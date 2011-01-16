@@ -589,6 +589,34 @@ class phpsec {
       self::$cik = $_COOKIE[PHPSEC_CIKCOOKIE];
     }
   }
+
+  /**
+   * Encrypt data returning a serialized array safe for storage in a database
+   * or file.
+   *
+   * @param mixed $data
+   *   Data to encrypt.
+   *
+   * @return string
+   *   Serialized array containing the encrypted data along with some meta data.
+   */
+  public static function encrypt($data) {
+
+  }
+
+  /**
+   * Decrypt a serialized array as returned by encrypt().
+   *
+   * @param string $data
+   *   Serialized array containing the encrypted data and meta information in the
+   *   excact format as returned by encrypt().
+   *
+   * @return mixed
+   *   Decrypted data in it's original form.
+   */
+  public static function decrypt($data) {
+
+  }
 } phpsec::init();
 // Since this is a staticly called library, we need to initialize it ourself as no
 // contruct funtion is called for us.
