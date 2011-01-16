@@ -1,6 +1,5 @@
 <?php
-/* $Id: phpsec.class.php,v 1.17 2011/01/16 11:09:09 xqus Exp $
-
+/**
       phpSec - A PHP security library
       Web:     phpsec.sf.net
 
