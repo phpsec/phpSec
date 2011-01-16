@@ -535,7 +535,7 @@ class phpsec {
     // Set the magic word in the cache.
     self::cacheSet('captcha', $str);
 
-    // Save the image.
+    // Save the image in the public data dir.
     imagepng($img, PHPSEC_PUBLICDATADIR.'/'.$filename.'.png');
     imagedestroy($img);
   }
