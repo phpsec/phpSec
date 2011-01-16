@@ -1,3 +1,5 @@
+January 16. 2011 - xqus
+  Prealpha 0.0.1 released.
 
 January 8. 2011 - xqus
   First code written.
