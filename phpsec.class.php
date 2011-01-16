@@ -622,8 +622,6 @@ class phpsec {
     } else {
       self::$cryptSessKey = $_COOKIE[PHPSEC_CIKCOOKIE];
     }
-    echo 'App  key:'.self::$cryptAppKey."\n";
-    echo 'Sess key:'.self::$cryptSessKey."\n";
   }
 
   /**
