@@ -103,16 +103,19 @@ class phpsec {
     mb_internal_encoding(PHPSEC_CHARSET);
     mb_regex_encoding(PHPSEC_CHARSET);
 
-     // Create a random token for each visitor and store it the users session.
-     // This is for example used to identify owners of cache data.
-     if(!isset($_SESSION['phpSec-uid'])) {
-       self::$uid = self::genUid();
-       $_SESSION['phpSec-uid'] = self::$uid;
-     } else {
-       self::$uid = $_SESSION['phpSec-uid'];
-     }
-     // Initialize the crypto, set the keys and other stuff we need.
-     self::cryptoInit();
+    // Do cache garbage collection.
+    self::cacheGc();
+
+    // Create a random token for each visitor and store it the users session.
+    // This is for example used to identify owners of cache data.
+    if(!isset($_SESSION['phpSec-uid'])) {
+      self::$uid = self::genUid();
+      $_SESSION['phpSec-uid'] = self::$uid;
+    } else {
+      self::$uid = $_SESSION['phpSec-uid'];
+    }
+    // Initialize the crypto, set the keys and other stuff we need.
+    self::cryptoInit();
   }
 
   /**
@@ -289,7 +292,20 @@ class phpsec {
    * Do garbage collection on cached data.
    */
   private static function cacheGc() {
-    //TODO: Create garbage collection
+    if ($handle = opendir(PHPSEC_DATADIR)) {
+      while (false !== ($file = readdir($handle))) {
+        if ($file != "." && $file != "..") {
+          if(substr($file, 0 ,6) == 'cache_') {
+            $fileName = PHPSEC_DATADIR.'/'.$file;
+            $data = unserialize(file_get_contents($fileName));
+            if($data['ttl'] < time()) {
+              unlink($fileName);
+            }
+          }
+        }
+      }
+      closedir($handle);
+    }
   }
 
   private static function cacheFilename($name) {
