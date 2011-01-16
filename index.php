@@ -1,8 +1,7 @@
 <?php
-/* $Id: index.php,v 1.4 2011/01/15 22:14:12 xqus Exp $
-
+/**
       phpSec - A PHP security library
-      Web:     phpsec.sf.net
+      Web:     https://github.com/xqus/phpSec
 
       Copyright 2011 Audun Larsen. All rights reserved.
       larsen@xqus.com

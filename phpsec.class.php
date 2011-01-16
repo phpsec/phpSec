@@ -1,7 +1,7 @@
 <?php
 /**
       phpSec - A PHP security library
-      Web:     phpsec.sf.net
+      Web:     https://github.com/xqus/phpSec
 
       Copyright 2011 Audun Larsen. All rights reserved.
       larsen@xqus.com
