@@ -70,19 +70,27 @@ define('PHPSEC_SESSNAME', 'phpSecSess');
  */
 define('PHPSEC_CIKCOOKIE', 'phpSecCik');
 
+/**
+ * Define secret to use as a shared crypto key.
+ * WARNING: Changing this breaks all before encrypted data.
+ */
+define('PHPSEC_SECRET', 'twxwcMNlp3xchzlHmuXzHJHE96DPiatAxrcw3sxu');
+
 define('PHPSEC_E_ERROR',  E_USER_ERROR);
 define('PHPSEC_E_WARN',   E_USER_WARNING);
 define('PHPSEC_E_NOTICE', E_USER_NOTICE);
 
 class phpsec {
-  public  static $uid = null; // User identifier. To identify a session.
-  private static $cik = null; // Session crypto key. Used for encryption of session data.
+  public  static $uid          = null; // User identifier. To identify a session.
+  private static $cryptSessKey = null; // Session crypto key. Used for session data.
+  private static $cryptAppKey  = null; // App crypto key. Used for long time storage.
+  private static $cryptDescr   = null; // Crypto descriptor.
 
   /**
    * Initialize the library.
    */
   public static function init() {
-    // Check write permissions to directories
+    /* Check write permissions to directories */
     if(!is_writeable(PHPSEC_LOGDIR)) {
       self::error('Log directory('.PHPSEC_LOGDIR.') not writeable');
     }
@@ -90,31 +98,32 @@ class phpsec {
       self::error('Data directory('.PHPSEC_DATADIR.') not writeable');
     }
 
-    // If the phpSec session handler is enabled, start it.
+    /* If the phpSec session handler is enabled, start it. */
     if(PHPSEC_SESSIONS === true) {
       self::sessionStart();
     }
-    // Start session if not already started earlier.
+    /* Start session if not already started earlier. */
     if(session_id() == '') {
        session_start();
      }
 
-    // Set the charset of the multibyte functions in PHP.
+    /* Set the charset of the multibyte functions in PHP. */
     mb_internal_encoding(PHPSEC_CHARSET);
     mb_regex_encoding(PHPSEC_CHARSET);
 
-    // Do cache garbage collection.
+    /* Do cache garbage collection.
+    TODO: This should probably not be run every time. */
     self::cacheGc();
 
-    // Create a random token for each visitor and store it the users session.
-    // This is for example used to identify owners of cache data.
+    /* Create a random token for each visitor and store it the users session.
+       This is for example used to identify owners of cache data. */
     if(!isset($_SESSION['phpSec-uid'])) {
       self::$uid = self::genUid();
       $_SESSION['phpSec-uid'] = self::$uid;
     } else {
       self::$uid = $_SESSION['phpSec-uid'];
     }
-    // Initialize the crypto, set the keys and other stuff we need.
+    /* Initialize the crypto, set the keys and other stuff we need. */
     self::cryptoInit();
   }
 
@@ -142,24 +151,24 @@ class phpsec {
    *   to apply.
    */
   public static function f($str, $args = array()) {
-    //First, loop trough the args and apply the filters.
+    /* First, loop trough the args and apply the filters. */
     while(list($name, $data) = each($args)) {
       $safeData = false;
       $filterType = mb_substr($name, 0, 1);
       switch($filterType) {
         case '%':
-          // %variables: HTML is stripped from the string
-          // before it is in inserted.
+          /* %variables: HTML is stripped from the string
+             before it is in inserted. */
           $safeData = strip_tags($data);
           break;
         case '!':
-          // !variables: HTML and special characters is escaped from the string
-          // before it is in inserted.
+          /* !variables: HTML and special characters is escaped from the string
+             before it is in inserted. */
           $safeData = htmlentities($data, ENT_QUOTES, PHPSEC_CHARSET);
           break;
         case '@':
-          // @variables: Only HTML is escaped from the string. Special characters
-          // is kept as is.
+          /* @variables: Only HTML is escaped from the string. Special characters
+             is kept as is. */
           $safeData = htmlspecialchars($data, ENT_NOQUOTES, PHPSEC_CHARSET);
           break;
         default:
@@ -187,7 +196,7 @@ class phpsec {
   private static function error($msg, $level = PHPSEC_E_WARN) {
     $callee = next(debug_backtrace());
     trigger_error($msg.'. (Called from <strong>'.$callee['file'].' line '.$callee['line'].'</strong>)', $level);
-    //TODO: Write error to file.
+    /* TODO: Write error to file. */
   }
 
   /**
@@ -205,7 +214,7 @@ class phpsec {
    */
   public static function log($type, $msg, $level = 'warn') {
     $fileName = PHPSEC_LOGDIR.'/log_'.$type;
-    //TODO: Add some more information when writing log entry.
+    /* TODO: Add some more information when writing log entry. */
     $line = date('c').' - '.$level.' - '.$msg;
 
     $fp = fopen($fileName, 'a');
@@ -348,7 +357,7 @@ class phpsec {
    */
   public static function getToken($name, $ttl = 3600) {
     $token = self::genUid();
-    // Save the token to the cahce.
+    /* Save the token to the cahce. */
     self::cacheSet('token-'.$name, $token, $ttl);
     return $token;
   }
@@ -366,9 +375,9 @@ class phpsec {
    */
   public static function validToken($name, $token) {
     $cacheToken = self::cacheGet('token-'.$name);
-    // Check if the provided token matches the token in the cache.
+    /* Check if the provided token matches the token in the cache. */
     if($cacheToken == $token) {
-      // Remove the token from the cahche so it can't be reused.
+      /* Remove the token from the cahche so it can't be reused. */
       self::cacheRem('token-'.$name);
       return true;
     }
@@ -439,12 +448,12 @@ class phpsec {
        * data from $dbPassword.
        */
       $pwInjected = self::pwInject($password, $data['salt'], $data['injection']);
-      // Create a hash and see if it matches.
+      /* Create a hash and see if it matches. */
       if(hash($data['algo'], $pwInjected) == $data['hash']) {
         return true;
       }
     } else {
-      // Invalid array supplied.
+      /* Invalid array supplied. */
       self::error('Invalid data supplied. Expected serialized array as returned by pwHash()');
     }
     return false;
@@ -488,9 +497,7 @@ class phpsec {
    *   Returns the filename to the image containing the captcha or false on failure.
    */
   public static function captcha() {
-    /**
-     * First, make sure we have GD.
-     */
+    /* First, make sure we have GD. */
     if(!function_exists('imagecreatetruecolor')) {
       self::error('GD is required to create captchas');
       return false;
@@ -525,13 +532,11 @@ class phpsec {
     $border = imagecolorallocate($img, 0, 0, 0);
     $line   = imagecolorallocate($img, 255, 0, 0);
 
-    // Add border.
+    /* Add border. */
     imagerectangle ($img,0 ,0, $width-1, $height-1, $border);
 
-    /**
-     * Add some background noice to the image. Loops trough the image and
-     * randomly set background colors.
-     */
+    /* Add some background noice to the image. Loops trough the image and
+     * randomly set background colors. */
     $numColors = sizeof($bg);
     for($y = 1; $y < $height-1; $y++) {
       for($x = 1; $x < $width-1; $x++) {
@@ -539,19 +544,19 @@ class phpsec {
       }
     }
 
-    // Add a line to the image just for the heck of it.
+    /* Add a line to the image just for the heck of it. */
     imageline($img, 10, rand(5, $height-5), $width-10, rand(5, $height-5), $line);
 
-    // Add the text to the image. You need to be a genius to come up with code like this.
+    /* Add the text to the image. You need to be a genius to come up with code like this. */
     $str = self::captchaWord(6);
     for($i = 0; $i < strlen($str); $i++) {
       $char = strtoupper(substr($str, $i, 1));
       imagestring($img, 5, 20+$i*14, rand(5,10), $char, $border);
     }
-    // Set the magic word in the cache.
+    /* Set the magic word in the cache. */
     self::cacheSet('captcha', $str);
 
-    // Save the image in the public data dir.
+    /* Save the image in the public data dir. */
     imagepng($img, PHPSEC_PUBLICDATADIR.'/'.$filename.'.png');
     imagedestroy($img);
   }
@@ -573,14 +578,14 @@ class phpsec {
     if(session_id() != '') {
       self::error('Session already started. Can\'t use phpSec sessions', PHPSEC_E_WARN);
     } else {
-      // TODO: Create own session handler and add encryption support.
-      // Set the session.save.path to our datadir.
+      /* TODO: Create own session handler and add encryption support.
+       * Set the session.save.path to our datadir. */
       session_save_path(PHPSEC_DATADIR);
-      // Rename the session to avoid clusterfu*ks.
+      /* Rename the session to avoid clusterfu*ks. */
       session_name(PHPSEC_SESSNAME);
-      // Initialize the session.
+      /* Initialize the session. */
       session_start();
-      // Regenerate the session ID and remove the old session to avaoid session hijacking.
+      /* Regenerate the session ID and remove the old session to avaoid session hijacking. */
       session_regenerate_id(true);
     }
   }
@@ -590,20 +595,35 @@ class phpsec {
    * Create a crypto key to use for this session.
    */
   private static function cryptoInit() {
-    //TODO: Do some checks to see if our PHP installation supports the algos.
+    /* TODO: Do some checks to see if our PHP installation supports the algos. */
     /**
-     * If we don't already have a crypto key we need to create one and save it in
+     * Initialize the mcrypt module. Set the application crypto key that will be used
+     * for long time storage of data.
+     */
+    /* Open the cipher */
+    self::$cryptDescr = mcrypt_module_open(MCRYPT_BLOWFISH, '', 'cbc', '');
+
+    /* Get keysize length */
+    $ks = mcrypt_enc_get_key_size(self::$cryptDescr);
+
+    /* Get the application key from our secret */
+    self::$cryptAppKey = substr(hash(PHPSEC_HASHTYPE, PHPSEC_SECRET), 0, $ks);
+
+    /**
+     * If we don't already have a session crypto key we need to create one and save it in
      * a cookie so e can use it trough the session. Note that this key should only
      * be used for session data and not database storage. For that we need a permanent
      * key that don't change.
      */
     if(!isset($_COOKIE[PHPSEC_CIKCOOKIE])) {
-      self::$cik = self::genUid(80);
-      // TODO: Path, domain and secure only should be defined by user.
-      setcookie(PHPSEC_CIKCOOKIE, self::$cik, 0, null, null, false);
+      self::$cryptSessKey = substr(hash(PHPSEC_HASHTYPE, self::genUid(80)), 0, $ks);
+      /* TODO: Path, domain and secure only should be defined by user. */
+      setcookie(PHPSEC_CIKCOOKIE, self::$cryptSessKey, 0, null, null, false);
     } else {
-      self::$cik = $_COOKIE[PHPSEC_CIKCOOKIE];
+      self::$cryptSessKey = $_COOKIE[PHPSEC_CIKCOOKIE];
     }
+    echo 'App  key:'.self::$cryptAppKey."\n";
+    echo 'Sess key:'.self::$cryptSessKey."\n";
   }
 
   /**
@@ -617,7 +637,8 @@ class phpsec {
    *   Serialized array containing the encrypted data along with some meta data.
    */
   public static function encrypt($data) {
-
+    /* Create IV */
+    $iv = mcrypt_create_iv(mcrypt_enc_get_iv_size(self::$cryptDescr), MCRYPT_RAND);
   }
 
   /**
@@ -634,5 +655,5 @@ class phpsec {
 
   }
 } phpsec::init();
-// Since this is a staticly called library, we need to initialize it ourself as no
-// contruct funtion is called for us.
+/* Since this is a staticly called library, we need to initialize it ourself as no
+ * contruct funtion is called for us. */
