@@ -596,25 +596,20 @@ class phpsec {
    */
   private static function cryptoInit() {
     /* TODO: Do some checks to see if our PHP installation supports the algos. */
-    /**
-     * Initialize the mcrypt module. Set the application crypto key that will be used
-     * for long time storage of data.
-     */
-    /* Open the cipher */
-    self::$cryptDescr = mcrypt_module_open(MCRYPT_BLOWFISH, '', 'cbc', '');
 
-    /* Get keysize length */
+    /* Open the cipher. */
+    self::$cryptDescr = mcrypt_module_open(MCRYPT_BLOWFISH, '', 'cbc', ''); /* TODO: You know what to do here. */
+
+    /* Get keysize length. */
     $ks = mcrypt_enc_get_key_size(self::$cryptDescr);
 
-    /* Get the application key from our secret */
+    /* Get the application key from our secret. */
     self::$cryptAppKey = substr(hash(PHPSEC_HASHTYPE, PHPSEC_SECRET), 0, $ks);
 
-    /**
-     * If we don't already have a session crypto key we need to create one and save it in
+    /* If we don't already have a session crypto key we need to create one and save it in
      * a cookie so e can use it trough the session. Note that this key should only
      * be used for session data and not database storage. For that we need a permanent
-     * key that don't change.
-     */
+     * key that don't change. */
     if(!isset($_COOKIE[PHPSEC_CIKCOOKIE])) {
       self::$cryptSessKey = substr(hash(PHPSEC_HASHTYPE, self::genUid(80)), 0, $ks);
       /* TODO: Path, domain and secure only should be defined by user. */
@@ -626,7 +621,13 @@ class phpsec {
 
   /**
    * Encrypt data returning a serialized array safe for storage in a database
-   * or file.
+   * or file. The array has the following structure before it is serialized:
+   * array(
+   *   'cdata' => 'Encrypted data, Base 64 encoded',
+   *   'iv'    => 'Base64 encoded IV',
+   *   'algo'  => 'Algorythm used',
+   *   'mode'  => 'Mode used',
+   * )
    *
    * @param mixed $data
    *   Data to encrypt.
@@ -635,8 +636,16 @@ class phpsec {
    *   Serialized array containing the encrypted data along with some meta data.
    */
   public static function encrypt($data) {
-    /* Create IV */
+    /* Create IV. */
     $iv = mcrypt_create_iv(mcrypt_enc_get_iv_size(self::$cryptDescr), MCRYPT_RAND);
+
+    /* Prepeare the array with data. */
+    $encrypted['cdata'] = base64_encode(mcrypt_generic(self::$cryptDescr, serialize($data)));
+    $encrypted['algo']  = MCRYPT_BLOWFISH; /* TODO: You know what to do here. */
+    $encrypted['mode']  = 'cbc';
+    $encrypted['iv']    = base64_encode($iv);
+
+    return serialize($encrypted);
   }
 
   /**
