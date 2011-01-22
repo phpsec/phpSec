@@ -635,9 +635,20 @@ class phpsec {
    * @return string
    *   Serialized array containing the encrypted data along with some meta data.
    */
-  public static function encrypt($data) {
+  public static function encrypt($data, $keyType = 'longtime') {
     /* Create IV. */
     $iv = mcrypt_create_iv(mcrypt_enc_get_iv_size(self::$cryptDescr), MCRYPT_RAND);
+
+    /* Select key and pass on to mcrypt. */
+    switch($keyType) {
+      case 'longtime':
+        $key = self::$cryptAppKey;
+        break;
+      case 'onetime':
+        $key = self::$cryptSessKey;
+        break;
+    }
+    mcrypt_generic_init(self::$cryptDescr, $key, $iv);
 
     /* Prepeare the array with data. */
     $encrypted['cdata'] = base64_encode(mcrypt_generic(self::$cryptDescr, serialize($data)));
