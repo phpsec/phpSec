@@ -18,6 +18,12 @@ Getting started
 For more information on installation and usage, please check out the
 [Wiki](https://github.com/xqus/phpSec/wiki/Documentation).
 
+System requirements
+-------------------
+PHP 5.2(?) or greater with the following extensions is required to use phpSec:
+* Mcrypt <http://php.net/mcrypt>
+* Hash <http://php.net/hash>
+
 Getting help
 ------------
 If you need any help with using phpSec or need to report a bug/security issue or you
