@@ -6,12 +6,12 @@ against various attacks.
 
 Features
 --------
-* [XSS][1] filter.
-* [CSRF][2] protection.
-* Password hashing helper functions.
-* Logging functions.
-* Data encryption.
-* Enhanced session security.
+*    [XSS][1] filter.
+*    [CSRF][2] protection.
+*    Password hashing helper functions.
+*    Logging functions.
+*    Data encryption.
+*    Enhanced session security.
 
 Getting started
 ---------------
@@ -21,8 +21,10 @@ For more information on installation and usage, please check out the
 System requirements
 -------------------
 PHP 5.2(?) or greater with the following extensions is required to use phpSec:
-* Mcrypt <http://php.net/mcrypt>
-* Hash <http://php.net/hash>
+
+*   Mcrypt
+*   Hash
+
 
 Getting help
 ------------
