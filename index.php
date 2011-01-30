@@ -30,6 +30,13 @@ echo 'Uid: '.phpsec::$uid."\n\n";
 echo "<hr />";
 
 /**
+ * Test encryption
+ */
+print_r(phpsec::encrypt('f00bar'));
+print_r(phpsec::decrypt(phpsec::encrypt('f00bar')));
+echo "<hr />";
+
+/**
  * Test captcha.
  */
 /*$captcha = phpsec::captcha();
