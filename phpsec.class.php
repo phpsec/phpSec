@@ -71,6 +71,12 @@ define('PHPSEC_SESSNAME', 'phpSecSess');
 define('PHPSEC_CIKCOOKIE', 'phpSecCik');
 
 /**
+ * Garbage collection probablility. Setting it to 1 makes it run every time,
+ * 0.5 every second time and setting it to 0 disabled garbage collection.
+ */
+define('PHPSEC_GCPROB', 0.2);
+
+/**
  * Define secret to use as a shared crypto key.
  * WARNING: Changing this breaks all before encrypted data.
  */
@@ -111,8 +117,7 @@ class phpsec {
     mb_internal_encoding(PHPSEC_CHARSET);
     mb_regex_encoding(PHPSEC_CHARSET);
 
-    /* Do cache garbage collection.
-    TODO: This should probably not be run every time. */
+    /* Do cache garbage collection. */
     self::cacheGc();
 
     /* Create a random token for each visitor and store it the users session.
@@ -301,6 +306,12 @@ class phpsec {
    * Do garbage collection on cached data.
    */
   private static function cacheGc() {
+    $probMax = 1 / PHPSEC_GCPROB;
+    $do = rand(1, $probMax);
+    if($do > 1) {
+      /* Skipping GC this time. */
+      return false;
+    }
     if ($handle = opendir(PHPSEC_DATADIR)) {
       while (false !== ($file = readdir($handle))) {
         if ($file != "." && $file != "..") {
@@ -315,6 +326,7 @@ class phpsec {
       }
       closedir($handle);
     }
+    return true;
   }
 
   private static function cacheFilename($name) {
