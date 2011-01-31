@@ -597,8 +597,7 @@ class phpsec {
   private static function cryptoInit() {
     /* TODO: Do some checks to see if our PHP installation supports the algos. */
 
-    /* Open the cipher. */
-    self::$cryptDescr = mcrypt_module_open(MCRYPT_BLOWFISH, '', 'cbc', ''); /* TODO: You know what to do here. */
+    self::$cryptDescr = mcrypt_module_open(MCRYPT_BLOWFISH, '', 'cbc', '');
 
     /* Get keysize length. */
     $ks = mcrypt_enc_get_key_size(self::$cryptDescr);
@@ -640,7 +639,8 @@ class phpsec {
     /* Create IV. */
     $iv = mcrypt_create_iv(mcrypt_enc_get_iv_size(self::$cryptDescr), MCRYPT_RAND);
 
-    /* Select key and pass on to mcrypt. */
+    /* Select key and pass on to mcrypt.
+     * TODO: Move this to cryptoInit() or mabye a new method?*/
     switch($keyType) {
       case 'longtime':
         $key = self::$cryptAppKey;
@@ -664,16 +664,40 @@ class phpsec {
   }
 
   /**
-   * Decrypt a serialized array as returned by encrypt().
+   * Decrypt a data encrypted by encrypt().
    *
    * @param string $data
-   *   Serialized array containing the encrypted data and meta information in the
+   *   JSON string containing the encrypted data and meta information in the
    *   excact format as returned by encrypt().
    *
    * @return mixed
    *   Decrypted data in it's original form.
    */
-  public static function decrypt($data) {
+  public static function decrypt($data, $keyType = 'longtime') {
+    /* First select the key to use. */
+    switch($keyType) {
+      case 'longtime':
+        $key = self::$cryptAppKey;
+        break;
+      case 'onetime':
+        $key = self::$cryptSessKey;
+        break;
+    }
+
+    /* Decode the JSON string */
+    $data = json_decode($data, true);
+    if($data === NULL || sizeof($data) !== 5) {
+      self::error('Invalid data passed to decrypt()');
+      return false;
+    }
+
+    /* Everything looks good so far. Let's continue.*/
+    $td = mcrypt_module_open($data['algo'], '', $data['mode'], '');
+
+    mcrypt_generic_init($td, $key, base64_decode($data['iv']));
+    $decrypted = mdecrypt_generic($td, base64_decode($data['cdata']));
+
+    return unserialize($decrypted);
 
   }
 } phpsec::init();
