@@ -620,13 +620,14 @@ class phpsec {
   }
 
   /**
-   * Encrypt data returning a serialized array safe for storage in a database
-   * or file. The array has the following structure before it is serialized:
+   * Encrypt data returning a JSON encoded array safe for storage in a database
+   * or file. The array has the following structure before it is encoded:
    * array(
    *   'cdata' => 'Encrypted data, Base 64 encoded',
    *   'iv'    => 'Base64 encoded IV',
    *   'algo'  => 'Algorythm used',
    *   'mode'  => 'Mode used',
+   *   'hash'  => 'A SHA256 hash of the data'
    * )
    *
    * @param mixed $data
@@ -651,12 +652,15 @@ class phpsec {
     mcrypt_generic_init(self::$cryptDescr, $key, $iv);
 
     /* Prepeare the array with data. */
-    $encrypted['cdata'] = base64_encode(mcrypt_generic(self::$cryptDescr, serialize($data)));
+    $serializedData = serialize($data);
+
+    $encrypted['cdata'] = base64_encode(mcrypt_generic(self::$cryptDescr, $serializedData));
+    $encrypted['hash']  = hash('sha256', $serializedData);
     $encrypted['algo']  = MCRYPT_BLOWFISH; /* TODO: You know what to do here. */
     $encrypted['mode']  = 'cbc';
     $encrypted['iv']    = base64_encode($iv);
 
-    return serialize($encrypted);
+    return json_encode($encrypted);
   }
 
   /**
