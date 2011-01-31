@@ -707,10 +707,13 @@ class phpsec {
     $td = mcrypt_module_open($data['algo'], '', $data['mode'], '');
 
     mcrypt_generic_init($td, $key, base64_decode($data['iv']));
-    $decrypted = mdecrypt_generic($td, base64_decode($data['cdata']));
-
-    return unserialize($decrypted);
-
+    $decrypted = rtrim(mdecrypt_generic($td, base64_decode($data['cdata'])), "\0");
+    echo $decrypted;
+    if(hash('sha256', $decrypted) == $data['hash']) {
+      return unserialize($decrypted);
+    } else {
+      return false;
+    }
   }
 } phpsec::init();
 /* Since this is a staticly called library, we need to initialize it ourself as no
