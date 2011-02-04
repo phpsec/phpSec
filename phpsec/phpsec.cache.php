@@ -24,7 +24,10 @@
   THE SOFTWARE.
  */
 
-class psCache {
+/**
+ *  Provides as simple cahce engine.
+ */
+class phpsecCache {
   /**
    * Save data to the cache.
    *
