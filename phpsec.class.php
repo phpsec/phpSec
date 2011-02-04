@@ -104,8 +104,9 @@ class phpsec {
   public static function load($class) {
     $basePath = dirname(__FILE__);
     $classes = array(
-      'psCache'   => 'phpsec.cache.php',
-      'psSession' => 'phpsec.session.php',
+      'phpsecCache'   => 'phpsec.cache.php',
+      'phpsecSession' => 'phpsec.session.php',
+      'phpsecRand'    => 'phpsec.rand.php',
     );
 
     if(isset($classes[$class])) {
