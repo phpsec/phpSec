@@ -637,38 +637,6 @@ class phpsec {
       return false;
     }
   }
-
-  public static function randBytes($length) {
-    /* Code inspired by this blogpost by Enrico Zimuel
-     * http://www.zimuel.it/blog/2011/01/strong-cryptography-in-php/ */
-    $strong = false;
-    if(function_exists('openssl_random_pseudo_bytes')) {
-      $rnd = openssl_random_pseudo_bytes($length, $strong);
-      if($strong === true) {
-        return $rnd;
-      }
-    }
-    /* Either we dont have the OpenSSL library or the data returned was not
-     * considered secure. Fall back on this less secure code. */
-    for ($i=0;$i<$length;$i++) {
-      $sha= hash('sha256', mt_rand());
-      $char= mt_rand(0,30);
-      $rnd.= chr(hexdec($sha[$char].$sha[$char+1]));
-    }
-    return $rnd;
-  }
-
-  public static function randInt() {
-
-  }
-
-  public static function randStr() {
-
-  }
-
-  public static function randhex() {
-
-  }
 } phpsec::init();
 /* Since this is a staticly called library, we need to initialize it ourself as no
  * contruct funtion is called for us. */
