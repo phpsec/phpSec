@@ -18,22 +18,30 @@
 
 
  */
+
+
 echo "<pre>";
 error_reporting(E_ALL);
 ini_set('display_errors','stdout');
 
-
 require_once 'phpsec.class.php';
+
 
 // Print the uid
 echo 'Uid: '.phpsec::$uid."\n\n";
 echo "<hr />";
 
+
+/**
+ * Test randomness
+ */
+echo phpsec::randBytes(10);
+echo "<hr />";
 /**
  * Test encryption
  */
 print_r(phpsec::encrypt('f00bar'));
-print_r(phpsec::decrypt(phpsec::encrypt('f00bar')));
+print_r(phpsec::decrypt(phpsec::encrypt(array('1','2'))));
 echo "<hr />";
 
 /**
@@ -80,7 +88,6 @@ echo phpsec::f('This is a !test, %ok?', array('!test' => 't<br>est. Å?""', '%ok
  * Test logging.
  */
 phpsec::log('access', 'Someone loaded the page', 'debug');
-
 
 
 echo "</pre>";

@@ -100,7 +100,27 @@ class phpsec {
   /**
    * Initialize the library.
    */
+
+  public static function load($class) {
+    $basePath = dirname(__FILE__);
+    $classes = array(
+      'psCache'   => 'phpsec.cache.php',
+      'psSession' => 'phpsec.session.php',
+    );
+
+    if(isset($classes[$class])) {
+      require_once $basePath.'/'.$classes[$class];
+    }
+  }
   public static function init() {
+    /* First of all, register the autoloading function.
+     * If we have one set from somewhere else, keep it. */
+     $autoLoadFunctions   = spl_autoload_functions();
+     $autoLoadFunctions[] = 'phpsec::load';
+     foreach($autoLoadFunctions as $autoLoadFunction) {
+       spl_autoload_register($autoLoadFunction);
+     }
+
     /* Check write permissions to directories */
     if(!is_writeable(PHPSEC_LOGDIR)) {
       self::error('Log directory('.PHPSEC_LOGDIR.') not writeable');
@@ -121,9 +141,6 @@ class phpsec {
     /* Set the charset of the multibyte functions in PHP. */
     mb_internal_encoding(PHPSEC_CHARSET);
     mb_regex_encoding(PHPSEC_CHARSET);
-
-    /* Do cache garbage collection. */
-    self::cacheGc();
 
     /* Create a random token for each visitor and store it the users session.
        This is for example used to identify owners of cache data. */
@@ -240,105 +257,6 @@ class phpsec {
   }
 
   /**
-   * Save data to the cache.
-   *
-   * @param name
-   *   String containing the name of the data to save.
-   *
-   * @param data
-   *   Data to save. Can be any dataform.
-   *
-   * @param ttl
-   *   Time to live in seconds.
-   */
-  private static function cacheSet($name, $data, $ttl = 3600) {
-    $fileName =  PHPSEC_DATADIR.'/'.self::cacheFilename($name);
-    $saveData['data'] = $data;
-    $saveData['ttl']  = time() + $ttl;
-    $data = serialize($saveData);
-    $fp = fopen($fileName, 'w');
-    if($fp !== false) {
-      if(flock($fp, LOCK_EX)) {
-        fwrite($fp, $data);
-        flock($fp, LOCK_UN);
-        fclose($fp);
-      } else {
-        self::error('Could not lock logfile');
-      }
-    }
-  }
-
-  /**
-   * Get data from the cache.
-   *
-   * @param name
-   *   String containing the name of the data to get.
-   *
-   * @return mixed
-   *   Returns data in it's original form, or false if no data stored.
-   */
-  private static function cacheGet($name) {
-    $fileName =  PHPSEC_DATADIR.'/'.self::cacheFilename($name);
-    if(file_exists($fileName)) {
-      $data = unserialize(file_get_contents($fileName));
-      if($data['ttl'] > time()) {
-        return $data['data'];
-      }
-
-    }
-    return false;
-  }
-
-  /**
-   * Remove data from the cache.
-   *
-   * @param name
-   *   String containing the name of the data to remove.
-   *
-   * @return boolean
-   *   True on success, false otherwise.
-   */
-  private static function cacheRem($name) {
-    $fileName =  PHPSEC_DATADIR.'/'.self::cacheFilename($name);
-    if(unlink($fileName)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  /**
-   * Do garbage collection on cached data.
-   */
-  private static function cacheGc() {
-    $probMax = 1 / PHPSEC_GCPROB;
-    $do = rand(1, $probMax);
-    if($do > 1) {
-      /* Skipping GC this time. */
-      return false;
-    }
-    if ($handle = opendir(PHPSEC_DATADIR)) {
-      while (false !== ($file = readdir($handle))) {
-        if ($file != "." && $file != "..") {
-          if(substr($file, 0 ,6) == 'cache_') {
-            $fileName = PHPSEC_DATADIR.'/'.$file;
-            $data = unserialize(file_get_contents($fileName));
-            if($data['ttl'] < time()) {
-              unlink($fileName);
-            }
-          }
-        }
-      }
-      closedir($handle);
-    }
-    return true;
-  }
-
-  private static function cacheFilename($name) {
-    return 'cache_'.$name.'_'.hash(PHPSEC_HASHTYPE, self::$uid);
-  }
-
-  /**
    * Returns a unique identifier in the format spsecified in
    * OpenID Authentication 2.0 protocol.
    * For example: 2005-05-15T17:11:51ZUNIQUE
@@ -375,7 +293,7 @@ class phpsec {
   public static function getToken($name, $ttl = 3600) {
     $token = self::genUid();
     /* Save the token to the cahce. */
-    self::cacheSet('token-'.$name, $token, $ttl);
+    psCache::cacheSet('token-'.$name, $token, $ttl);
     return $token;
   }
 
@@ -391,11 +309,11 @@ class phpsec {
    *   Returns true if the token is valid. Returns false otherwise.
    */
   public static function validToken($name, $token) {
-    $cacheToken = self::cacheGet('token-'.$name);
+    $cacheToken = psCache::cacheGet('token-'.$name);
     /* Check if the provided token matches the token in the cache. */
     if($cacheToken == $token) {
       /* Remove the token from the cahche so it can't be reused. */
-      self::cacheRem('token-'.$name);
+      psCache::cacheRem('token-'.$name);
       return true;
     }
     return false;
@@ -571,7 +489,7 @@ class phpsec {
       imagestring($img, 5, 20+$i*14, rand(5,10), $char, $border);
     }
     /* Set the magic word in the cache. */
-    self::cacheSet('captcha', $str);
+    psCache::cacheSet('captcha', $str);
 
     /* Save the image in the public data dir. */
     imagepng($img, PHPSEC_PUBLICDATADIR.'/'.$filename.'.png');
