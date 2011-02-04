@@ -294,7 +294,7 @@ class phpsec {
   public static function getToken($name, $ttl = 3600) {
     $token = self::genUid();
     /* Save the token to the cahce. */
-    psCache::cacheSet('token-'.$name, $token, $ttl);
+    phpsecCache::cacheSet('token-'.$name, $token, $ttl);
     return $token;
   }
 
@@ -310,11 +310,11 @@ class phpsec {
    *   Returns true if the token is valid. Returns false otherwise.
    */
   public static function validToken($name, $token) {
-    $cacheToken = psCache::cacheGet('token-'.$name);
+    $cacheToken = phpsecCache::cacheGet('token-'.$name);
     /* Check if the provided token matches the token in the cache. */
     if($cacheToken == $token) {
       /* Remove the token from the cahche so it can't be reused. */
-      psCache::cacheRem('token-'.$name);
+      phpsecCache::cacheRem('token-'.$name);
       return true;
     }
     return false;
@@ -490,7 +490,7 @@ class phpsec {
       imagestring($img, 5, 20+$i*14, rand(5,10), $char, $border);
     }
     /* Set the magic word in the cache. */
-    psCache::cacheSet('captcha', $str);
+    phpsecCache::cacheSet('captcha', $str);
 
     /* Save the image in the public data dir. */
     imagepng($img, PHPSEC_PUBLICDATADIR.'/'.$filename.'.png');
