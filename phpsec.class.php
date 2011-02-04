@@ -109,7 +109,7 @@ class phpsec {
     );
 
     if(isset($classes[$class])) {
-      require_once $basePath.'/'.$classes[$class];
+      require_once $basePath.'/phpsec/'.$classes[$class];
     }
   }
   public static function init() {
