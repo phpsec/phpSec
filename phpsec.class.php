@@ -130,7 +130,7 @@ class phpsec {
 
     /* If the phpSec session handler is enabled, start it. */
     if(PHPSEC_SESSIONS === true) {
-      self::sessionStart();
+      phpsecSession::sessionStart();
     }
     /* Start session if not already started earlier. */
     if(session_id() == '') {
@@ -501,25 +501,6 @@ class phpsec {
    */
   private static function captchaWord($len = 5) {
     return substr(hash(PHPSEC_HASHTYPE, self::genUid()), 0, $len);
-  }
-
-  /**
-   * Initialize a phpSec enforced session.
-   */
-  private static function sessionStart() {
-    if(session_id() != '') {
-      self::error('Session already started. Can\'t use phpSec sessions', PHPSEC_E_WARN);
-    } else {
-      /* TODO: Create own session handler and add encryption support.
-       * Set the session.save.path to our datadir. */
-      session_save_path(PHPSEC_DATADIR);
-      /* Rename the session to avoid clusterfu*ks. */
-      session_name(PHPSEC_SESSNAME);
-      /* Initialize the session. */
-      session_start();
-      /* Regenerate the session ID and remove the old session to avaoid session hijacking. */
-      session_regenerate_id(true);
-    }
   }
 } phpsec::init();
 /* Since this is a staticly called library, we need to initialize it ourself as no
