@@ -35,13 +35,13 @@ echo "<hr />";
 /**
  * Test randomness
  */
-echo phpsec::randBytes(10);
+echo phpsecRand::randBytes(10);
 echo "<hr />";
 /**
  * Test encryption
  */
-print_r(phpsec::encrypt('f00bar'));
-print_r(phpsec::decrypt(phpsec::encrypt(array('1','2'))));
+print_r(phpsecCrypt::encrypt('f00bar'));
+print_r(phpsecCrypt::decrypt(phpsecCrypt::encrypt(array('1','2'))));
 echo "<hr />";
 
 /**
