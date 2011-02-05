@@ -35,6 +35,10 @@ class phpsecSession {
 
   /**
    * Open session.
+   *
+   * @param string $path
+   * @param string $name
+   * @return bool
    */
   public static function open($path, $name) {
     /* Set some variables we need later */
@@ -58,12 +62,25 @@ class phpsecSession {
     } else {
       self::$_secret = $_COOKIE[self::$_keyCookie];
     }
+
+    return true;
   }
 
+  /**
+   * Close the session
+   *
+   * @return bool
+   */
   public static function close() {
     return true;
   }
 
+  /**
+   * Read and decrypt session.
+   *
+   * @param string $id
+   * @return bool
+   */
   public static function read($id) {
     $file = self::fileName($id);
     if(file_exists($file)) {
@@ -73,6 +90,13 @@ class phpsecSession {
     return false;
   }
 
+  /**
+   * Encrypt and write session.
+   *
+   * @param string $id
+   * @param string $data
+   * @return bool
+   */
   public static function write($id, $data) {
     $file = self::fileName($id);
     $encrypted = phpsecCrypt::encrypt($data, self::$_secret);
@@ -84,7 +108,12 @@ class phpsecSession {
     }
     return false;
   }
-
+  /**
+   * Destroy/remove the session.
+   *
+   * @param string $id
+   * @return bool
+   */
   public static function destroy($id) {
     $file = self::fileName($id);
     setcookie(
@@ -94,7 +123,12 @@ class phpsecSession {
     );
     return(@unlink($file));
   }
-
+  /**
+   * Do garbage collection.
+   *
+   * @param integer $ttl
+   * @return bool
+   */
   public static function gc($ttl) {
     $fileNames = glob(self::$_savePath.'/'.self::$_name.'_*');
     foreach($fileNames as $fileName) {
@@ -105,6 +139,12 @@ class phpsecSession {
     return true;
   }
 
+  /**
+   * Get the filname for a session ID.
+   *
+   * @param string $id
+   * @return string
+   */
   private static function fileName($id) {
     return self::$_savePath.'/'.self::$_name."_".$id;
   }
