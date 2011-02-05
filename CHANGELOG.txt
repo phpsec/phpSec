@@ -1,3 +1,12 @@
+February 5. 2011 - xqus
+  alpha-0.0.2 released.
+- The library is no longer automatically initialized. You now need to call phpsec::init().
+- Added encryption functions.
+- Added random functions.
+- Separated the library into smaller files.
+- Added session encryption.
+- Many minor changes..
+
 January 16. 2011 - xqus
   Prealpha 0.0.1 released.
 
