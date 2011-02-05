@@ -28,38 +28,6 @@
  * Provides methods for encrypting data.
  */
 class phpsecCrypt {
-  private static $cryptSessKey = null; // Session crypto key. Used for session data.
-  private static $cryptAppKey  = null; // App crypto key. Used for long time storage.
-  private static $cryptDescr   = null; // Crypto descriptor.
-  /**
-   * Initialize the crypto library.
-   * Check to see if our PHP installation meets the requirements.
-   * Create a crypto key to use for this session.
-   */
-  public static function init() {
-    /* TODO: Do some checks to see if our PHP installation supports the algos. */
-
-    self::$cryptDescr = mcrypt_module_open(MCRYPT_BLOWFISH, '', 'cbc', '');
-
-    /* Get keysize length. */
-    $ks = mcrypt_enc_get_key_size(self::$cryptDescr);
-
-    /* Get the application key from our secret. */
-    self::$cryptAppKey = substr(hash(PHPSEC_HASHTYPE, PHPSEC_SECRET), 0, $ks);
-
-    /* If we don't already have a session crypto key we need to create one and save it in
-     * a cookie so e can use it trough the session. Note that this key should only
-     * be used for session data and not database storage. For that we need a permanent
-     * key that don't change. */
-    if(!isset($_COOKIE[PHPSEC_CIKCOOKIE])) {
-      self::$cryptSessKey = substr(hash(PHPSEC_HASHTYPE, phpsec::genUid(80)), 0, $ks);
-      /* TODO: Path, domain and secure only should be defined by user. */
-      setcookie(PHPSEC_CIKCOOKIE, self::$cryptSessKey, 0, null, null, false);
-    } else {
-      self::$cryptSessKey = $_COOKIE[PHPSEC_CIKCOOKIE];
-    }
-  }
-
   /**
    * Encrypt data returning a JSON encoded array safe for storage in a database
    * or file. The array has the following structure before it is encoded:
@@ -77,26 +45,25 @@ class phpsecCrypt {
    * @return string
    *   Serialized array containing the encrypted data along with some meta data.
    */
-  public static function encrypt($data, $keyType = 'longtime') {
-    /* Create IV. */
-    $iv = mcrypt_create_iv(mcrypt_enc_get_iv_size(self::$cryptDescr), MCRYPT_RAND);
+  public static function encrypt($data, $key) {
+    $td = mcrypt_module_open(MCRYPT_BLOWFISH, '', 'cbc', '');
 
-    /* Select key and pass on to mcrypt.
-     * TODO: Move this to cryptoInit() or mabye a new method?*/
-    switch($keyType) {
-      case 'longtime':
-        $key = self::$cryptAppKey;
-        break;
-      case 'onetime':
-        $key = self::$cryptSessKey;
-        break;
-    }
-    mcrypt_generic_init(self::$cryptDescr, $key, $iv);
+    /* Create IV. */
+    $iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
+
+    /* Get keysize length. */
+    $ks = mcrypt_enc_get_key_size($td);
+
+    /* Get key. */
+    $key = self::getKey($key, $ks);
+
+    /* Init mcrypt. */
+    mcrypt_generic_init($td, $key, $iv);
 
     /* Prepeare the array with data. */
     $serializedData = serialize($data);
 
-    $encrypted['cdata'] = base64_encode(mcrypt_generic(self::$cryptDescr, $serializedData));
+    $encrypted['cdata'] = base64_encode(mcrypt_generic($td, $serializedData));
     $encrypted['hash']  = hash('sha256', $serializedData);
     $encrypted['algo']  = MCRYPT_BLOWFISH; /* TODO: You know what to do here. */
     $encrypted['mode']  = 'cbc';
@@ -115,16 +82,7 @@ class phpsecCrypt {
    * @return mixed
    *   Decrypted data in it's original form.
    */
-  public static function decrypt($data, $keyType = 'longtime') {
-    /* First select the key to use. */
-    switch($keyType) {
-      case 'longtime':
-        $key = self::$cryptAppKey;
-        break;
-      case 'onetime':
-        $key = self::$cryptSessKey;
-        break;
-    }
+  public static function decrypt($data, $key) {
 
     /* Decode the JSON string */
     $data = json_decode($data, true);
@@ -132,11 +90,18 @@ class phpsecCrypt {
       self::error('Invalid data passed to decrypt()');
       return false;
     }
-
     /* Everything looks good so far. Let's continue.*/
     $td = mcrypt_module_open($data['algo'], '', $data['mode'], '');
 
+    /* Get keysize length. */
+    $ks = mcrypt_enc_get_key_size($td);
+
+    /* Get key. */
+    $key = self::getKey($key, $ks);
+
+    /* Init mcrypt. */
     mcrypt_generic_init($td, $key, base64_decode($data['iv']));
+
     $decrypted = rtrim(mdecrypt_generic($td, base64_decode($data['cdata'])));
     if(hash('sha256', $decrypted) == $data['hash']) {
       return unserialize($decrypted);
@@ -144,5 +109,9 @@ class phpsecCrypt {
       return false;
     }
   }
-} phpsecCrypt::init();
+
+  function getKey($key, $ks) {
+    return substr(hash(PHPSEC_HASHTYPE, $key), 0, $ks);
+  }
+}
 /* Initialize the crypto, set the keys and other stuff we need. */

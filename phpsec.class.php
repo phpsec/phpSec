@@ -71,21 +71,10 @@ define('PHPSEC_SALTINJECTION', 'before');
 define('PHPSEC_SESSNAME', 'phpSecSess');
 
 /**
- * Define cookie name for the krypto key.
- */
-define('PHPSEC_CIKCOOKIE', 'phpSecCik');
-
-/**
  * Garbage collection probablility. Setting it to 1 makes it run every time,
  * 0.5 every second time and setting it to 0 disabled garbage collection.
  */
 define('PHPSEC_GCPROB', 0.2);
-
-/**
- * Define secret to use as a shared crypto key.
- * WARNING: Changing this breaks all before encrypted data.
- */
-define('PHPSEC_SECRET', 'twxwcMNlp3xchzlHmuXzHJHE96DPiatAxrcw3sxu');
 
 define('PHPSEC_E_ERROR',  E_USER_ERROR);
 define('PHPSEC_E_WARN',   E_USER_WARNING);

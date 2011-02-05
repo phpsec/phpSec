@@ -40,8 +40,8 @@ echo "<hr />";
 /**
  * Test encryption
  */
-print_r(phpsecCrypt::encrypt('f00bar'));
-print_r(phpsecCrypt::decrypt(phpsecCrypt::encrypt(array('1','2'))));
+print_r(phpsecCrypt::encrypt('f00bar', 'secret'));
+print_r(phpsecCrypt::decrypt(phpsecCrypt::encrypt(array('1','2'), 'secret'), 'secret'));
 echo "<hr />";
 
 /**
