@@ -28,7 +28,7 @@ class phpsec {
   public static $_charset = 'utf-8';
   public static $_datadir = null;
   public static $_logdir  = null;
-  public static $uid = null; // User identifier.
+  public static $uid      = null; // User identifier.
 
   /* Constants. */
   const HASH_TYPE      = 'sha256';
