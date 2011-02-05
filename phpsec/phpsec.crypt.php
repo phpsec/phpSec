@@ -110,7 +110,7 @@ class phpsecCrypt {
     }
   }
 
-  function getKey($key, $ks) {
+  private function getKey($key, $ks) {
     return substr(hash(PHPSEC_HASHTYPE, $key), 0, $ks);
   }
 }
