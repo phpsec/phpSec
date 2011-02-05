@@ -25,7 +25,9 @@ error_reporting(E_ALL);
 ini_set('display_errors','stdout');
 
 require_once 'phpsec.class.php';
-
+phpsec::$_datadir = '/var/www/phpSec/data';
+phpsec::$_logdir = '/var/www/phpSec/logs';
+phpsec::init();
 
 // Print the uid
 echo 'Uid: '.phpsec::$uid."\n\n";

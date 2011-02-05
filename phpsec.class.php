@@ -24,65 +24,15 @@
   THE SOFTWARE.
  */
 
-/**
- * Define whether to use the more secure phpSec session handler.
- * Set to true to use the phpSec handler, or false to use the
- * native php session handler.
- */
-define('PHPSEC_SESSIONS', true);
-
-/**
- * Defines the charset that phpSec uses. This should be that same
- * as you use for your application in general.
- */
-define('PHPSEC_CHARSET', 'UTF-8');
-
-/**
- * Define directory to the phpSec log directory.
- * Should not be accessible from web
- */
-define('PHPSEC_LOGDIR', './logs');
-
-/**
- * Define directory to the phpSec data directory.
- * Should not be accessible from web.
- */
-define('PHPSEC_DATADIR', '/var/www/phpSec/data');
-
-/**
- * Define directory to the phpSec public data directory.
- * This must be accessible from the web.
- */
-define('PHPSEC_PUBLICDATADIR', '/var/www/phpSec/data');
-
-/**
- * Define defult hashing method.
- */
-define('PHPSEC_HASHTYPE', 'sha256');
-
-/**
- * Define default salt injection method.
- */
-define('PHPSEC_SALTINJECTION', 'before');
-
-/**
- * Define phpSec session name.
- */
-define('PHPSEC_SESSNAME', 'phpSecSess');
-
-/**
- * Garbage collection probablility. Setting it to 1 makes it run every time,
- * 0.5 every second time and setting it to 0 disabled garbage collection.
- */
-define('PHPSEC_GCPROB', 0.2);
-
-define('PHPSEC_E_ERROR',  E_USER_ERROR);
-define('PHPSEC_E_WARN',   E_USER_WARNING);
-define('PHPSEC_E_NOTICE', E_USER_NOTICE);
-
 class phpsec {
+  public static $_charset = 'utf-8';
+  public static $_datadir = null;
+  public static $_logdir  = null;
   public static $uid = null; // User identifier.
 
+  /* Constants. */
+  const HASH_TYPE      = 'sha256';
+  const SALT_INJECTION = 'before';
 
   /**
    * Autoload function to load required files when needed.
@@ -114,25 +64,22 @@ class phpsec {
      }
 
     /* Check write permissions to directories */
-    if(!is_writeable(PHPSEC_LOGDIR)) {
-      self::error('Log directory('.PHPSEC_LOGDIR.') not writeable');
+    if(!is_writeable(self::$_logdir)) {
+      self::error('Log directory('.self::$_logdir.') not writeable');
     }
-    if(!is_writeable(PHPSEC_DATADIR)) {
-      self::error('Data directory('.PHPSEC_DATADIR.') not writeable');
+    if(!is_writeable(self::$_datadir)) {
+      self::error('Data directory('.self::$_datadir.') not writeable');
     }
 
-    /* If the phpSec session handler is enabled, start it. */
-    if(PHPSEC_SESSIONS === true) {
-      phpsecSession::sessionStart();
-    }
-    /* Start session if not already started earlier. */
-    if(session_id() == '') {
-       session_start();
-     }
+    /* Set the data dir for the cache class. */
+    phpsecCache::$_datadir = self::$_datadir;
 
     /* Set the charset of the multibyte functions in PHP. */
-    mb_internal_encoding(PHPSEC_CHARSET);
-    mb_regex_encoding(PHPSEC_CHARSET);
+    mb_internal_encoding(self::$_charset);
+    mb_regex_encoding(self::$_charset);
+
+    /* Start a new session. */
+    phpsecSession::sessionStart();
 
     /* Create a random token for each visitor and store it the users session.
        This is for example used to identify owners of cache data. */
@@ -181,15 +128,15 @@ class phpsec {
         case '!':
           /* !variables: HTML and special characters is escaped from the string
              before it is in inserted. */
-          $safeData = htmlentities($data, ENT_QUOTES, PHPSEC_CHARSET);
+          $safeData = htmlentities($data, ENT_QUOTES, self::$_charset);
           break;
         case '@':
           /* @variables: Only HTML is escaped from the string. Special characters
              is kept as is. */
-          $safeData = htmlspecialchars($data, ENT_NOQUOTES, PHPSEC_CHARSET);
+          $safeData = htmlspecialchars($data, ENT_NOQUOTES, self::$_charset);
           break;
         default:
-          self::error('Unknown variable type', PHPSEC_E_NOTICE);
+          self::error('Unknown variable type', E_USER_NOTICE);
           break;
       }
       if($safeData !== false) {
@@ -207,10 +154,10 @@ class phpsec {
    *   String containing the error message
    *
    * @param constant
-   *   Error level (optional). Could be PHPSEC_E_ERROR, PHPSEC_E_WARN, PHPSEC_E_NOTICE.
+   *   Error level (optional).
    *   If none is specified PHPSEC_E_WARN is used.
    */
-  private static function error($msg, $level = PHPSEC_E_WARN) {
+  private static function error($msg, $level = E_USER_WARNING) {
     $callee = next(debug_backtrace());
     trigger_error($msg.'. (Called from <strong>'.$callee['file'].' line '.$callee['line'].'</strong>)', $level);
     /* TODO: Write error to file. */
@@ -230,7 +177,7 @@ class phpsec {
    *   If none is specified warn is used.
    */
   public static function log($type, $msg, $level = 'warn') {
-    $fileName = PHPSEC_LOGDIR.'/log_'.$type;
+    $fileName = self::$_logdir.'/log_'.$type;
     /* TODO: Add some more information when writing log entry. */
     $line = date('c').' - '.$level.' - '.$msg;
 
@@ -264,7 +211,7 @@ class phpsec {
     }
     $timeStamp = gmdate('Y-m-d\TH:i:s\Z');
     $randLength = $length-strlen($timeStamp);
-    return $timeStamp.substr(hash(PHPSEC_HASHTYPE, uniqid(null, true)), 0, $randLength);
+    return $timeStamp.substr(hash(self::HASH_TYPE, uniqid(null, true)), 0, $randLength);
   }
 
   /**
@@ -334,14 +281,14 @@ class phpsec {
    */
   public static function pwHash($password) {
     $salt     = self::genUid();
-    $injected = self::pwInject($password, $salt, PHPSEC_SALTINJECTION);
-    $hash     = hash(PHPSEC_HASHTYPE, $injected);
+    $injected = self::pwInject($password, $salt, self::SALT_INJECTION);
+    $hash     = hash(self::HASH_TYPE, $injected);
 
     $return = array(
       'hash'      => $hash,
       'salt'      => $salt,
-      'algo'      => PHPSEC_HASHTYPE,
-      'injection' => PHPSEC_SALTINJECTION,
+      'algo'      => self::HASH_TYPE,
+      'injection' => self::SALT_INJECTION,
     );
     return serialize($return);
   }
@@ -414,6 +361,4 @@ class phpsec {
     }
     return $injected;
   }
-} phpsec::init();
-/* Since this is a staticly called library, we need to initialize it ourself as no
- * contruct funtion is called for us. */
+}

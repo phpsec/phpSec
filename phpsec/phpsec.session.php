@@ -28,22 +28,17 @@
  * Implements a session handler to save session data encrypted.
  */
 class phpsecSession {
+  const sessName = 'phpSecSess';
   /**
    * Initialize a phpSec enforced session.
    */
   public static function sessionStart() {
-    if(session_id() != '') {
-      self::error('Session already started. Can\'t use phpSec sessions', PHPSEC_E_WARN);
-    } else {
-      /* TODO: Create own session handler and add encryption support.
-       * Set the session.save.path to our datadir. */
-      session_save_path(PHPSEC_DATADIR);
-      /* Rename the session to avoid clusterfu*ks. */
-      session_name(PHPSEC_SESSNAME);
-      /* Initialize the session. */
-      session_start();
-      /* Regenerate the session ID and remove the old session to avaoid session hijacking. */
-      session_regenerate_id(true);
-    }
+    /* TODO: Create own session handler and add encryption support.
+    /* Rename the session to avoid clusterfu*ks. */
+    session_name(self::sessName);
+    /* Initialize the session. */
+    session_start();
+    /* Regenerate the session ID and remove the old session to avaoid session hijacking. */
+    session_regenerate_id(true);
   }
 }

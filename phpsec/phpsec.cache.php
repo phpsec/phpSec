@@ -28,6 +28,11 @@
  * Provides as simple cahce engine.
  */
 class phpsecCache {
+  public static $_datadir = null;
+
+  const GC_PROB   = 0.2;
+  const HASH_TYPE = 'sha256';
+
   /**
    * Save data to the cache.
    *
@@ -41,7 +46,7 @@ class phpsecCache {
    *   Time to live in seconds.
    */
   public static function cacheSet($name, $data, $ttl = 3600) {
-    $fileName =  PHPSEC_DATADIR.'/'.self::cacheFilename($name);
+    $fileName =  self::$_datadir.'/'.self::cacheFilename($name);
     $saveData['data'] = $data;
     $saveData['ttl']  = time() + $ttl;
     $data = serialize($saveData);
@@ -70,7 +75,7 @@ class phpsecCache {
     /* Do cache garbage collection. */
     self::cacheGc();
 
-    $fileName =  PHPSEC_DATADIR.'/'.self::cacheFilename($name);
+    $fileName =  self::$_datadir.'/'.self::cacheFilename($name);
     if(file_exists($fileName)) {
       $data = unserialize(file_get_contents($fileName));
       if($data['ttl'] > time()) {
@@ -91,7 +96,7 @@ class phpsecCache {
    *   True on success, false otherwise.
    */
   public static function cacheRem($name) {
-    $fileName =  PHPSEC_DATADIR.'/'.self::cacheFilename($name);
+    $fileName =  self::$_datadir.'/'.self::cacheFilename($name);
     if(unlink($fileName)) {
       return true;
     } else {
@@ -103,17 +108,17 @@ class phpsecCache {
    * Do garbage collection on cached data.
    */
   private static function cacheGc() {
-    $probMax = 1 / PHPSEC_GCPROB;
+    $probMax = 1 / self::GC_PROB;
     $do = rand(1, $probMax);
     if($do > 1) {
       /* Skipping GC this time. */
       return false;
     }
-    if ($handle = opendir(PHPSEC_DATADIR)) {
+    if ($handle = opendir(self::$_datadir)) {
       while (false !== ($file = readdir($handle))) {
         if ($file != "." && $file != "..") {
           if(substr($file, 0 ,6) == 'cache_') {
-            $fileName = PHPSEC_DATADIR.'/'.$file;
+            $fileName = self::$_datadir.'/'.$file;
             $data = unserialize(file_get_contents($fileName));
             if($data['ttl'] < time()) {
               unlink($fileName);
@@ -127,6 +132,6 @@ class phpsecCache {
   }
 
   private static function cacheFilename($name) {
-    return 'cache_'.$name.'_'.hash(PHPSEC_HASHTYPE, phpsec::$uid);
+    return 'cache_'.$name.'_'.hash(self::HASH_TYPE, phpsec::$uid);
   }
 }
