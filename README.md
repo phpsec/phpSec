@@ -12,6 +12,8 @@ Features
 *    Logging functions.
 *    Data encryption.
 *    Enhanced session security.
+*    Session encryption.
+*    Random data generator.
 
 Getting started
 ---------------
