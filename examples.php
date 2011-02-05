@@ -37,7 +37,7 @@ echo "<hr />";
 /**
  * Test randomness
  */
-echo phpsecRand::randBytes(10);
+echo phpsecRand::str(10);
 echo "<hr />";
 /**
  * Test encryption
