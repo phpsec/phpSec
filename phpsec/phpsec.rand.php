@@ -29,7 +29,9 @@
  */
 
 class phpsecRand {
-  public static function randBytes($length) {
+  public static $_charset = 'abcdefghijklmnopqrstuvwxyz0123456789';
+
+  public static function bytes($length) {
     /* Code inspired by this blogpost by Enrico Zimuel
      * http://www.zimuel.it/blog/2011/01/strong-cryptography-in-php/ */
     $strong = false;
@@ -41,24 +43,38 @@ class phpsecRand {
     }
     /* Either we dont have the OpenSSL library or the data returned was not
      * considered secure. Fall back on this less secure code. */
+    $rnd = '';
     for ($i=0;$i<$length;$i++) {
-      $sha= hash('sha256', mt_rand());
-      $char= mt_rand(0,30);
-      $rnd.= chr(hexdec($sha[$char].$sha[$char+1]));
+      $sha = hash('sha256', mt_rand());
+      $char = mt_rand(0,30);
+      $rnd .= chr(hexdec($sha[$char].$sha[$char+1]));
     }
     return $rnd;
   }
 
-  public static function randInt() {
-
+  public static function int($min, $max) {
+    $delta = $max-$min;
+    $bytes = ceil($delta/256);
+    $rnd = self::bytes($bytes);
+    $add = 0;
+    for ($i = 0; $i < $bytes; $i++) {
+      $add += ord($rnd[$i]);
+    }
+    $add = $add % ($delta + 1);
+    return $min + $add;
   }
 
-  public static function randStr() {
-
+  public static function str($len) {
+    $str = '';
+    for ($i = 0; $i < $len; $i++) {
+      $pos = self::int(0,strlen(self::$_charset)-1);
+      $str .= self::$_charset[$pos];
+    }
+    return $str;
   }
 
-  public static function randhex() {
-
+  public static function hex($len) {
+    return bin2hex(self::bytes($len));
   }
 }
 
