@@ -81,12 +81,12 @@ define('PHPSEC_E_WARN',   E_USER_WARNING);
 define('PHPSEC_E_NOTICE', E_USER_NOTICE);
 
 class phpsec {
-  public  static $uid          = null; // User identifier. To identify a session.
+  public static $uid = null; // User identifier.
+
 
   /**
-   * Initialize the library.
+   * Autoload function to load required files when needed.
    */
-
   public static function load($class) {
     $basePath = dirname(__FILE__);
     $classes = array(
@@ -100,6 +100,10 @@ class phpsec {
       require_once $basePath.'/phpsec/'.$classes[$class];
     }
   }
+
+  /**
+   * Initialize the library.
+   */
   public static function init() {
     /* First of all, register the autoloading function.
      * If we have one set from somewhere else, keep it. */
