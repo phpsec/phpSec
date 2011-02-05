@@ -25,7 +25,7 @@
  */
 
 /**
- *  Provides as simple cahce engine.
+ * Provides as simple cahce engine.
  */
 class phpsecCache {
   /**
@@ -130,4 +130,3 @@ class phpsecCache {
     return 'cache_'.$name.'_'.hash(PHPSEC_HASHTYPE, phpsec::$uid);
   }
 }
-?>
