@@ -28,6 +28,10 @@
  * Provides methods for encrypting data.
  */
 class phpsecCrypt {
+  const ALGO      = MCRYPT_BLOWFISH;
+  const ALGO_MODE = MCRYPT_MODE_CBC;
+  const HASH_TYPE = 'sha256';
+
   /**
    * Encrypt data returning a JSON encoded array safe for storage in a database
    * or file. The array has the following structure before it is encoded:
@@ -46,7 +50,7 @@ class phpsecCrypt {
    *   Serialized array containing the encrypted data along with some meta data.
    */
   public static function encrypt($data, $key) {
-    $td = mcrypt_module_open(MCRYPT_BLOWFISH, '', 'cbc', '');
+    $td = mcrypt_module_open(self::ALGO, '', self::ALGO_MODE, '');
 
     /* Create IV. */
     $iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
@@ -64,9 +68,9 @@ class phpsecCrypt {
     $serializedData = serialize($data);
 
     $encrypted['cdata'] = base64_encode(mcrypt_generic($td, $serializedData));
-    $encrypted['hash']  = hash('sha256', $serializedData);
-    $encrypted['algo']  = MCRYPT_BLOWFISH; /* TODO: You know what to do here. */
-    $encrypted['mode']  = 'cbc';
+    $encrypted['hash']  = hash(self::HASH_TYPE, $serializedData);
+    $encrypted['algo']  = self::ALGO; /* TODO: You know what to do here. */
+    $encrypted['mode']  = self::ALGO_MODE;
     $encrypted['iv']    = base64_encode($iv);
 
     return json_encode($encrypted);
@@ -103,7 +107,7 @@ class phpsecCrypt {
     mcrypt_generic_init($td, $key, base64_decode($data['iv']));
 
     $decrypted = rtrim(mdecrypt_generic($td, base64_decode($data['cdata'])));
-    if(hash('sha256', $decrypted) == $data['hash']) {
+    if(hash(self::HASH_TYPE, $decrypted) == $data['hash']) {
       return unserialize($decrypted);
     } else {
       return false;
@@ -111,6 +115,6 @@ class phpsecCrypt {
   }
 
   private function getKey($key, $ks) {
-    return substr(hash(PHPSEC_HASHTYPE, $key), 0, $ks);
+    return substr(hash(self::HASH_TYPE, $key), 0, $ks);
   }
 }
