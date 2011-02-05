@@ -28,17 +28,84 @@
  * Implements a session handler to save session data encrypted.
  */
 class phpsecSession {
-  const sessName = 'phpSecSess';
+  private static $_savePath;
+  private static $_name;
+  private static $_keyCookie;
+  private static $_secret;
+
   /**
-   * Initialize a phpSec enforced session.
+   * Open session.
    */
-  public static function sessionStart() {
-    /* TODO: Create own session handler and add encryption support.
-    /* Rename the session to avoid clusterfu*ks. */
-    session_name(self::sessName);
-    /* Initialize the session. */
-    session_start();
-    /* Regenerate the session ID and remove the old session to avaoid session hijacking. */
-    session_regenerate_id(true);
+  public static function open($path, $name) {
+    /* Set some variables we need later */
+    self::$_savePath  = $path;
+    self::$_name      = $name;
+    self::$_keyCookie = $name.'_secret';
+
+    /* If we don't have a  encryption key, create one. */
+    if(!isset($_COOKIE[self::$_keyCookie])) {
+      self::$_secret = phpsec::genUid(); /* TODO: Use phpsecRand instead. */
+      $cookieParam = session_get_cookie_params();
+      setcookie(
+        self::$_keyCookie,
+        self::$_secret,
+        $cookieParam['lifetime'],
+        $cookieParam['path'],
+        $cookieParam['domain'],
+        $cookieParam['secure'],
+        $cookieParam['httponly']
+      );
+    } else {
+      self::$_secret = $_COOKIE[self::$_keyCookie];
+    }
+  }
+
+  public static function close() {
+    return true;
+  }
+
+  public static function read($id) {
+    $file = self::fileName($id);
+    if(file_exists($file)) {
+      $data = file_get_contents($file);
+      return phpsecCrypt::decrypt($data, self::$_secret);
+    }
+    return false;
+  }
+
+  public static function write($id, $data) {
+    $file = self::fileName($id);
+    $encrypted = phpsecCrypt::encrypt($data, self::$_secret);
+    $fp = @fopen($file, 'w');
+    if($fp) {
+      $success = fwrite($fp, $encrypted);
+      fclose($fp);
+      return $success;
+    }
+    return false;
+  }
+
+  public static function destroy($id) {
+    $file = self::fileName($id);
+    setcookie(
+      self::$_keyCookie,
+      '',
+      time()-10
+    );
+    return(@unlink($file));
+  }
+
+  public static function gc($ttl) {
+    $fileNames = glob(self::$_savePath.'/'.self::$_name.'_*');
+    foreach($fileNames as $fileName) {
+      if(filemtime($fileName) + $ttl < time()) {
+        @unlink($fileName);
+      }
+    }
+    return true;
+  }
+
+  private static function fileName($id) {
+    return self::$_savePath.'/'.self::$_name."_".$id;
   }
 }

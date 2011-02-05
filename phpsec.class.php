@@ -78,8 +78,21 @@ class phpsec {
     mb_internal_encoding(self::$_charset);
     mb_regex_encoding(self::$_charset);
 
+    /* Register the custom session handler. */
+    ini_set('session.save_handler', 'user');
+    session_set_save_handler(
+      'phpsecSession::open',
+      'phpsecSession::close',
+      'phpsecSession::read',
+      'phpsecSession::write',
+      'phpsecSession::destroy',
+      'phpsecSession::gc'
+    );
+
     /* Start a new session. */
-    phpsecSession::sessionStart();
+    session_start();
+    /* Regenerate the session ID and remove the old session to avoid session hijacking. */
+    session_regenerate_id(true);
 
     /* Create a random token for each visitor and store it the users session.
        This is for example used to identify owners of cache data. */
