@@ -114,4 +114,3 @@ class phpsecCrypt {
     return substr(hash(PHPSEC_HASHTYPE, $key), 0, $ks);
   }
 }
-/* Initialize the crypto, set the keys and other stuff we need. */
