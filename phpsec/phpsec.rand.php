@@ -31,12 +31,18 @@
 class phpsecRand {
   public static $_charset = 'abcdefghijklmnopqrstuvwxyz0123456789';
 
-  public static function bytes($length) {
+  /**
+   * Generate random data.
+   *
+   * @param integer $len
+   * @return binary
+   */
+  public static function bytes($len) {
     /* Code inspired by this blogpost by Enrico Zimuel
      * http://www.zimuel.it/blog/2011/01/strong-cryptography-in-php/ */
     $strong = false;
     if(function_exists('openssl_random_pseudo_bytes')) {
-      $rnd = openssl_random_pseudo_bytes($length, $strong);
+      $rnd = openssl_random_pseudo_bytes($len, $strong);
       if($strong === true) {
         return $rnd;
       }
@@ -44,14 +50,21 @@ class phpsecRand {
     /* Either we dont have the OpenSSL library or the data returned was not
      * considered secure. Fall back on this less secure code. */
     $rnd = '';
-    for ($i=0;$i<$length;$i++) {
+    for ($i=0;$i<$len;$i++) {
       $sha = hash('sha256', mt_rand());
       $char = mt_rand(0,30);
       $rnd .= chr(hexdec($sha[$char].$sha[$char+1]));
     }
-    return $rnd;
+    return (binary) $rnd;
   }
 
+  /**
+   * Generate a random integer.
+   *
+   * @param integer $min
+   * @param integer $max
+   * @return integer
+   */
   public static function int($min, $max) {
     $delta = $max-$min;
     $bytes = ceil($delta/256);
@@ -64,6 +77,12 @@ class phpsecRand {
     return $min + $add;
   }
 
+  /**
+   * Generate a random string.
+   *
+   * @param integer $len
+   * @return string
+   */
   public static function str($len) {
     $str = '';
     for ($i = 0; $i < $len; $i++) {
@@ -73,6 +92,12 @@ class phpsecRand {
     return $str;
   }
 
+  /**
+   * Return random hexadecimal data.
+   *
+   * @param $len
+   * @return string
+   */
   public static function hex($len) {
     return bin2hex(self::bytes($len));
   }
