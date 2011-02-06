@@ -271,7 +271,7 @@ class phpsec {
 
   /**
    * Create a hashed version of a password, safe for storage in a database.
-   * This function return a serialized array that can be stored directly
+   * This function return a json encodeed array that can be stored directly
    * in a database. The array has the following layout:
    * array(
    *   'hash'      => The hash created from the password and a salt.
@@ -289,7 +289,7 @@ class phpsec {
    *   The password to hash.
    *
    * @return string
-   *   Returns a serialized array containing the password hash, salt and
+   *   Returns a json encoded array containing the password hash, salt and
    *   some meta data.
    */
   public static function pwHash($password) {
@@ -303,7 +303,7 @@ class phpsec {
       'algo'      => self::HASH_TYPE,
       'injection' => self::SALT_INJECTION,
     );
-    return serialize($return);
+    return json_encode($return);
   }
 
   /**
@@ -314,7 +314,7 @@ class phpsec {
    *   The password supplied by the user in the login form.
    *
    * @param dbPassword
-   *   The serialized array fetched from the database, in the exact format
+   *   The json string fetched from the database, in the exact format
    *   as created by pwHash().
    *
    * @return boolean
@@ -325,7 +325,7 @@ class phpsec {
      * Unserialize registerd password array and validate it to ensure
      * we got a valid array.
      */
-    $data = unserialize($dbPassword);
+    $data = json_decode($dbPassword, true);
     if(isset($data['injection']) && sizeof($data) == 4) {
       /**
        * Ok, e are pretty sure this is good stuff. Now inject the salt
