@@ -36,19 +36,20 @@ class phpsecCache {
   /**
    * Save data to the cache.
    *
-   * @param name
+   * @param string $name
    *   String containing the name of the data to save.
    *
-   * @param data
+   * @param mixed $data
    *   Data to save. Can be any dataform.
    *
-   * @param ttl
+   * @param integer $ttl
    *   Time to live in seconds.
    */
   public static function cacheSet($name, $data, $ttl = 3600) {
     $fileName =  self::$_datadir.'/'.self::cacheFilename($name);
     $saveData['data'] = $data;
     $saveData['ttl']  = time() + $ttl;
+    /* TODO: #22*/
     $data = serialize($saveData);
     $fp = fopen($fileName, 'w');
     if($fp !== false) {
@@ -65,7 +66,7 @@ class phpsecCache {
   /**
    * Get data from the cache.
    *
-   * @param name
+   * @param string $name
    *   String containing the name of the data to get.
    *
    * @return mixed
@@ -89,7 +90,7 @@ class phpsecCache {
   /**
    * Remove data from the cache.
    *
-   * @param name
+   * @param string $name
    *   String containing the name of the data to remove.
    *
    * @return boolean
