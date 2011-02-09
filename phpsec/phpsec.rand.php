@@ -95,7 +95,7 @@ class phpsecRand {
   /**
    * Return random hexadecimal data.
    *
-   * @param $len
+   * @param integer $len
    * @return string
    */
   public static function hex($len) {
