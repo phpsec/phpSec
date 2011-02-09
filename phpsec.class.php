@@ -241,7 +241,7 @@ class phpsec {
    *   The token to supply with the form data.
    */
   public static function getToken($name, $ttl = 3600) {
-    $token = self::genUid();
+    $token = phpsecRand::str(32);
     /* Save the token to the cahce. */
     phpsecCache::cacheSet('token-'.$name, $token, $ttl);
     return $token;
