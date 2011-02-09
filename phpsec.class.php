@@ -224,7 +224,7 @@ class phpsec {
     }
     $timeStamp = gmdate('Y-m-d\TH:i:s\Z');
     $randLength = $length-strlen($timeStamp);
-    return $timeStamp.substr(hash(self::HASH_TYPE, uniqid(null, true)), 0, $randLength);
+    return $timeStamp.substr(hash(self::HASH_TYPE, phpsecRand::str(40)), 0, $randLength);
   }
 
   /**
