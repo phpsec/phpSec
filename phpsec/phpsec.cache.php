@@ -47,10 +47,11 @@ class phpsecCache {
    */
   public static function cacheSet($name, $data, $ttl = 3600) {
     $fileName =  self::$_datadir.'/'.self::cacheFilename($name);
-    $saveData['data'] = $data;
+    $saveData['data'] = serialize($data);
     $saveData['ttl']  = time() + $ttl;
+    $saveData['hash'] = hash(self::HASH_TYPE, $saveData['data']);
     /* TODO: #22*/
-    $data = serialize($saveData);
+    $data = json_encode($saveData);
     $fp = fopen($fileName, 'w');
     if($fp !== false) {
       if(flock($fp, LOCK_EX)) {
@@ -78,9 +79,11 @@ class phpsecCache {
 
     $fileName =  self::$_datadir.'/'.self::cacheFilename($name);
     if(file_exists($fileName)) {
-      $data = unserialize(file_get_contents($fileName));
+      $data = json_decode(file_get_contents($fileName), true);
       if($data['ttl'] > time()) {
-        return $data['data'];
+        if(hash(self::HASH_TYPE, $data['data']) == $data['hash']) {
+          return unserialize($data['data']);
+        }
       }
 
     }
@@ -120,7 +123,7 @@ class phpsecCache {
         if ($file != "." && $file != "..") {
           if(substr($file, 0 ,6) == 'cache_') {
             $fileName = self::$_datadir.'/'.$file;
-            $data = unserialize(file_get_contents($fileName));
+            $data = json_decode(file_get_contents($fileName), true);
             if($data['ttl'] < time()) {
               unlink($fileName);
             }
