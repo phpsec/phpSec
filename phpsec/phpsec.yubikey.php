@@ -89,7 +89,7 @@ class phpsecYubikey {
      foreach($lines as $line) {
        if(trim($line) != '') {
          list($key, $val) = explode("=", $line, 2);
-         $rdata[$key] = $val;
+         $rdata[$key] = trim($val);
        }
     }
     return $rdata;

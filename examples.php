@@ -15,8 +15,6 @@
    THIS SOFTWARE IS PROVIDED BY ``AS IS''
    IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY TYPE OF
    DAMAGE ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE.
-
-
  */
 
 
@@ -70,7 +68,12 @@ echo "<hr />";
  */
 if(isset($_GET['do'])) {
   if(phpsec::validToken('myform', $_GET['token'])) {
-    echo "Valid token!";
+    echo "Valid token!<br />";
+    phpsecYubikey::$_clientId     = 5118;
+    phpsecYubikey::$_clientSecret = 'n7cIJF1IaL8WeTUsluWRSpRLOqs=';
+    if(phpsecYubikey::verify($_GET['otp'])) {
+      echo "Valid OTP!";
+    }
   } else {
     echo "Invalid token!";
   }
@@ -78,6 +81,7 @@ if(isset($_GET['do'])) {
 $token = phpSec::getToken('myform');
 echo "<form>";
 echo "<input type='hidden' name='token' value='$token'>";
+echo "<input type'text' name='otp'>";
 echo "<input type='submit' name='do'>";
 echo "</form>";
 echo "<hr />";
