@@ -114,7 +114,18 @@ class phpsecCrypt {
     }
   }
 
-  private function getKey($key, $ks) {
-    return substr(hash(self::HASH_TYPE, $key), 0, $ks);
+  /**
+   * Get a key from a secret.
+   *
+   * @param string $secret
+   *   The secret to generate a key from.
+   *
+   * @param integer $ks
+   *   The key size.
+   *
+   * @return string
+   */
+  private function getKey($secret, $ks) {
+    return substr(hash(self::HASH_TYPE, $secret), 0, $ks);
   }
 }

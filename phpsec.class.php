@@ -44,6 +44,7 @@ class phpsec {
       'phpsecSession' => 'phpsec.session.php',
       'phpsecRand'    => 'phpsec.rand.php',
       'phpsecCrypt'   => 'phpsec.crypt.php',
+      'phpsecYubikey' => 'phpsec.yubikey.php',
     );
 
     if(isset($classes[$class])) {
@@ -118,11 +119,11 @@ class phpsec {
    *
    * @see https://sourceforge.net/apps/mediawiki/phpsec/index.php?title=Documentation#2.1_Using_the_XSS_filter
    *
-   * @param str
+   * @param string $str
    *   Base string. The string itself is not filtered in any way, but
    *   used to compose the filtered parts from the args array.
    *
-   * @param args
+   * @param array $args
    *   An associative array containing data to be filtered by the XSS filter.
    *   The array keys should be preceeded with %, ! or @ defining what filter
    *   to apply.
@@ -163,10 +164,10 @@ class phpsec {
    * Provides the library a simple way of reporting errors to the developer using PHPs error
    * handler.
    *
-   * @param string
+   * @param string $msg
    *   String containing the error message
    *
-   * @param constant
+   * @param constant $level
    *   Error level (optional).
    *   If none is specified PHPSEC_E_WARN is used.
    */
@@ -179,13 +180,13 @@ class phpsec {
   /**
    * Write an entry to a log.
    *
-   * @param type
+   * @param string $type
    *   Specify the type of the logentry. This will be a part of the filname.
    *
-   * @param msg
+   * @param string $msg
    *   The log message itself.
    *
-   * @param level
+   * @param string $level
    *   Error level (optional). Should be either debug, notice, warn or error.
    *   If none is specified warn is used.
    */
@@ -214,7 +215,7 @@ class phpsec {
    * phpSec.
    * @see http://openid.net/specs/openid-authentication-2_0.html
    *
-   * @param length
+   * @param integer $length
    *   The total length of the uid. Must be between 25 and 80 characters.
    */
   public static function genUid($length = 50) {
@@ -224,24 +225,24 @@ class phpsec {
     }
     $timeStamp = gmdate('Y-m-d\TH:i:s\Z');
     $randLength = $length-strlen($timeStamp);
-    return $timeStamp.substr(hash(self::HASH_TYPE, uniqid(null, true)), 0, $randLength);
+    return $timeStamp.substr(hash(self::HASH_TYPE, phpsecRand::str(40)), 0, $randLength);
   }
 
   /**
    * Generate and save a one-time-token for a form. Used to protect against
    * CSRF attacks.
    *
-   * @param name
+   * @param string $name
    *   Name of the form to generate a token for.
    *
-   * @param ttl
+   * @param integer $ttl
    *   How long the token should be valid in seconds.
    *
    * @return string
    *   The token to supply with the form data.
    */
   public static function getToken($name, $ttl = 3600) {
-    $token = self::genUid();
+    $token = phpsecRand::str(32);
     /* Save the token to the cahce. */
     phpsecCache::cacheSet('token-'.$name, $token, $ttl);
     return $token;
@@ -252,7 +253,7 @@ class phpsec {
    * This function should be called before accepting data from a user-submitted form.
    * @see setToken();
    *
-   * @param name
+   * @param string $name
    *   Name of the form to validate the token for.
    *
    * @return boolean
@@ -285,7 +286,7 @@ class phpsec {
    * after: The salt is placed directly after the password without any seperation
    * characters.
    *
-   * @param password
+   * @param string $password
    *   The password to hash.
    *
    * @return string
@@ -310,10 +311,10 @@ class phpsec {
    * Validate a user-supplied  password against a stored password saved
    * using the pwHash() method.
    *
-   * @param password
+   * @param string $password
    *   The password supplied by the user in the login form.
    *
-   * @param dbPassword
+   * @param string $dbPassword
    *   The json string fetched from the database, in the exact format
    *   as created by pwHash().
    *
@@ -347,13 +348,13 @@ class phpsec {
   /**
    * Inject a salt into a password to create the string to be hashed.
    *
-   * @param password
+   * @param string $password
    *   Plain-text password.
    *
-   * @param salt
+   * @param string $salt
    *   Well, the salt to inject into the password.
    *
-   * @param injection
+   * @param string $injection
    *   The method used to inject the salt. @see pwHash().
    *
    * @return string

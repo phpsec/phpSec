@@ -48,7 +48,8 @@ class phpsecSession {
 
     /* If we don't have a  encryption key, create one. */
     if(!isset($_COOKIE[self::$_keyCookie])) {
-      self::$_secret = phpsec::genUid(); /* TODO: Use phpsecRand instead. */
+      /* I have no idea if this is a reasonable length. */
+      self::$_secret = phpsecRand::str(80);
       $cookieParam = session_get_cookie_params();
       setcookie(
         self::$_keyCookie,

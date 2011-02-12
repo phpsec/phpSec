@@ -36,20 +36,22 @@ class phpsecCache {
   /**
    * Save data to the cache.
    *
-   * @param name
+   * @param string $name
    *   String containing the name of the data to save.
    *
-   * @param data
+   * @param mixed $data
    *   Data to save. Can be any dataform.
    *
-   * @param ttl
+   * @param integer $ttl
    *   Time to live in seconds.
    */
   public static function cacheSet($name, $data, $ttl = 3600) {
     $fileName =  self::$_datadir.'/'.self::cacheFilename($name);
-    $saveData['data'] = $data;
+    $saveData['data'] = serialize($data);
     $saveData['ttl']  = time() + $ttl;
-    $data = serialize($saveData);
+    $saveData['hash'] = hash(self::HASH_TYPE, $saveData['data']);
+    /* TODO: #22*/
+    $data = json_encode($saveData);
     $fp = fopen($fileName, 'w');
     if($fp !== false) {
       if(flock($fp, LOCK_EX)) {
@@ -65,7 +67,7 @@ class phpsecCache {
   /**
    * Get data from the cache.
    *
-   * @param name
+   * @param string $name
    *   String containing the name of the data to get.
    *
    * @return mixed
@@ -77,9 +79,11 @@ class phpsecCache {
 
     $fileName =  self::$_datadir.'/'.self::cacheFilename($name);
     if(file_exists($fileName)) {
-      $data = unserialize(file_get_contents($fileName));
+      $data = json_decode(file_get_contents($fileName), true);
       if($data['ttl'] > time()) {
-        return $data['data'];
+        if(hash(self::HASH_TYPE, $data['data']) == $data['hash']) {
+          return unserialize($data['data']);
+        }
       }
 
     }
@@ -89,7 +93,7 @@ class phpsecCache {
   /**
    * Remove data from the cache.
    *
-   * @param name
+   * @param string $name
    *   String containing the name of the data to remove.
    *
    * @return boolean
@@ -119,7 +123,7 @@ class phpsecCache {
         if ($file != "." && $file != "..") {
           if(substr($file, 0 ,6) == 'cache_') {
             $fileName = self::$_datadir.'/'.$file;
-            $data = unserialize(file_get_contents($fileName));
+            $data = json_decode(file_get_contents($fileName), true);
             if($data['ttl'] < time()) {
               unlink($fileName);
             }
