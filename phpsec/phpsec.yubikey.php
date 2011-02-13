@@ -146,4 +146,16 @@ class phpsecYubikey {
     }
     return $rdata;
   }
+
+  /**
+   * Validate a string as a one-time-password.
+   *
+   * @param string $otp
+   *   String to Validate
+   *
+   * @return boolean
+   */
+  private function validOtp($otp) {
+
+  }
 }
