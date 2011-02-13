@@ -123,7 +123,16 @@ class phpsecYubikey {
     /* Convert the array with data to a request string. */
     $query = http_build_query($data);
 
-    $response = @file_get_contents('http://api.yubico.com/wsapi/2.0/verify?'.$query);
+    $opts = array(
+      'http'=>array(
+        'method'=>"GET",
+        'header'=>"Accept-language: en\r\n" .
+                  "User-Agent: phpSec (http://phpsec.xqus.com)\r\n"
+      )
+    );
+
+    $context = stream_context_create($opts);
+    $response = @file_get_contents('http://api.yubico.com/wsapi/2.0/verify?'.$query, null, $context);
     if($response === false) {
       /* Could not make request. */
       return false;
