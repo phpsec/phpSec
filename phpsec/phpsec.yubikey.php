@@ -27,7 +27,9 @@
 class phpsecYubikey {
   public static $_clientId     = null;
   public static $_clientSecret = null;
-  public static $lastError    = null;
+  public static $lastError     = null;
+
+  private static $_charset = 'cbdefghijklnrtuv';
 
   /**
    * Verify Yubikey one time password against the Yubico servers.
@@ -145,7 +147,7 @@ class phpsecYubikey {
       /* Could not make request. */
       return false;
     }
-
+    echo $response;
     /* Parse response and create an array with the data. */
     $lines = explode("\r\n", $response);
      foreach($lines as $line) {
@@ -168,8 +170,25 @@ class phpsecYubikey {
    * @return boolean
    */
   private static function validOtp($otp) {
-    if(strlen($otp) != 44) {
+    $length  = strlen($otp);
+
+    /* Check length. */
+    if($length != 44) {
       return false;
+    }
+
+    /* Check for even length. */
+    if($length % 2 != 0) {
+      return false;
+    }
+
+    /* Check for invalid characters. */
+    for ($i = 0; $i < $length; $i=$i+2 ) {
+      $high = strpos(self::$_charset, $otp[$i]);
+      $low  = strpos(self::$_charset, $otp[$i+1]);
+      if($high === false || $low === false) {
+        return false;
+      }
     }
 
     return true;
