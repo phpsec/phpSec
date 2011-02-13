@@ -174,4 +174,20 @@ class phpsecYubikey {
 
     return true;
   }
+
+  /**
+   * Get the Yubico ID from a OTP.
+   *
+   * @param string $otp
+   *   The one time password to get the ID from.
+   *
+   * @return string
+   *   Returns the Yubikey ID, or FALSE on failure.
+   */
+  public static function getYubikeyId($otp) {
+    if(!self::calidOtp($otp)) {
+      return false;
+    }
+    return substr($otp, 0, 12);
+  }
 }
