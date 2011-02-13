@@ -177,11 +177,6 @@ class phpsecYubikey {
       return false;
     }
 
-    /* Check for even length. */
-    if($length % 2 != 0) {
-      return false;
-    }
-
     /* Check for invalid characters. */
     for ($i = 0; $i < $length; $i=$i+2 ) {
       $high = strpos(self::$_charset, $otp[$i]);
