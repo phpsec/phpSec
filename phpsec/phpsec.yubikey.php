@@ -27,6 +27,7 @@
 class phpsecYubikey {
   public static $_clientId     = null;
   public static $_clientSecret = null;
+  public static $lastError    = null;
 
   /**
    * Verify Yubikey one time password against the Yubico servers.
@@ -52,17 +53,20 @@ class phpsecYubikey {
 
     /* If tokens don't match return false. */
     if($response['otp'] != $otp) {
+      self::$lastError = 'YUBIKEY_NO_MATCH';
       return false;
     }
 
     /* Check status of response. If not OK return false.*/
     if($response['status'] != 'OK') {
+      self::$lastError = 'YUBIKEY_COMPUTER_SAYS_NO'; //TODO: Fix this. Use status from server.
       return false;
     }
 
     /* Sign the request to see if it matches signature from server. */
     $signature = self::sign($response);
     if($signature !== $response['h']) {
+      self::$lastError = 'YUBIKEY_BAD_SERVER_SIGNATURE';
       return false;
     }
     return true;
