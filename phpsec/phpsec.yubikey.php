@@ -42,7 +42,11 @@ class phpsecYubikey {
       self::$lastError = 'YUBIKEY_CLIENT_DATA_NEEDED';
       return false;
     }
-    /* TODO: Validate OTP before makng request. */
+
+    if(!self::validOtp($otp)) {
+      self::$lastError = 'YUBIKEY_INVALID_OTP';
+      return false;
+    }
     /* Setup the data needed to make the request. */
     $data['otp']       = $otp;
     $data['id']        = self::$_clientId;
@@ -164,6 +168,10 @@ class phpsecYubikey {
    * @return boolean
    */
   private function validOtp($otp) {
+    if(strlen($otp) != 44) {
+      return false;
+    }
 
+    return true;
   }
 }
