@@ -25,10 +25,11 @@
  */
 
 class phpsec {
-  public static $_charset = 'utf-8';
-  public static $_datadir = null;
-  public static $_logdir  = null;
-  public static $uid      = null; // User identifier.
+  public static $_charset    = 'utf-8';
+  public static $_datadir    = null;
+  public static $_logdir     = null;
+  public static $_sessenable = true;
+  public static $uid         = null; // User identifier.
 
   /* Constants. */
   const HASH_TYPE      = 'sha256';
@@ -79,16 +80,18 @@ class phpsec {
     mb_internal_encoding(self::$_charset);
     mb_regex_encoding(self::$_charset);
 
-    /* Register the custom session handler. */
-    ini_set('session.save_handler', 'user');
-    session_set_save_handler(
-      'phpsecSession::open',
-      'phpsecSession::close',
-      'phpsecSession::read',
-      'phpsecSession::write',
-      'phpsecSession::destroy',
-      'phpsecSession::gc'
-    );
+    /* Register the custom session handler if enabled. */
+    if(self::$_sessenable === true) {
+      ini_set('session.save_handler', 'user');
+      session_set_save_handler(
+        'phpsecSession::open',
+        'phpsecSession::close',
+        'phpsecSession::read',
+        'phpsecSession::write',
+        'phpsecSession::destroy',
+        'phpsecSession::gc'
+      );
+    }
 
     /* Start a new session. */
     session_start();
