@@ -39,9 +39,10 @@ class phpsecYubikey {
    */
   public static function verify($otp) {
     if(self::$_clientId === null || self::$_clientSecret === null) {
+      self::$lastError = 'YUBIKEY_CLIENT_DATA_NEEDED';
       return false;
     }
-
+    /* TODO: Validate OTP before makng request. */
     /* Setup the data needed to make the request. */
     $data['otp']       = $otp;
     $data['id']        = self::$_clientId;
@@ -118,6 +119,7 @@ class phpsecYubikey {
     /* Convert the array with data to a request string. */
     $query = http_build_query($data);
 
+    /* TODO: Better error handling. */
     $response = file_get_contents('http://api.yubico.com/wsapi/2.0/verify?'.$query);
 
     $lines = explode("\r\n", $response);
