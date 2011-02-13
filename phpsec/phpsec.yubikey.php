@@ -28,6 +28,14 @@ class phpsecYubikey {
   public static $_clientId     = null;
   public static $_clientSecret = null;
 
+  /**
+   * Verify Yubikey one time password against the Yubico servers.
+   *
+   * @param string $otp
+   *   One time password to verify.
+   *
+   * @return boolean
+   */
   public static function verify($otp) {
     if(self::$_clientId === null || self::$_clientSecret === null) {
       return false;
@@ -42,6 +50,11 @@ class phpsecYubikey {
     /* Do the request. */
     $response = self::getResponse($data);
 
+    /* If tokens don't match return false. */
+    if($response['otp'] != $otp) {
+      return false;
+    }
+
     /* Check status of response. If not OK return false.*/
     if($response['status'] != 'OK') {
       return false;
@@ -55,6 +68,15 @@ class phpsecYubikey {
     return true;
   }
 
+  /**
+   * Sign data using shared secret.
+   *
+   * @param array $data
+   *   Data to sign.
+   *
+   * @return string
+   *   Base64 encoded HMAC hash.
+   */
   private static function sign($data) {
     /* Remove signature from server. */
     unset($data['h']);
@@ -79,6 +101,15 @@ class phpsecYubikey {
     return base64_encode($sign);
   }
 
+  /**
+   * Make a request to the Yubico servers and get the response.
+   *
+   * @param array $data
+   *   Array containing the key/values for the request.
+   *
+   * @return array
+   *   Array containing key/values from the response.
+   */
   private static function getResponse($data) {
     /* Convert the array with data to a request string. */
     $query = http_build_query($data);
