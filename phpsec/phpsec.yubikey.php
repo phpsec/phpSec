@@ -185,7 +185,7 @@ class phpsecYubikey {
    *   Returns the Yubikey ID, or FALSE on failure.
    */
   public static function getYubikeyId($otp) {
-    if(!self::calidOtp($otp)) {
+    if(!self::validOtp($otp)) {
       return false;
     }
     return substr($otp, 0, 12);
