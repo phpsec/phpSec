@@ -167,7 +167,7 @@ class phpsecYubikey {
    *
    * @return boolean
    */
-  private function validOtp($otp) {
+  private static function validOtp($otp) {
     if(strlen($otp) != 44) {
       return false;
     }
