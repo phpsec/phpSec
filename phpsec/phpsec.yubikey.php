@@ -51,6 +51,10 @@ class phpsecYubikey {
 
     /* Do the request. */
     $response = self::getResponse($data);
+    if($response === false) {
+      self::$lastError = 'YUBIKEY_SERVER_ERROR';
+      return false;
+    }
 
     /* If tokens don't match return false. */
     if($response['otp'] != $otp) {
@@ -119,9 +123,11 @@ class phpsecYubikey {
     /* Convert the array with data to a request string. */
     $query = http_build_query($data);
 
-    /* TODO: Better error handling. */
-    $response = file_get_contents('http://api.yubico.com/wsapi/2.0/verify?'.$query);
-
+    $response = @file_get_contents('http://api.yubico.com/wsapi/2.0/verify?'.$query);
+    if($response === false) {
+      /* Could not make request. */
+      return false;
+    }
     $lines = explode("\r\n", $response);
      foreach($lines as $line) {
        if(trim($line) != '') {
