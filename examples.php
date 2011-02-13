@@ -69,10 +69,12 @@ echo "<hr />";
 if(isset($_GET['do'])) {
   if(phpsec::validToken('myform', $_GET['token'])) {
     echo "Valid token!<br />";
-    phpsecYubikey::$_clientId     = '';
-    phpsecYubikey::$_clientSecret = '';
+    phpsecYubikey::$_clientId     = 5118;
+    phpsecYubikey::$_clientSecret = 'n7cIJF1IaL8WeTUsluWRSpRLOqs=';
     if(phpsecYubikey::verify($_GET['otp'])) {
       echo "Valid OTP!";
+    } else {
+      echo phpsecYubikey::$lastError;
     }
   } else {
     echo "Invalid token!";
