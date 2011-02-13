@@ -123,6 +123,7 @@ class phpsecYubikey {
     /* Convert the array with data to a request string. */
     $query = http_build_query($data);
 
+    /* Set up array with options for the context used by file_get_contents(). */
     $opts = array(
       'http'=>array(
         'method'=>"GET",
@@ -131,12 +132,17 @@ class phpsecYubikey {
       )
     );
 
+    /* Create context. Allowing us to specify User-Agent. */
     $context = stream_context_create($opts);
+
+    /* Get response from Yubico server. */
     $response = @file_get_contents('http://api.yubico.com/wsapi/2.0/verify?'.$query, null, $context);
     if($response === false) {
       /* Could not make request. */
       return false;
     }
+
+    /* Parse response and create an array with the data. */
     $lines = explode("\r\n", $response);
      foreach($lines as $line) {
        if(trim($line) != '') {
@@ -144,6 +150,8 @@ class phpsecYubikey {
          $rdata[$key] = trim($val);
        }
     }
+
+    /* All done. */
     return $rdata;
   }
 
