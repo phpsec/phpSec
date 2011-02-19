@@ -54,6 +54,7 @@ class phpsecYubikey {
     $data['id']        = self::$_clientId;
     $data['nonce']     = phpsecRand::str(20);
     $data['timestamp'] = 1;
+    $data['h']         = self::sign($data);
 
     /* Do the request. */
     $response = self::getResponse($data);
@@ -147,7 +148,6 @@ class phpsecYubikey {
       /* Could not make request. */
       return false;
     }
-    echo $response;
     /* Parse response and create an array with the data. */
     $lines = explode("\r\n", $response);
      foreach($lines as $line) {
