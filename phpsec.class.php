@@ -119,7 +119,7 @@ class phpsec {
    * before it is inserted.
    * @variables: Only HTML is escaped from the string. Special characters
    * is kept as is.
-   * &variables: Encode a string according to RFC 3986 for use in a link.
+   * &variables: Encode a string according to RFC 3986 for use in a URL.
    *
    * @see https://github.com/xqus/phpSec/wiki/XSS-filter
    * @see http://www.faqs.org/rfcs/rfc3986
@@ -155,7 +155,7 @@ class phpsec {
           $safeData = htmlspecialchars($data, ENT_NOQUOTES, self::$_charset);
           break;
         case '&':
-          /* Encode a string according to RFC 3986 for use in a link. */
+          /* Encode a string according to RFC 3986 for use in a URL. */
           $safeData = rawurlencode($data);
           break;
         default:
