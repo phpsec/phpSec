@@ -14,6 +14,7 @@ Features
 *    Enhanced session security.
 *    Session encryption.
 *    Random data generator.
+*    Yubikey[3] inegrations
 
 Getting started
 ---------------
@@ -36,3 +37,4 @@ Make sure you label the issue with a appropriate label.
 
 [1]:http://en.wikipedia.org/wiki/Cross-site_scripting        "Wikipedia on XSS"
 [2]:http://en.wikipedia.org/wiki/Cross-site_request_forgery  "Wikipedia on CSRF"
+[2]:http://yubico.com                                        "Yubikey"
