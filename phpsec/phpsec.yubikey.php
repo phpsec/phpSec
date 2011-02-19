@@ -71,7 +71,23 @@ class phpsecYubikey {
 
     /* Check status of response. If not OK return false.*/
     if($response['status'] != 'OK') {
-      self::$lastError = 'YUBIKEY_COMPUTER_SAYS_NO'; //TODO: Fix this. Use status from server.
+      switch($response['status']) {
+        case 'REPLAYED_OTP':
+          self::$lastError = 'YUBIKEY_SERVER_REPLAYED_OTP';
+          break;
+        case 'REPLAYED_REQUEST':
+          self::$lastError = 'YUBIKEY_SERVER_REPLAYED_REQUEST';
+          break;
+        case 'BAD_OTP':
+          self::$lastError = 'YUBIKEY_SERVER_BAD_OTP';
+          break;
+        case 'NO_SUCH_CLIENT':
+          self::$lastError = 'YUBIKEY_SERVER_NO_SUCH_CLIENT';
+          break;
+        default:
+          self::$lastError = 'YUBIKEY_SERVER_SAYS_NO';
+          break;
+      }
       return false;
     }
 
