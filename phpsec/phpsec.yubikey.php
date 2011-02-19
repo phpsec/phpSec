@@ -69,7 +69,7 @@ class phpsecYubikey {
       return false;
     }
 
-    /* Check status of response. If not OK return false.*/
+    /* Check status of response. If not OK return false. */
     if($response['status'] != 'OK') {
       switch($response['status']) {
         case 'REPLAYED_OTP':
