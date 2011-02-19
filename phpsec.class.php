@@ -120,7 +120,7 @@ class phpsec {
    * @variables: Only HTML is escaped from the string. Special characters
    * is kept as is.
    *
-   * @see https://sourceforge.net/apps/mediawiki/phpsec/index.php?title=Documentation#2.1_Using_the_XSS_filter
+   * @see https://github.com/xqus/phpSec/wiki/XSS-filter
    *
    * @param string $str
    *   Base string. The string itself is not filtered in any way, but
