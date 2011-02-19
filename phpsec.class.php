@@ -183,7 +183,6 @@ class phpsec {
   private static function error($msg, $level = E_USER_WARNING) {
     $callee = next(debug_backtrace());
     trigger_error($msg.'. (Called from <strong>'.$callee['file'].' line '.$callee['line'].'</strong>)', $level);
-    /* TODO: Write error to file. */
   }
 
   /**
@@ -201,9 +200,22 @@ class phpsec {
    */
   public static function log($type, $msg, $level = 'warn') {
     $fileName = self::$_logdir.'/log_'.$type;
-    /* TODO: Add some more information when writing log entry. */
-    $line = date('c').' - '.$level.' - '.$msg;
 
+    /* I'm only using vsprintf() to make the code look good. */
+    $line = vsprintf('[%s] [%s] [%s] %s %s %s - %s "%s"',
+      array(
+        date('c'),
+        $level,
+        $_SERVER['REMOTE_ADDR'],
+        $_SERVER['REQUEST_METHOD'],
+        $_SERVER['SCRIPT_NAME'],
+        $_SERVER['SERVER_PROTOCOL'],
+        $msg,
+        $_SERVER['HTTP_USER_AGENT']
+      )
+    );
+
+    /* Open the logfile and write the entry. */
     $fp = fopen($fileName, 'a');
     if($fp !== false) {
       if(flock($fp, LOCK_EX)) {
