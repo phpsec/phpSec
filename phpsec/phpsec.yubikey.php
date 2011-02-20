@@ -149,9 +149,9 @@ class phpsecYubikey {
     /* Set up array with options for the context used by file_get_contents(). */
     $opts = array(
       'http'=>array(
-        'method'=>"GET",
-        'header'=>"Accept-language: en\r\n" .
-                  "User-Agent: phpSec (http://phpsec.xqus.com)\r\n"
+        'method' => "GET",
+        'header' => "Accept-language: en\r\n" .
+                    "User-Agent: phpSec (http://phpsec.xqus.com)\r\n"
       )
     );
 
