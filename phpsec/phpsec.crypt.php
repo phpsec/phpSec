@@ -54,7 +54,7 @@ class phpsecCrypt {
 
     $encrypted['cdata'] = base64_encode(mcrypt_generic($td, $serializedData));
     $encrypted['hash']  = hash(self::HASH_TYPE, $serializedData);
-    $encrypted['algo']  = self::ALGO; /* TODO: You know what to do here. */
+    $encrypted['algo']  = self::ALGO;
     $encrypted['mode']  = self::ALGO_MODE;
     $encrypted['iv']    = base64_encode($iv);
 
