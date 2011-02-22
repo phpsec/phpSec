@@ -39,11 +39,14 @@ class phpsecOtp {
    *   Optional array of data that belongs to $action. Used to ensure that the action
    *   is performed with the same data as when the OTP was generated.
    *
+   * @param integer $length
+   *   OTP length.
+   *
    * @param integer $ttl
    *   Time to live for the OTP. In seconds.
    *
    */
-  public static function generate($action, $data = null, $ttl = 480) {
+  public static function generate($action, $data = null, $length = 6, $ttl = 480) {
 
   }
 
