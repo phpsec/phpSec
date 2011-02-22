@@ -46,6 +46,7 @@ class phpsec {
       'phpsecRand'    => 'phpsec.rand.php',
       'phpsecCrypt'   => 'phpsec.crypt.php',
       'phpsecYubikey' => 'phpsec.yubikey.php',
+      'phpsecOtp'     => 'phpsec.otp.php',
     );
 
     if(isset($classes[$class])) {
