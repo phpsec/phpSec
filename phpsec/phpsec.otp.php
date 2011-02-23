@@ -29,13 +29,25 @@ class phpsecOtp {
    * @param integer $ttl
    *   Time to live for the OTP. In seconds.
    *
+   * @return string
+   *   One time password that should be delivered to the user.
+   *
    */
   public static function generate($action, $data = null, $length = 6, $ttl = 480) {
+    $otp['pw'] = phpsecRand::str($length);
+    if($data !== null) {
+      $otp['hash'] = hash(phpsec::HASH_TYPE, serialize($data));
+    }
+    phpsecCache::cacheSet('otp-'.$action, $otp, $ttl);
 
+    return $otp['pw'];
   }
 
   /**
    * Validate a one-time-password.
+   *
+   * @param strgin $otp
+   *   OTP supplied by user.
    *
    * @param string $action
    *   See phpsecOtp::generate().
@@ -44,8 +56,21 @@ class phpsecOtp {
    *   See phpsecOtp::generate().
    *
    */
-  public static function validate($action, $data = array()) {
-
+  public static function validate($otp, $action, $data = null) {
+    $cache = phpsecCache::cacheGet('otp-'.$action);
+    /* This is totally backwards. We check for what should not have been and
+     * return false if we stuble across something fishy. Unless something good happened,
+     * and we somehow did't find anything wrong. Then we return true. But if something really
+     * bad happens we still return false. */
+    if($cache !== false) {
+      if($cache['pw'] !== $otp) {
+        return false;
+      } elseif(isset($cache['hash']) && $cache['hash'] !== hash(phpsec::HASH_TYPE, serialize($data))) {
+        return false;
+      }
+      return true;
+    }
+    return false;
   }
 
   /**
