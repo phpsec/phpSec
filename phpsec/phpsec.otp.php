@@ -136,6 +136,9 @@ class phpsecOtp {
     return false;
   }
 
+  /**
+   * Save a password card.
+   */
   private static function psSave($card) {
     /* Save card. We should probably encrypt it first. */
     $fp = fopen(phpsec::$_datadir.'/otp-card-'.$card['id'], 'w');
@@ -145,6 +148,10 @@ class phpsecOtp {
     }
   }
 
+  /**
+   * Prepeare the password card for saving.
+   * Must be called before phpsecOtp::psSave().
+   */
   private static function psHash($card) {
     /* We are encoding the password list just because we want to make
      * the file look nice, and to avoid bugs with special characters. */
