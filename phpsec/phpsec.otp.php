@@ -8,6 +8,10 @@
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
+
+/**
+ * Provides one time password functionality.
+ */
 class phpsecOtp {
   const HASH_TYPE = 'sha256';
   /**
@@ -86,11 +90,8 @@ class phpsecOtp {
       $card['usable'][$i] = true;
     }
 
-
     $card = self::psHash($card);
-
     self::psSave($card);
-
 
     return $card['id'];
   }
@@ -106,6 +107,7 @@ class phpsecOtp {
 
         $card = self::psHash($card);
         self::psSave($card);
+
         return true;
       }
     }
