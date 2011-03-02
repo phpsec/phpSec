@@ -1,6 +1,15 @@
+
+  alpha-0.0.3
+- [#21] Use of phpSec session handler is now optional.
+- [#17] phpsec::pwHash() now returns a JSON encoded array.
+- Added Yubikey integration. See https://github.com/xqus/phpSec/wiki/Yubikey
+- Added &type variables to phpsec::f().
+- Many minor fixes..
+
 February 5. 2011 - xqus
   alpha-0.0.2 released.
-- The library is no longer automatically initialized. You now need to call phpsec::init().
+- The library is no longer automatically initialized.
+  You now need to call phpsec::init().
 - Added encryption functions.
 - Added random functions.
 - Separated the library into smaller files.

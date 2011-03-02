@@ -1,20 +1,12 @@
 <?php
 /**
-      phpSec - A PHP security library
-      Web:     https://github.com/xqus/phpSec
+  phpSec - A PHP security library
 
-      Copyright 2011 Audun Larsen. All rights reserved.
-      larsen@xqus.com
-
-   Redistribution and use, with or without modification,
-   are permitted provided that the following condition is met:
-
-   * Redistribution and use of source code must retain the above copyright notice,
-     this list of conditions and the following disclaimer.
-
-   THIS SOFTWARE IS PROVIDED BY ``AS IS''
-   IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY TYPE OF
-   DAMAGE ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE.
+  @author    Audun Larsen <larsen@gmail.com>
+  @copyright Copyright (c) Audun Larsen, 2011
+  @link      https://github.com/xqus/phpSec
+  @license   http://opensource.org/licenses/mit-license.php The MIT License
+  @package   phpSec
  */
 
 
@@ -33,9 +25,20 @@ echo "<hr />";
 
 
 /**
- * Test randomness
+ * Test OTP
  */
-echo phpsecRand::str(10);
+$otp = phpsecOtp::generate('login');
+if(phpsecOtp::validate($otp, 'login')) {
+  echo "Valid OTP.";
+}
+echo "<hr />";
+//$cardId = phpsecOtp::psGenerate();
+if(phpsecOtp::psValidate('5baaabf1cbee', 0, 'di9dqa')) {
+  echo "Valid ps OTP.";
+}
+print_r(phpsecOtp::psLoad('5baaabf1cbee'));
+
+
 echo "<hr />";
 /**
  * Test encryption
@@ -91,7 +94,7 @@ echo "<hr />";
 /**
  * Test XSS filter.
  */
-echo phpsec::f('This is a !test, %ok?', array('!test' => 't<br>est. Å?""', '%ok' => 'o<br>kÅ?""'));
+echo phpsec::f('http://www.example.com/q=&q', array('&q' => 'this is a query&'));
 /**
  * Test logging.
  */
