@@ -114,9 +114,9 @@ class phpsecOtp {
    */
   public static function cardValidate($cardId, $selected, $otp) {
     $card = self::cardLoad($cardId);
-    if($card['usable'][$selected] === true) {
+    if(isset($card['usable'][$selected]) && $card['usable'][$selected] === true) {
       if($card['list'][$selected] == $otp) {
-        $card['usable'][$selected] = false;
+        unset($card['usable'][$selected]);
 
         $card = self::cardHash($card);
         self::cardSave($card);
@@ -137,7 +137,12 @@ class phpsecOtp {
    *   OTP ID of a available OTP.
    */
   public static function cardSelect($cardId) {
+    $card = self::cardLoad($cardId);
 
+    $available = array_keys($card['usable']);
+
+    $selected = phpsecRand::int(0, count($available)-1);
+    return $available[$selected];
   }
   /**
    * Load a password card.
@@ -171,7 +176,9 @@ class phpsecOtp {
    *   Number of unused OTPs.
    */
   public static function cardRemaining($cardId) {
+    $card = self::cardLoad($cardId);
 
+    return count($card['usable']);
   }
 
   /**
