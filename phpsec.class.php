@@ -8,6 +8,10 @@
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
+
+/**
+ * phpSec basic functionality.
+ */
 class phpsec {
   public static $_charset    = 'utf-8';
   public static $_datadir    = null;

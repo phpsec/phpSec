@@ -8,6 +8,10 @@
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
+
+/**
+ * Implements validation of Yubikey against Yubico servers.
+ */
 class phpsecYubikey {
   public static $_clientId     = null;
   public static $_clientSecret = null;
