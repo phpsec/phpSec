@@ -80,12 +80,12 @@ class phpsec {
         'phpsecSession::destroy',
         'phpsecSession::gc'
       );
+      /* Start a new session. */
+      session_start();
+      /* Regenerate the session ID and remove the old session to avoid session hijacking. */
+      session_regenerate_id(true);
     }
 
-    /* Start a new session. */
-    session_start();
-    /* Regenerate the session ID and remove the old session to avoid session hijacking. */
-    session_regenerate_id(true);
 
     /* Create a random token for each visitor and store it the users session.
        This is for example used to identify owners of cache data. */
