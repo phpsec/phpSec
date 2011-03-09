@@ -10,7 +10,7 @@
  */
 
 /**
- * Provides one time password functionality.
+ * Provides one time password functionality. This code is experimental.
  */
 class phpsecOtp {
   const HASH_TYPE = 'sha256';

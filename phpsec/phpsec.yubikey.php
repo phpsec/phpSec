@@ -10,7 +10,7 @@
  */
 
 /**
- * Implements validation of Yubikey against Yubico servers.
+ * Implements validation of Yubikey against Yubico servers. This code is experimental.
  */
 class phpsecYubikey {
   public static $_clientId     = null;
