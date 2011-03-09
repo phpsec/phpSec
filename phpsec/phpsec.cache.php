@@ -35,7 +35,7 @@ class phpsecCache {
     $saveData['data'] = serialize($data);
     $saveData['ttl']  = time() + $ttl;
     $saveData['hash'] = hash(self::HASH_TYPE, $saveData['data']);
-    /* TODO: #22*/
+
     $data = json_encode($saveData);
     $fp = fopen($fileName, 'w');
     if($fp !== false) {
