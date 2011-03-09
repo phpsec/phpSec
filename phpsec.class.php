@@ -22,7 +22,7 @@ class phpsec {
   /* Constants. */
   const HASH_TYPE      = 'sha256';
   const SALT_INJECTION = 'before';
-  const VERSION        = '0.0.3-dev';
+  const VERSION        = '0.0.3';
   /**
    * Autoload function to load required files when needed.
    */

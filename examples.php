@@ -23,7 +23,6 @@ phpsec::init();
 echo 'Uid: '.phpsec::$uid."\n\n";
 echo "<hr />";
 
-
 /**
  * Test OTP
  */
@@ -32,11 +31,13 @@ if(phpsecOtp::validate($otp, 'login')) {
   echo "Valid OTP.";
 }
 echo "<hr />";
-//$cardId = phpsecOtp::psGenerate();
-if(phpsecOtp::psValidate('5baaabf1cbee', 0, 'di9dqa')) {
+echo phpsecOtp::cardRemaining('5baaabf1cbee');
+echo phpsecOtp::cardSelect('5baaabf1cbee');
+//$cardId = phpsecOtp::cardGenerate();
+if(phpsecOtp::cardValidate('5baaabf1cbee', 63, '7al9p8')) {
   echo "Valid ps OTP.";
 }
-print_r(phpsecOtp::psLoad('5baaabf1cbee'));
+//print_r(phpsecOtp::cardLoad('5baaabf1cbee'));
 
 
 echo "<hr />";
