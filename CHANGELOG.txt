@@ -1,3 +1,5 @@
+  alpha-0.0.4
+
 March 9. 2011 - xqus
   alpha-0.0.3 released.
 - [#21] Use of phpSec session handler is now optional.
