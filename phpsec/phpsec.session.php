@@ -19,14 +19,14 @@ class phpsecSession {
   private static $_secret;
 
   /**
-   * Open session.
+   * Open a session.
    *
    * @param string $path
    * @param string $name
    * @return bool
    */
   public static function open($path, $name) {
-    /* Set some variables we need later */
+    /* Set some variables we need later. */
     self::$_savePath  = $path;
     self::$_name      = $name;
     self::$_keyCookie = $name.'_secret';
@@ -53,7 +53,7 @@ class phpsecSession {
   }
 
   /**
-   * Close the session
+   * Close a session.
    *
    * @return bool
    */
@@ -62,7 +62,7 @@ class phpsecSession {
   }
 
   /**
-   * Read and decrypt session.
+   * Read and decrypt a session.
    *
    * @param string $id
    * @return bool
@@ -77,7 +77,7 @@ class phpsecSession {
   }
 
   /**
-   * Encrypt and write session.
+   * Encrypt and save a session.
    *
    * @param string $id
    * @param string $data
@@ -95,7 +95,7 @@ class phpsecSession {
     return false;
   }
   /**
-   * Destroy/remove the session.
+   * Destroy/remove a session.
    *
    * @param string $id
    * @return bool
