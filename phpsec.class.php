@@ -35,6 +35,7 @@ class phpsec {
       'phpsecCrypt'   => 'phpsec.crypt.php',
       'phpsecYubikey' => 'phpsec.yubikey.php',
       'phpsecOtp'     => 'phpsec.otp.php',
+      'phpsecLog'     => 'phpsec.log.php',
     );
 
     if(isset($classes[$class])) {

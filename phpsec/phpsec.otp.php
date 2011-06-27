@@ -63,7 +63,7 @@ class phpsecOtp {
   public static function validate($otp, $action, $data = null) {
     $cache = phpsecCache::cacheGet('otp-'.$action);
     /* This is totally backwards. We check for what should not have been and
-     * return false if we stuble across something fishy. Unless something good happened,
+     * return false if we stubmle across something fishy. Unless something good happened,
      * and we somehow did't find anything wrong. Then we return true. But if something really
      * bad happens we still return false. */
     if($cache !== false) {
