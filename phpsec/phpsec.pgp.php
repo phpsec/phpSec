@@ -14,26 +14,26 @@
  */
 class phpsecPgp {
   public static $_gpgPath = '/var/bin/gpg';
-
   public static $_keyDir = null;
+
 
   public static function genKeys() {
 
   }
 
-  public function signKey() {
+  public static function signKey() {
 
   }
 
-  public function sign() {
+  public static  function sign() {
 
   }
 
-  public function encrypt() {
+  public static function encrypt() {
 
   }
 
-  public function decrypt() {
+  public static function decrypt() {
 
   }
 
