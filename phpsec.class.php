@@ -226,6 +226,9 @@ class phpsec {
    *   Returns true if the token is valid. Returns false otherwise.
    */
   public static function validToken($name, $token) {
+    if(strlen($token) == 0) {
+      return false;
+    }
     $cacheToken = phpsecCache::cacheGet('token-'.$name);
     /* Check if the provided token matches the token in the cache. */
     if($cacheToken == $token) {
