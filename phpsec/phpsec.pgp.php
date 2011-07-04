@@ -9,5 +9,32 @@
   @package   phpSec
  */
 
+/**
+ * Class to act as an interface to GPG.
+ */
 class phpsecPgp {
+  public static $_gpgPath = '/var/bin/gpg';
+
+  public static $_keyDir = null;
+
+  public static function genKeys() {
+
+  }
+
+  public function signKey() {
+
+  }
+
+  public function sign() {
+
+  }
+
+  public function encrypt() {
+
+  }
+
+  public function decrypt() {
+
+  }
+
 }
