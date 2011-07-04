@@ -15,7 +15,6 @@
 class phpsec {
   public static $_charset    = 'utf-8';
   public static $_datadir    = null;
-  public static $_logdir     = null;
   public static $_sessenable = true;
   public static $uid         = null; // User identifier.
 
@@ -56,9 +55,6 @@ class phpsec {
      }
 
     /* Check write permissions to directories */
-    if(!is_writeable(self::$_logdir)) {
-      self::error('Log directory('.self::$_logdir.') not writeable');
-    }
     if(!is_writeable(self::$_datadir)) {
       self::error('Data directory('.self::$_datadir.') not writeable');
     }
@@ -175,48 +171,6 @@ class phpsec {
     trigger_error($msg.'. (Called from <strong>'.$callee['file'].' line '.$callee['line'].'</strong>)', $level);
   }
 
-  /**
-   * Write an entry to a log.
-   *
-   * @param string $type
-   *   Specify the type of the logentry. This will be a part of the filname.
-   *
-   * @param string $msg
-   *   The log message itself.
-   *
-   * @param string $level
-   *   Error level (optional). Should be either debug, notice, warn or error.
-   *   If none is specified warn is used.
-   */
-  public static function log($type, $msg, $level = 'warn') {
-    $fileName = self::$_logdir.'/log_'.$type;
-
-    /* I'm only using vsprintf() to make the code look good. */
-    $line = vsprintf('[%s] [%s] [%s] %s %s %s - %s "%s"',
-      array(
-        date('c'),
-        $level,
-        $_SERVER['REMOTE_ADDR'],
-        $_SERVER['REQUEST_METHOD'],
-        $_SERVER['SCRIPT_NAME'],
-        $_SERVER['SERVER_PROTOCOL'],
-        $msg,
-        $_SERVER['HTTP_USER_AGENT']
-      )
-    );
-
-    /* Open the logfile and write the entry. */
-    $fp = fopen($fileName, 'a');
-    if($fp !== false) {
-      if(flock($fp, LOCK_EX)) {
-        fwrite($fp, $line."\n");
-        flock($fp, LOCK_UN);
-        fclose($fp);
-      } else {
-        self::error('Could not lock logfile');
-      }
-    }
-  }
 
   /**
    * Returns a unique identifier in the format spsecified in

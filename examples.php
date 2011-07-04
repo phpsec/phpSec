@@ -16,8 +16,8 @@ ini_set('display_errors','stdout');
 
 require_once 'phpsec.class.php';
 phpsec::$_datadir = '/var/www/phpSec/data';
-phpsec::$_logdir = '/var/www/phpSec/logs';
 phpsec::init();
+
 
 // Print the uid
 echo 'Uid: '.phpsec::$uid."\n\n";
@@ -44,8 +44,7 @@ echo "<hr />";
 /**
  * Test encryption
  */
-print_r(phpsecCrypt::encrypt('f00bar', 'secret'));
-print_r(phpsecCrypt::decrypt(phpsecCrypt::encrypt(array('1','2'), 'secret'), 'secret'));
+print_r(phpsecCrypt::decrypt(phpsecCrypt::encrypt(array('secret'=> 'Some secret.'), 'secret'), 'secret'));
 echo "<hr />";
 
 /**
@@ -72,7 +71,6 @@ echo "<hr />";
  */
 if(isset($_GET['do'])) {
   if(phpsec::validToken('myform', $_GET['token'])) {
-    echo "Valid token!<br />";
     phpsecYubikey::$_clientId     = 5118;
     phpsecYubikey::$_clientSecret = 'n7cIJF1IaL8WeTUsluWRSpRLOqs=';
     if(phpsecYubikey::verify($_GET['otp'])) {
@@ -99,7 +97,8 @@ echo phpsec::f('http://www.example.com/q=&q', array('&q' => 'this is a query&'))
 /**
  * Test logging.
  */
-phpsec::log('access', 'Someone loaded the page', 'debug');
+phpsecLog::$_logdir = '/var/www/phpSec/logs';
+phpsecLog::log('access', 'Someone loaded the page', 'debug');
 
 
 echo "</pre>";
