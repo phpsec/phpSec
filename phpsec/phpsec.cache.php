@@ -10,7 +10,9 @@
  */
 
 /**
- * Provides as simple cahce engine.
+ * Provides us with simple cahce engine.
+ * Only intended for use by phpSec, but feel free to use
+ * it if you want.
  */
 class phpsecCache {
   public static $_datadir = null;
