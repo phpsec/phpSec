@@ -38,7 +38,7 @@ class phpsecCrypt {
     $td = mcrypt_module_open(self::ALGO, '', self::ALGO_MODE, '');
 
     /* Create IV. */
-    $iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
+    $iv = phpsecRand::bytes(mcrypt_enc_get_iv_size($td));
 
     /* Get keysize length. */
     $ks = mcrypt_enc_get_key_size($td);
