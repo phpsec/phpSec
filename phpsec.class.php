@@ -170,7 +170,7 @@ class phpsec {
    *   Error level (optional).
    *   If none is specified PHPSEC_E_WARN is used.
    */
-  private static function error($msg, $level = E_USER_WARNING) {
+  public static function error($msg, $level = E_USER_WARNING) {
     $callee = next(debug_backtrace());
     trigger_error($msg.'. (Called from <strong>'.$callee['file'].' line '.$callee['line'].'</strong>)', $level);
   }

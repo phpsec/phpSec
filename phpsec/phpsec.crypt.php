@@ -76,7 +76,7 @@ class phpsecCrypt {
     /* Decode the JSON string */
     $data = json_decode($data, true);
     if($data === NULL || sizeof($data) !== 5) {
-      self::error('Invalid data passed to decrypt()');
+      phpsec::error('Invalid data passed to decrypt()');
       return false;
     }
     /* Everything looks good so far. Let's continue.*/
