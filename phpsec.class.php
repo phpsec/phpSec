@@ -97,8 +97,7 @@ class phpsec {
 
   /**
    * XSS filter. Returns a string that is safe to use on the page.
-   * A string with variables is supplied to the function along with an
-   * associative array defining tha values of the variables.
+   *
    * There are three types of variables:
    * %variables: HTML is stripped from the string
    * before it is inserted.
@@ -108,20 +107,24 @@ class phpsec {
    * is kept as is.
    * &variables: Encode a string according to RFC 3986 for use in a URL.
    *
-   * @see https://github.com/xqus/phpSec/wiki/XSS-filter
+   * @see http://phpsec.xqus.com/node/2424
    * @see http://www.faqs.org/rfcs/rfc3986
    *
    * @param string $str
-   *   Base string. The string itself is not filtered in any way, but
-   *   used to compose the filtered parts from the args array.
+   *   If $args is a string, this should be only %, ! @ or &.
+   *   If $args is a array, this should be a string containing the 'glue'
+   *   used to compose the filtered parts from the $args array.
    *
-   * @param array $args
-   *   An associative array containing data to be filtered by the XSS filter.
+   * @param mixed $args
+   *   A string to filter or an associative array containing data to filter.
    *   The array keys should be preceeded with %, ! or @ defining what filter
    *   to apply.
    */
-  public static function f($str, $args = array()) {
-    /* First, loop trough the args and apply the filters. */
+  public static function f($str, $args) {
+    if(is_string($args)) {
+      $args = array($str => $args);
+    }
+    /* Loop trough the args and apply the filters. */
     while(list($name, $data) = each($args)) {
       $safeData = false;
       $filterType = mb_substr($name, 0, 1);
