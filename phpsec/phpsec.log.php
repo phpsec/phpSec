@@ -15,8 +15,12 @@ class phpsecLog {
    *
    * Examples:
    *
-   * filesystem:/var/www/phpsec/logs
+   * phpsecLog::$_logdir = 'filesystem:/var/www/phpSec/logs';
    *   Write log to a file in the /var/www/phpsec/logs directory.
+   *
+   * phpsecLog::$_logdir = 'syslog:'.LOG_USER;
+   *   Write log til syslog. See http://www.php.net/manual/en/function.openlog.php
+   *   for available facilities.
    */
   public static $_logdir = null;
   /**
@@ -29,16 +33,23 @@ class phpsecLog {
    *   The log message itself.
    *
    * @param string $level
-   *   Error level (optional). Should be either debug, notice, warn or error.
-   *   If none is specified warn is used.
+   *   Error level (optional) can be one of:
+   *    LOG_EMERG    system is unusable
+   *    LOG_ALERT    action must be taken immediately
+   *    LOG_CRIT     critical conditions
+   *    LOG_ERR      error conditions
+   *    LOG_WARNING  warning conditions
+   *    LOG_NOTICE   normal, but significant, condition
+   *    LOG_INFO     informational message
+   *    LOG_DEBUG    debug-level message
+   *   If none is specified LOG_WARNING is used.
    */
-  public static function log($type, $msg, $level = 'warn') {
-
+  public static function log($type, $msg, $level = LOG_WARNING) {
     /* I'm only using vsprintf() to make the code look good. */
     $line = vsprintf('[%s] [%s] [%s] %s %s %s - %s "%s"',
       array(
         date('c'),
-        $level,
+        'Priority:'.$level,
         $_SERVER['REMOTE_ADDR'],
         $_SERVER['REQUEST_METHOD'],
         $_SERVER['SCRIPT_NAME'],
@@ -63,6 +74,11 @@ class phpsecLog {
         return self::fileWrite($fileName, $line);
       break;
 
+      case 'syslog':
+        /* Write log using syslog. */
+        self::syslogWrite($logDest[1], $line, $level);
+      break;
+
       default:
         /* We don't know what type of storage this is. Return error. */
         phpsec::error('Invalid log destination type: '.$logDest[0]);
@@ -85,5 +101,12 @@ class phpsecLog {
       }
     }
     return true;
+  }
+
+  private static function syslogWrite($facility, $msg, $level) {
+    openlog('phpSec', LOG_ODELAY, $facility);
+    syslog ($level, $msg);
+    closelog();
+
   }
 }
