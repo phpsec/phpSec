@@ -10,6 +10,14 @@
  */
 
 class phpsecLog {
+  /**
+   * Define how, and where to write logs.
+   *
+   * Examples:
+   *
+   * filesystem:/var/www/phpsec/logs
+   *   Write log to a file in the /var/www/phpsec/logs directory.
+   */
   public static $_logdir = null;
   /**
    * Write an entry to a log.
@@ -25,7 +33,6 @@ class phpsecLog {
    *   If none is specified warn is used.
    */
   public static function log($type, $msg, $level = 'warn') {
-    $fileName = self::$_logdir.'/log_'.$type;
 
     /* I'm only using vsprintf() to make the code look good. */
     $line = vsprintf('[%s] [%s] [%s] %s %s %s - %s "%s"',
@@ -41,6 +48,26 @@ class phpsecLog {
       )
     );
 
+
+    if(strpos(self::$_logdir, ':') === false) {
+      phpsec::error('Invalid log destination: '.self::$_logdir);
+      return false;
+    }
+    $logDest = explode(':', self::$_logdir);
+
+    switch($logDest[0]) {
+      case 'filesystem':
+        $fileName = $logDest[1].'/log_'.$type;
+        self::fileWrite($fileName, $line);
+      break;
+
+      default:
+        phpsec::error('Invalid log destination type: '.$logDest[0]);
+      break;
+    }
+  }
+
+  private static function fileWrite($fileName, $line) {
     /* Open the logfile and write the entry. */
     $fp = fopen($fileName, 'a');
     if($fp !== false) {
