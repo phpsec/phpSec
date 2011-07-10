@@ -9,6 +9,9 @@
   @package   phpSec
  */
 
+/**
+ * Adds logging functionality.
+ */
 class phpsecLog {
   /**
    * Define how, and where to write logs.
