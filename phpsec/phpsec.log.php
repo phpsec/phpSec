@@ -76,7 +76,7 @@ class phpsecLog {
         flock($fp, LOCK_UN);
         fclose($fp);
       } else {
-        self::error('Could not lock logfile');
+        phpsec::error('Could not lock logfile');
       }
     }
   }
