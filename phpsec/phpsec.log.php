@@ -60,7 +60,7 @@ class phpsecLog {
       case 'filesystem':
         /* Save til a file in the filesystem. */
         $fileName = $logDest[1].'/log_'.$type;
-        self::fileWrite($fileName, $line);
+        return self::fileWrite($fileName, $line);
       break;
 
       default:
@@ -84,5 +84,6 @@ class phpsecLog {
         phpsec::error('Could not lock logfile');
       }
     }
+    return true;
   }
 }
