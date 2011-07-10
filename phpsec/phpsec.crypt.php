@@ -101,6 +101,10 @@ class phpsecCrypt {
 
   /**
    * Get a key from a secret.
+   * What we do is create two different hashes from the secret, combine them
+   * and pick out the number of characters we need.
+   * We used the raw binary output of the hash function for maximum
+   * bit strength (we have 255 chars to choose from, instead of 16).
    *
    * @param string $secret
    *   The secret to generate a key from.
@@ -111,6 +115,8 @@ class phpsecCrypt {
    * @return string
    */
   private static function getKey($secret, $ks) {
-    return substr(hash(self::HASH_TYPE, $secret), 0, $ks);
+    $key1 = hash('SHA256', $secret, true);
+    $key2 = hash('SHA512', $secret, true);
+    return substr($key2.$key1, 0, $ks);
   }
 }
