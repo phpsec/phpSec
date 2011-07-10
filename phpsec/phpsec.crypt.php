@@ -35,6 +35,11 @@ class phpsecCrypt {
    *   Serialized array containing the encrypted data along with some meta data.
    */
   public static function encrypt($data, $key) {
+    if(strlen($key) < 4) {
+      phpsec::error('Key is to short. Expected 4 characters or more');
+      return false;
+    }
+
     $td = mcrypt_module_open(self::ALGO, '', self::ALGO_MODE, '');
 
     /* Create IV. */
@@ -112,11 +117,20 @@ class phpsecCrypt {
    * @param integer $ks
    *   The key size.
    *
-   * @return string
+   * @return binary
+   *   Key created from secret.
    */
   private static function getKey($secret, $ks) {
-    $key1 = hash('SHA256', $secret, true);
-    $key2 = hash('SHA512', $secret, true);
+    /* Split the secret into two parts. */
+    $secretSplit = floor(strlen($secret));
+    $secret1 = substr($secret, 0, $secretSplit);
+    $secret2 = substr($secret, $secretSplit);
+
+    /* Hash the two parts seperatly and return the result in raw format. */
+    $key1 = hash('sha256', $secret1, true);
+    $key2 = hash('sha256', $secret2, true);
+
+    /* Return the part of the key we need. */
     return substr($key2.$key1, 0, $ks);
   }
 }
