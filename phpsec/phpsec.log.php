@@ -48,23 +48,28 @@ class phpsecLog {
       )
     );
 
-
+    /* Check the log destination for : to ensure it's the correct format. */
     if(strpos(self::$_logdir, ':') === false) {
       phpsec::error('Invalid log destination: '.self::$_logdir);
       return false;
     }
-    $logDest = explode(':', self::$_logdir);
 
+    /* Check the log destination and call the appropriate method for storage. */
+    $logDest = explode(':', self::$_logdir);
     switch($logDest[0]) {
       case 'filesystem':
+        /* Save til a file in the filesystem. */
         $fileName = $logDest[1].'/log_'.$type;
         self::fileWrite($fileName, $line);
       break;
 
       default:
+        /* We don't know what type of storage this is. Return error. */
         phpsec::error('Invalid log destination type: '.$logDest[0]);
+        return false;
       break;
     }
+    return true;
   }
 
   private static function fileWrite($fileName, $line) {
