@@ -19,6 +19,14 @@ phpsec::$_datadir = '/var/www/phpSec/data';
 phpsec::init();
 
 
+
+/* Test GPG. */
+phpsecPgp::$_keyDir = "/tmp/.gnupg";
+//echo phpsecPgp::genKeys('Audun Larsen', 'larsen@xqus.com', 'Test', '123abc');
+
+
+echo "<hr />";
+
 // Print the uid
 echo 'Uid: '.phpsec::$uid."\n\n";
 echo "<hr />";
@@ -44,7 +52,9 @@ echo "<hr />";
 /**
  * Test encryption
  */
-print_r(phpsecCrypt::decrypt(phpsecCrypt::encrypt(array('secret'=> 'Some secret.'), 'secret'), 'secret'));
+$encrypted = phpsecCrypt::encrypt(array('secret'=> 'Some secret.'), '675hgjhg786t786786tuygjhgjhgjhg76iuhlkfgdgsfgølø-jkgfgssdasdasd');
+print_r($encrypted);
+print_r(phpsecCrypt::decrypt($encrypted, '675hgjhg786t786786tuygjhgjhgjhg76iuhlkfgdgsfgølø-jkgfgssdasdasd'));
 echo "<hr />";
 
 /**
@@ -94,12 +104,16 @@ echo "<hr />";
  * Test XSS filter.
  */
 echo phpsec::f('http://www.example.com/q=&q', array('&q' => 'this is a query&'));
+echo "<hr />";
+echo phpsec::f('!', 'this is a query&<hr>');
 /**
  * Test logging.
  */
-phpsecLog::$_logdir = '/var/www/phpSec/logs';
-phpsecLog::log('access', 'Someone loaded the page', 'debug');
+phpsecLog::$_logdir = 'filesystem:/var/www/phpSec/logs';
+phpsecLog::log('access', 'Someone loaded the page', LOG_EMERG);
 
+phpsecLog::$_logdir = 'syslog:'.LOG_USER;
+phpsecLog::log('access', 'Someone loaded the page', LOG_EMERG);
 
 echo "</pre>";
 ?>
