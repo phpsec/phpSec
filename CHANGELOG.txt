@@ -1,5 +1,20 @@
-  alpha-0.0.4
-
+July 11. 2011 - xqus
+  alpha-0.0.4 release.
+  [#25] Empty CSRF token creates hickups.
+  Added initial GPG/PGP support. Still experimental.
+  Added phpsecLog class to add better logging support.  
+    This means that phpsec::init() has to be called before setting the log dir:
+    phpsecLog::$_logdir = 'filesystem:/var/www/phpSec/logs';
+    Also phpsec::log() is now phpsecLog::log().
+  Added syslog support to phpsecLog.
+  phpsec::f() now accepts strings a array of data to filter.
+  Improved error handling.
+  phpsecCrypt::encrypt() performance improvements.
+  Greatly improved key generation security in phpsecCrypt().
+    This means that data encrypted with phpSec alpha-0.0.3 and older will not
+    decrypt in this version.
+  
+  
 March 9. 2011 - xqus
   alpha-0.0.3 released.
 - [#21] Use of phpSec session handler is now optional.
