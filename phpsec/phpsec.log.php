@@ -22,7 +22,8 @@ class phpsecLog {
    *   Write log to a file in the /var/www/phpsec/logs directory.
    *
    * phpsecLog::$_logdir = 'syslog:'.LOG_USER;
-   *   Write log til syslog. See http://www.php.net/manual/en/function.openlog.php
+   *   Write log til syslog.
+   *   @see http://www.php.net/manual/en/function.openlog.php
    *   for available facilities.
    */
   public static $_logdir = null;
@@ -46,6 +47,9 @@ class phpsecLog {
    *    LOG_INFO     informational message
    *    LOG_DEBUG    debug-level message
    *   If none is specified LOG_WARNING is used.
+   *
+   * @return bool
+   *   Returns true on success, false on failure.
    */
   public static function log($type, $msg, $level = LOG_WARNING) {
     /* I'm only using vsprintf() to make the code look good. */
@@ -79,7 +83,7 @@ class phpsecLog {
 
       case 'syslog':
         /* Write log using syslog. */
-        self::syslogWrite($logDest[1], $line, $level);
+        return self::syslogWrite($logDest[1], $line, $level);
       break;
 
       default:
@@ -91,6 +95,17 @@ class phpsecLog {
     return true;
   }
 
+  /**
+   * Write a log entry to a file.
+   *
+   * @param string $filename
+   *   File to write to.
+   *
+   * @param string $line
+   *   Message to write til $filename.
+   *
+   * @return bool
+   */
   private static function fileWrite($fileName, $line) {
     /* Open the logfile and write the entry. */
     $fp = fopen($fileName, 'a');
@@ -99,17 +114,32 @@ class phpsecLog {
         fwrite($fp, $line."\n");
         flock($fp, LOCK_UN);
         fclose($fp);
+        return true;
       } else {
         phpsec::error('Could not lock logfile');
       }
     }
-    return true;
+    return false;
   }
 
+  /**
+   * Write a log entry to syslog.
+   *
+   * @param const $facility
+   *   @see http://www.php.net/manual/en/function.openlog.php
+   *
+   * @param string $msg
+   *   Message to write to syslog.
+   *
+   * @param const $level
+   *   @see http://www.php.net/manual/en/function.syslog.php
+   *
+   * @return bool
+   */
   private static function syslogWrite($facility, $msg, $level) {
     openlog('phpSec', LOG_ODELAY, $facility);
     syslog ($level, $msg);
     closelog();
-
+    return true;
   }
 }
