@@ -9,7 +9,6 @@
   @package   phpSec
  */
 
-
 echo "<pre>";
 error_reporting(E_ALL);
 ini_set('display_errors','stdout');
@@ -105,6 +104,7 @@ echo "<hr />";
  */
 echo phpsec::f('http://www.example.com/q=&q', array('&q' => 'this is a query&'));
 echo "<hr />";
+// simple mode.
 echo phpsec::f('!', 'this is a query&<hr>');
 /**
  * Test logging.
