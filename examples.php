@@ -109,7 +109,7 @@ echo phpsec::f('!', 'this is a query&<hr>');
 /**
  * Test logging.
  */
-phpsecLog::$_logdir = 'filesystem:/var/www/phpSec/logs';
+phpsecLog::$_logdir = 'filesystem:/var/www/phpSec/data';
 phpsecLog::log('access', 'Someone loaded the page', LOG_EMERG);
 
 phpsecLog::$_logdir = 'syslog:'.LOG_USER;
