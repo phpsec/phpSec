@@ -9,15 +9,20 @@
   @package   phpSec
  */
 
-class phpsecStorage {
+abstract class phpsecStorage {
   const GC_PROB   = 0.2;
   const HASH_TYPE = 'sha256';
-  
+
   function __construct() {
-  	
+
   }
-  
+
+  abstract public static function set();
+  abstract public static function get();
+  abstract public static function rem();
+
+
   private static function gc() {
-   	
-  } 
+
+  }
 }
