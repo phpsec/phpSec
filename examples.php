@@ -23,6 +23,7 @@ phpsec::init();
 phpsecPgp::$_keyDir = "/tmp/.gnupg";
 //echo phpsecPgp::genKeys('Audun Larsen', 'larsen@xqus.com', 'Test', '123abc');
 
+print_r(phpsecRand::arrayRand(array('key' => 'hei', 'hopp'), 2));
 
 echo "<hr />";
 
