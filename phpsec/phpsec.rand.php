@@ -85,5 +85,30 @@ class phpsecRand {
   public static function hex($len) {
     return bin2hex(self::bytes($len));
   }
+
+  /**
+   * Return one or more random random keys from an array.
+   *
+   * @param array $array
+   *   Input array.
+   *
+   * @param integer $num
+   *   Number of keys to pick.
+   *
+   * @return mixed
+   *   String with the key, or array containing multiple keys.
+   */
+  public static function arrayRand($array, $num = 1) {
+    $keys = array_keys($array);
+    $numKeys = sizeof($keys);
+    if($num == 1) {
+      return $keys[self::int(0, $numKeys-1)];
+    } else {
+      for($i=0; $i < $num; $i++) {
+        $picked[] = $keys[self::int(0, $numKeys-1)];
+      }
+      return $picked;
+    }
+  }
 }
 
