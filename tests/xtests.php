@@ -11,7 +11,6 @@ require_once 'phpSec/phpsec/phpsec.session.php';
 
 
 phpsec::$_datadir = '/tmp';
-phpsec::$_logdir  = '/tmp';
 phpsec::init();
 
 
