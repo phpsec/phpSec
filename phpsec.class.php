@@ -192,7 +192,7 @@ class phpsec {
       self::error('Length should be between 25 and 80');
       return false;
     }
-    $timeStamp = gmdate('Y-m-d\TH:i:s\Z');
+    $timeStamp = gmdate('Y-m-d\TH:i:se');
     $randLength = $length-strlen($timeStamp);
     return $timeStamp.substr(hash(self::HASH_TYPE, phpsecRand::str(40)), 0, $randLength);
   }
@@ -301,7 +301,7 @@ class phpsec {
     $data = json_decode($dbPassword, true);
     if(isset($data['injection']) && sizeof($data) == 4) {
       /**
-       * Ok, e are pretty sure this is good stuff. Now inject the salt
+       * Ok, we are pretty sure this is good stuff. Now inject the salt
        * into the user supplied password, to see if it matches the registerd
        * data from $dbPassword.
        */
@@ -310,6 +310,28 @@ class phpsec {
       if(hash($data['algo'], $pwInjected) == $data['hash']) {
         return true;
       }
+    } else {
+      /* Invalid array supplied. */
+      self::error('Invalid data supplied. Expected serialized array as returned by pwHash()');
+    }
+    return false;
+  }
+
+  /**
+   * Check the age of a salted password.
+   *
+   * @param string $dbPassword
+   *   The json string fetched from the database, in the exact format
+   *   as created by pwHash().
+   *
+   * @return integer
+   *   Age of password in seconds.
+   */
+  public static function pwAge($dbPassword) {
+    $data = json_decode($dbPassword, true);
+    if(isset($data['salt'])) {
+      $date = substr($data['salt'], 0, 22);
+      return gmdate('U') - strtotime($date);
     } else {
       /* Invalid array supplied. */
       self::error('Invalid data supplied. Expected serialized array as returned by pwHash()');
