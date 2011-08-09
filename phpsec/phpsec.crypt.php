@@ -122,7 +122,7 @@ class phpsecCrypt {
    */
   private static function getKey($secret, $ks) {
     /* Split the secret into two parts. */
-    $secretSplit = floor(strlen($secret));
+    $secretSplit = floor(strlen($secret)/2);
     $secret1 = substr($secret, 0, $secretSplit);
     $secret2 = substr($secret, $secretSplit);
 
