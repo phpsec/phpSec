@@ -108,11 +108,6 @@ class phpsecSession {
    */
   public static function destroy($id) {
     $file = self::fileName($id);
-    setcookie(
-      self::$_keyCookie,
-      '',
-      time()-10
-    );
     return(@unlink($file));
   }
   /**
