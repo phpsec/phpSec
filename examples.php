@@ -18,11 +18,6 @@ phpsec::$_datadir = '/var/www/phpSec/data';
 phpsec::init();
 
 
-
-/* Test GPG. */
-phpsecPgp::$_keyDir = "/tmp/.gnupg";
-//echo phpsecPgp::genKeys('Audun Larsen', 'larsen@xqus.com', 'Test', '123abc');
-
 print_r(phpsecRand::arrayRand(array('key' => 'hei', 'hopp'), 2));
 
 echo "<hr />";
@@ -68,7 +63,8 @@ echo "<hr />";*/
  * Test the password hasing helper functions.
  */
 $pwHashed = phpsec::pwHash('123abc');
-echo $pwHashed."\n"; // This is what we save to the database to validate against later.
+echo phpsec::pwAge($pwHashed).'<br>';
+echo $pwHashed."<br>\n"; // This is what we save to the database to validate against later.
 if(phpsec::pwCheck('123abc', $pwHashed)) {
   echo "Valid password.";
 } else {
