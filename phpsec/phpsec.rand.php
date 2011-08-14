@@ -35,7 +35,7 @@ class phpsecRand {
      * considered secure. Fall back on this less secure code. */
     $rnd = '';
     for ($i=0;$i<$len;$i++) {
-      $sha = hash('sha256', mt_rand());
+      $sha  = hash('sha256', mt_rand());
       $char = mt_rand(0,30);
       $rnd .= chr(hexdec($sha[$char].$sha[$char+1]));
     }
