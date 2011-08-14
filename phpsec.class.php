@@ -20,7 +20,6 @@ class phpsec {
 
   /* Constants. */
   const HASH_TYPE      = 'sha256';
-  const SALT_INJECTION = 'before';
   const VERSION        = '0.1-dev';
   /**
    * Autoload function to load required files when needed.
@@ -274,14 +273,13 @@ class phpsec {
    */
   public static function pwHash($password) {
     $salt     = self::genUid();
-    $injected = self::pwInject($password, $salt, self::SALT_INJECTION);
+    $injected = self::pwInject($password, $salt);
     $hash     = hash(self::HASH_TYPE, $injected);
 
     $return = array(
       'hash'      => $hash,
       'salt'      => $salt,
       'algo'      => self::HASH_TYPE,
-      'injection' => self::SALT_INJECTION,
     );
     return json_encode($return);
   }
@@ -306,13 +304,13 @@ class phpsec {
      * we got a valid array.
      */
     $data = json_decode($dbPassword, true);
-    if(isset($data['injection']) && sizeof($data) == 4) {
+    if(isset($data['algo']) && sizeof($data) == 3) {
       /**
        * Ok, we are pretty sure this is good stuff. Now inject the salt
        * into the user supplied password, to see if it matches the registerd
        * data from $dbPassword.
        */
-      $pwInjected = self::pwInject($password, $data['salt'], $data['injection']);
+      $pwInjected = self::pwInject($password, $data['salt']);
       /* Create a hash and see if it matches. */
       if(hash($data['algo'], $pwInjected) == $data['hash']) {
         return true;
@@ -355,25 +353,15 @@ class phpsec {
    * @param string $salt
    *   Well, the salt to inject into the password.
    *
-   * @param string $injection
-   *   The method used to inject the salt. @see pwHash().
-   *
    * @return string
    *   Returns the salted password, ready to be hashed.
    *
    */
-  private static function pwInject($password, $salt, $injection) {
-    switch($injection) {
-      case 'before':
-        $injected = $salt.$password;
-        break;
-      case 'after':
-        $injected = $password.$salt;
-        break;
-      default:
-        self::error('Invalid salt injection method');
-        return false;
-    }
-    return $injected;
+  private static function pwInject($password, $salt) {
+    $hex = hexdec(substr(hash(self::HASH_TYPE, $password), 0, 1));
+    $len = strlen($password);
+    $pos = floor($hex*($len/16));
+
+    return substr($password, 0, $pos).$salt.substr($password, $pos);
   }
 }
