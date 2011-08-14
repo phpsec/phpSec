@@ -31,6 +31,11 @@ class phpsecSession {
     self::$_name      = $name;
     self::$_keyCookie = $name.'_secret';
 
+    /* Set session ID if we don't have one. */
+    if(!isset($_COOKIE[$name])) {
+      session_id(phpsecRand::str(256));
+    }
+
     /* If we don't have a encryption key, create one. */
     if(!isset($_COOKIE[self::$_keyCookie])) {
       /* Create a 128 bit secret used for encryption of session. */
@@ -68,6 +73,7 @@ class phpsecSession {
    * @return bool
    */
   public static function read($id) {
+    echo "Read!";
     $file = self::fileName($id);
     if(file_exists($file)) {
       $data = file_get_contents($file);
