@@ -38,8 +38,7 @@ class phpsecSession {
 
     /* If we don't have a encryption key, create one. */
     if(!isset($_COOKIE[self::$_keyCookie])) {
-      /* Create a 128 bit secret used for encryption of session. */
-      self::$_secret = phpsecRand::bytes(128);
+      /* Create a secret used for encryption of session. */
       self::setSecret();
     } else {
       self::$_secret = base64_decode($_COOKIE[self::$_keyCookie]);
@@ -133,6 +132,7 @@ class phpsecSession {
    * @return true
    */
   private static function setSecret() {
+    self::$_secret = phpsecRand::bytes(128);
     $cookieParam = session_get_cookie_params();
     setcookie(
       self::$_keyCookie,
