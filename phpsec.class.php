@@ -21,7 +21,7 @@ class phpsec {
   /* Constants. */
   const HASH_TYPE      = 'sha256';
   const SALT_INJECTION = 'before';
-  const VERSION        = '0.0.4-dev';
+  const VERSION        = '0.1-dev';
   /**
    * Autoload function to load required files when needed.
    */
@@ -80,6 +80,15 @@ class phpsec {
       );
       /* Start a new session. */
       session_start();
+
+      /* Check the fingerprint to see if it matches, if not clear session data. */
+      $fingerprint = hash(self::HASH_TYPE, 'phpSec-fingerprint'.$_SERVER['HTTP_USER_AGENT']);
+      if(!isset($_SESSION['phpSec-fingerprint'])) {
+        $_SESSION['phpSec-fingerprint'] = $fingerprint;
+      }
+      if($fingerprint != $_SESSION['phpSec-fingerprint']) {
+        $_SESSION = array();
+      }
     }
 
 
