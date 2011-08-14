@@ -31,14 +31,14 @@ class phpsecSession {
     self::$_name      = $name;
     self::$_keyCookie = $name.'_secret';
 
-    /* If we don't have a  encryption key, create one. */
+    /* If we don't have a encryption key, create one. */
     if(!isset($_COOKIE[self::$_keyCookie])) {
-      /* I have no idea if this is a reasonable length. */
-      self::$_secret = phpsecRand::str(80);
+      /* Create a 128 bit secret used for encryption of session. */
+      self::$_secret = phpsecRand::bytes(128);
       $cookieParam = session_get_cookie_params();
       setcookie(
         self::$_keyCookie,
-        self::$_secret,
+        base64_encode(self::$_secret),
         $cookieParam['lifetime'],
         $cookieParam['path'],
         $cookieParam['domain'],
@@ -46,7 +46,7 @@ class phpsecSession {
         $cookieParam['httponly']
       );
     } else {
-      self::$_secret = $_COOKIE[self::$_keyCookie];
+      self::$_secret = base64_decode($_COOKIE[self::$_keyCookie]);
     }
 
     return true;
