@@ -63,11 +63,12 @@ class phpsecSession {
    * @return bool
    */
   public static function read($id) {
-    echo "Read!";
     $file = self::fileName($id);
     if(file_exists($file)) {
       $data = file_get_contents($file);
-      return phpsecCrypt::decrypt($data, self::$_secret);
+      $data = phpsecCrypt::decrypt($data, self::$_secret);
+      self::setSecret();
+      return $data;
     }
     return false;
   }
