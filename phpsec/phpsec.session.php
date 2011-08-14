@@ -65,8 +65,7 @@ class phpsecSession {
   public static function read($id) {
     $file = self::fileName($id);
     if(file_exists($file)) {
-      $data = file_get_contents($file);
-      $data = phpsecCrypt::decrypt($data, self::$_secret);
+      $data = phpsecCrypt::decrypt(file_get_contents($file), self::$_secret);
       self::setSecret();
       return $data;
     }
