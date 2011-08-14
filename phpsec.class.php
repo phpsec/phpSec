@@ -80,8 +80,6 @@ class phpsec {
       );
       /* Start a new session. */
       session_start();
-      /* Regenerate the session ID and remove the old session to avoid session hijacking. */
-      session_regenerate_id(true);
     }
 
 
