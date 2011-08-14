@@ -33,23 +33,14 @@ class phpsecSession {
 
     /* Set session ID if we don't have one. */
     if(!isset($_COOKIE[$name])) {
-      session_id(phpsecRand::str(256));
+      session_id(phpsecRand::str(128));
     }
 
     /* If we don't have a encryption key, create one. */
     if(!isset($_COOKIE[self::$_keyCookie])) {
       /* Create a 128 bit secret used for encryption of session. */
       self::$_secret = phpsecRand::bytes(128);
-      $cookieParam = session_get_cookie_params();
-      setcookie(
-        self::$_keyCookie,
-        base64_encode(self::$_secret),
-        $cookieParam['lifetime'],
-        $cookieParam['path'],
-        $cookieParam['domain'],
-        $cookieParam['secure'],
-        $cookieParam['httponly']
-      );
+      self::setSecret();
     } else {
       self::$_secret = base64_decode($_COOKIE[self::$_keyCookie]);
     }
@@ -134,5 +125,24 @@ class phpsecSession {
    */
   private static function fileName($id) {
     return self::$_savePath.'/'.self::$_name."_".$id;
+  }
+
+  /**
+   * Set the cookie with the secret.
+   *
+   * @return true
+   */
+  private static function setSecret() {
+    $cookieParam = session_get_cookie_params();
+    setcookie(
+      self::$_keyCookie,
+      base64_encode(self::$_secret),
+      $cookieParam['lifetime'],
+      $cookieParam['path'],
+      $cookieParam['domain'],
+      $cookieParam['secure'],
+      $cookieParam['httponly']
+    );
+    return true;
   }
 }
