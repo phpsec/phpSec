@@ -58,11 +58,11 @@ class phpsecCrypt {
     /* Prepeare the array with data. */
     $serializedData = serialize($data);
 
-    $encrypted['cdata'] = base64_encode(mcrypt_generic($td, $serializedData));
-    $encrypted['hash']  = hash(self::HASH_TYPE, $serializedData);
     $encrypted['algo']  = self::$_algo;
     $encrypted['mode']  = self::$_mode;
     $encrypted['iv']    = base64_encode($iv);
+    $encrypted['cdata'] = base64_encode(mcrypt_generic($td, $serializedData));
+    $encrypted['hash']  = hash(self::HASH_TYPE, $serializedData);
 
     return json_encode($encrypted);
   }
