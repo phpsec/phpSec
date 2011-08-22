@@ -13,7 +13,7 @@
  * Provides methods for encrypting data.
  */
 class phpsecCrypt {
-  const ALGO      = MCRYPT_BLOWFISH;
+  const ALGO      = MCRYPT_RIJNDAEL_256;
   const ALGO_MODE = MCRYPT_MODE_CBC;
   const HASH_TYPE = 'sha256';
 
@@ -41,7 +41,7 @@ class phpsecCrypt {
     }
 
     $td = mcrypt_module_open(self::ALGO, '', self::ALGO_MODE, '');
-
+print_r(mcrypt_list_algorithms());
     /* Create IV. */
     $iv = phpsecRand::bytes(mcrypt_enc_get_iv_size($td));
 
