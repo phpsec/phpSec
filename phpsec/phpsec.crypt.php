@@ -133,4 +133,48 @@ class phpsecCrypt {
     /* Return the part of the key we need. */
     return substr($key2.$key1, 0, $ks);
   }
+
+  /**
+   * Implement PBKDF2 as described in RFC 2898.
+   *
+   * @param string $p
+   *   Password.
+   *
+   * @param string $s
+   *   Salt.
+   *
+   * @param integer $c
+   *   Iteration count.
+   *
+   * @param integer $dkLen
+   *   Derived key length.
+   *
+   * @param string $a
+   *   A hash algorithm.
+   */
+  public static function pbkdf2($p, $s, $c, $dkLen, $a = 'sha256') {
+    $hLen = strlen(hash($a, null, true)); /* Hash length. */
+    $l    = ceil($dkLen / $hLen); /* Length in blocks of derived key. */
+    $dk   = ''; /* Derived key. */
+
+    /* Step 1. Check dkLen. */
+    if($dkLen > (2^32-1)*$hLen) {
+      phpsec::error('derived key too long');
+      return false;
+    }
+
+    for ($block = 1; $block<=$l; $block ++) {
+      /* Initial hash for this block. */
+      $ib = $b = hash_hmac($a, $s . pack('N', $block), $p, true);
+      /* Do block iterations. */
+      for ($i = 1; $i<$c; $i ++) {
+        /* XOR iteration. */
+        $ib ^= ($b = hash_hmac($a, $b, $p, true));
+      }
+      /* Append iterated block. */
+      $dk .= $ib;
+    }
+    /* Returned derived key. */
+    return substr($dk, 0, $dkLen);
+  }
 }
