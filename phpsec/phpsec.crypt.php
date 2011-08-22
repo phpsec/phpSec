@@ -13,8 +13,9 @@
  * Provides methods for encrypting data.
  */
 class phpsecCrypt {
-  const ALGO      = MCRYPT_RIJNDAEL_256;
-  const ALGO_MODE = MCRYPT_MODE_CBC;
+  public static $_algo = 'rijndael-256';
+  public static $_mode = 'ctr';
+
   const HASH_TYPE = 'sha256';
 
   /**
@@ -40,8 +41,8 @@ class phpsecCrypt {
       return false;
     }
 
-    $td = mcrypt_module_open(self::ALGO, '', self::ALGO_MODE, '');
-print_r(mcrypt_list_algorithms());
+    $td = mcrypt_module_open(self::$_algo, '', self::$_mode, '');
+
     /* Create IV. */
     $iv = phpsecRand::bytes(mcrypt_enc_get_iv_size($td));
 
@@ -59,8 +60,8 @@ print_r(mcrypt_list_algorithms());
 
     $encrypted['cdata'] = base64_encode(mcrypt_generic($td, $serializedData));
     $encrypted['hash']  = hash(self::HASH_TYPE, $serializedData);
-    $encrypted['algo']  = self::ALGO;
-    $encrypted['mode']  = self::ALGO_MODE;
+    $encrypted['algo']  = self::$_algo;
+    $encrypted['mode']  = self::$_mode;
     $encrypted['iv']    = base64_encode($iv);
 
     return json_encode($encrypted);
