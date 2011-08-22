@@ -98,6 +98,11 @@ class phpsecCrypt {
     mcrypt_generic_init($td, $key, base64_decode($data['iv']));
 
     $decrypted = rtrim(mdecrypt_generic($td, base64_decode($data['cdata'])));
+
+    /* Close up. */
+    mcrypt_generic_deinit($td);
+    mcrypt_module_close($td);
+
     if(hash(self::HASH_TYPE, $decrypted) == $data['hash']) {
       return unserialize($decrypted);
     } else {
