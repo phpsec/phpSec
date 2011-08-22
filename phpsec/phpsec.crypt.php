@@ -62,7 +62,7 @@ class phpsecCrypt {
     $encrypted['mode']  = self::$_mode;
     $encrypted['iv']    = base64_encode($iv);
     $encrypted['cdata'] = base64_encode(mcrypt_generic($td, $serializedData));
-    $encrypted['hash']  = hash(self::HASH_TYPE, $serializedData);
+    $encrypted['mac']   = base64_encode(self::pbkdf2($encrypted['cdata'], $key, 1000, 32));
 
     return json_encode($encrypted);
   }
@@ -94,6 +94,11 @@ class phpsecCrypt {
     /* Get key. */
     $key = self::getKey($key, $ks);
 
+    /* Check MAC. */
+    if(base64_decode($data['mac']) != self::pbkdf2($data['cdata'], $key, 1000, 32)) {
+      return false;
+    }
+
     /* Init mcrypt. */
     mcrypt_generic_init($td, $key, base64_decode($data['iv']));
 
@@ -103,11 +108,9 @@ class phpsecCrypt {
     mcrypt_generic_deinit($td);
     mcrypt_module_close($td);
 
-    if(hash(self::HASH_TYPE, $decrypted) == $data['hash']) {
-      return unserialize($decrypted);
-    } else {
-      return false;
-    }
+    /*Return decrypted data. */
+    return unserialize($decrypted);
+
   }
 
   /**
@@ -144,7 +147,7 @@ class phpsecCrypt {
    * Implement PBKDF2 as described in RFC 2898.
    *
    * @param string $p
-   *   Password.
+   *   Password to protect.
    *
    * @param string $s
    *   Salt.
