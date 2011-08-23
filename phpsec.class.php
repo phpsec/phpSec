@@ -236,6 +236,7 @@ class phpsec {
     }
     $timeStamp = gmdate('Y-m-d\TH:i:se');
     $randLength = $length-strlen($timeStamp);
+    phpsecRand::$_charset = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     return $timeStamp.phpsecRand::str($randLength);
   }
 
