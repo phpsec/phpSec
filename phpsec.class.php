@@ -227,16 +227,16 @@ class phpsec {
    * @see http://openid.net/specs/openid-authentication-2_0.html
    *
    * @param integer $length
-   *   The total length of the uid. Must be between 25 and 80 characters.
+   *   The total length of the uid. Must be above 25.
    */
   public static function genUid($length = 50) {
-    if($length < 25 || $length > 80) {
-      self::error('Length should be between 25 and 80');
+    if($length < 25) {
+      self::error('Length must be longer than 25');
       return false;
     }
     $timeStamp = gmdate('Y-m-d\TH:i:se');
     $randLength = $length-strlen($timeStamp);
-    return $timeStamp.substr(hash(self::HASH_TYPE, phpsecRand::str(40)), 0, $randLength);
+    return $timeStamp.phpsecRand::str($randLength);
   }
 
   /**
