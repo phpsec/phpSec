@@ -41,9 +41,8 @@ class phpsecSession {
       /* Create a secret used for encryption of session. */
       self::setSecret();
     } else {
-      self::$_secret = base64_decode($_COOKIE[self::$_keyCookie]);
+      self::$_secret = $_COOKIE[self::$_keyCookie];
     }
-
     return true;
   }
 
@@ -66,7 +65,10 @@ class phpsecSession {
     $file = self::fileName($id);
     if(file_exists($file)) {
       $data = phpsecCrypt::decrypt(file_get_contents($file), self::$_secret);
-      self::setSecret();
+      if(gmdate('U') - strtotime(substr(self::$_secret, 0, 22)) > 30) {
+        self::setSecret();
+        self::write($id, $data);
+      }
       return $data;
     }
     return false;
@@ -132,11 +134,11 @@ class phpsecSession {
    * @return true
    */
   private static function setSecret() {
-    self::$_secret = phpsecRand::bytes(128);
+    self::$_secret = phpsec::genUid(128);
     $cookieParam = session_get_cookie_params();
     setcookie(
       self::$_keyCookie,
-      base64_encode(self::$_secret),
+      self::$_secret,
       $cookieParam['lifetime'],
       $cookieParam['path'],
       $cookieParam['domain'],
