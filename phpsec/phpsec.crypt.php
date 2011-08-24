@@ -46,12 +46,6 @@ class phpsecCrypt {
     /* Create IV. */
     $iv = phpsecRand::bytes(mcrypt_enc_get_iv_size($td));
 
-    /* Get keysize length. */
-    $ks = mcrypt_enc_get_key_size($td);
-
-    /* Get key. */
-    $key = self::getKey($key, $ks);
-
     /* Init mcrypt. */
     mcrypt_generic_init($td, $key, $iv);
 
@@ -88,12 +82,6 @@ class phpsecCrypt {
     /* Everything looks good so far. Let's continue.*/
     $td = mcrypt_module_open($data['algo'], '', $data['mode'], '');
 
-    /* Get keysize length. */
-    $ks = mcrypt_enc_get_key_size($td);
-
-    /* Get key. */
-    $key = self::getKey($key, $ks);
-
     /* Check MAC. */
     if(base64_decode($data['mac']) != self::pbkdf2($data['cdata'], $key, 1000, 32)) {
       return false;
@@ -111,36 +99,6 @@ class phpsecCrypt {
     /*Return decrypted data. */
     return unserialize($decrypted);
 
-  }
-
-  /**
-   * Get a key from a secret.
-   * What we do is create two different hashes from the secret, combine them
-   * and pick out the number of characters we need.
-   * We use the raw binary output of the hash function for maximum
-   * bit strength (we have 255 chars to choose from, instead of 16).
-   *
-   * @param string $secret
-   *   The secret to generate a key from.
-   *
-   * @param integer $ks
-   *   The key size.
-   *
-   * @return binary
-   *   Key created from secret.
-   */
-  private static function getKey($secret, $ks) {
-    /* Split the secret into two parts. */
-    $secretSplit = floor(strlen($secret)/2);
-    $secret1 = substr($secret, 0, $secretSplit);
-    $secret2 = substr($secret, $secretSplit);
-
-    /* Hash the two parts seperatly and return the result in raw format. */
-    $key1 = hash('sha256', $secret1, true);
-    $key2 = hash('sha256', $secret2, true);
-
-    /* Return the part of the key we need. */
-    return substr($key2.$key1, 0, $ks);
   }
 
   /**

@@ -134,7 +134,7 @@ class phpsecSession {
    * @return true
    */
   private static function setSecret() {
-    self::$_secret = phpsec::genUid(128);
+    self::$_secret = phpsec::genUid(32);
     $cookieParam = session_get_cookie_params();
     setcookie(
       self::$_keyCookie,
