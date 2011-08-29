@@ -17,6 +17,8 @@ class phpsecSession {
   private static $_name;
   private static $_keyCookie;
   private static $_secret;
+  private static $_currID;
+  private static $_newID;
 
   /**
    * Open a session.
@@ -31,17 +33,32 @@ class phpsecSession {
     self::$_name      = $name;
     self::$_keyCookie = $name.'_secret';
 
-    /* Set session ID if we don't have one. */
-    if(!isset($_COOKIE[$name])) {
-      session_id(phpsecRand::str(128));
+    /* Set current and new ID. */
+    if(isset($_COOKIE[$name])) {
+      self::$_currID = $_COOKIE[$name];
+    } else {
+      self::$_currID = null;
     }
+    self::$_newID  = phpsecRand::str(128);
+
+    /* Set cookie with new session ID. */
+    $cookieParam = session_get_cookie_params();
+    setcookie(
+      $name,
+      self::$_newID,
+      $cookieParam['lifetime'],
+      $cookieParam['path'],
+      $cookieParam['domain'],
+      $cookieParam['secure'],
+      $cookieParam['httponly']
+    );
 
     /* If we don't have a encryption key, create one. */
     if(!isset($_COOKIE[self::$_keyCookie])) {
       /* Create a secret used for encryption of session. */
       self::setSecret();
     } else {
-      self::$_secret = $_COOKIE[self::$_keyCookie];
+      self::$_secret = base64_decode($_COOKIE[self::$_keyCookie]);
     }
     return true;
   }
@@ -66,8 +83,8 @@ class phpsecSession {
     if(file_exists($file)) {
       $data = phpsecCrypt::decrypt(file_get_contents($file), self::$_secret);
       if(gmdate('U') - strtotime(substr(self::$_secret, 0, 22)) > 30) {
-        self::setSecret();
-        self::write($id, $data);
+        //self::setSecret();
+        //self::write($id, $data);
       }
       return $data;
     }
@@ -82,12 +99,16 @@ class phpsecSession {
    * @return bool
    */
   public static function write($id, $data) {
-    $file = self::fileName($id);
+    /* Save session with the new ID. */
+    $file = self::fileName(self::$_newID);
+    echo $file;
     $encrypted = phpsecCrypt::encrypt($data, self::$_secret);
     $fp = @fopen($file, 'w');
     if($fp) {
       $success = fwrite($fp, $encrypted);
       fclose($fp);
+      /* Destroy old session. */
+      self::destroy($id);
       return $success;
     }
     return false;
@@ -134,11 +155,11 @@ class phpsecSession {
    * @return true
    */
   private static function setSecret() {
-    self::$_secret = phpsec::genUid(32);
+    self::$_secret = phpsecRand::bytes(32);
     $cookieParam = session_get_cookie_params();
     setcookie(
       self::$_keyCookie,
-      self::$_secret,
+      base64_encode(self::$_secret),
       $cookieParam['lifetime'],
       $cookieParam['path'],
       $cookieParam['domain'],
