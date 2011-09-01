@@ -79,7 +79,7 @@ class phpsecSession {
    * @return bool
    */
   public static function read($id) {
-    $file = self::fileName($id);
+    $file = self::fileName($_COOKIE[self::$_name]);
     if(file_exists($file)) {
       $data = phpsecCrypt::decrypt(file_get_contents($file), self::$_secret);
       if(gmdate('U') - strtotime(substr(self::$_secret, 0, 22)) > 30) {
