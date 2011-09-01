@@ -13,7 +13,7 @@
  * Provides methods for generating random data.
  */
 class phpsecRand {
-  public static $_charset = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  public static $_charset = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
   /**
    * Generate random data.
