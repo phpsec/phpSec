@@ -76,6 +76,10 @@ class phpsec {
         'phpsecSession::destroy',
         'phpsecSession::gc'
       );
+
+      /* Since we set a session cookie on our session handler, disable the build in cookies. */
+      ini_set('session.use_cookies', 0);
+
       /* Start a new session. */
       session_start();
 
