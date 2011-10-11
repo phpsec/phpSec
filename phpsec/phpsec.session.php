@@ -76,9 +76,12 @@ class phpsecSession {
    * Read and decrypt a session.
    *
    * @param string $id
-   * @return bool
+   * @return mixed
    */
   public static function read($id) {
+    if(!isset($_COOKIE[self::$_name])) {
+      return false;
+    }
     $file = self::fileName($_COOKIE[self::$_name]);
     if(file_exists($file)) {
       $data = phpsecCrypt::decrypt(file_get_contents($file), self::$_secret);
