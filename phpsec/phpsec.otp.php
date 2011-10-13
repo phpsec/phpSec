@@ -72,6 +72,7 @@ class phpsecOtp {
       } elseif(isset($cache['hash']) && $cache['hash'] !== hash(self::HASH_TYPE, serialize($data))) {
         return false;
       }
+      phpsecCache::cacheRem('otp-'.$action);
       return true;
     }
     return false;
