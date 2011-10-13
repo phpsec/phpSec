@@ -100,6 +100,7 @@ class phpsecCrypt {
 
     /* Check MAC. */
     if(base64_decode($data['mac']) != self::pbkdf2($data['cdata'], $key, 1000, 32)) {
+      phpsec::error('Message authentication code invalid');
       return false;
     }
 
