@@ -34,6 +34,8 @@ class phpsec {
       'phpsecYubikey' => 'phpsec.yubikey.php',
       'phpsecOtp'     => 'phpsec.otp.php',
       'phpsecLog'     => 'phpsec.log.php',
+      'phpsecStore'   => 'phpsec.store.php',
+      'phpsecStoreFilesystem' => 'phpsec.store.filesystem.php',
     );
 
     if(isset($classes[$class])) {
@@ -57,6 +59,9 @@ class phpsec {
     if(!is_writeable(self::$_datadir)) {
       self::error('Data directory('.self::$_datadir.') not writeable');
     }
+
+    /* Open store. */
+    $store = new phpsecStoreFilesystem();
 
     /* Set the data dir for the cache class. */
     phpsecCache::$_datadir = self::$_datadir;
