@@ -24,7 +24,7 @@ For more information on installation and usage, please check out the
 
 System requirements
 -------------------
-PHP 5.2(?) or greater with the following extensions is required to use phpSec:
+PHP 5.3.0 or greater with the following extensions is required to use phpSec:
 
 *   Mcrypt
 *   Hash
