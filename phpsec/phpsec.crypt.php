@@ -140,12 +140,12 @@ class phpsecCrypt {
    */
   public static function pbkdf2($p, $s, $c, $dkLen, $a = 'sha256') {
     $hLen = strlen(hash($a, null, true)); /* Hash length. */
-    $l    = ceil($dkLen / $hLen); /* Length in blocks of derived key. */
-    $dk   = ''; /* Derived key. */
+    $l    = ceil($dkLen / $hLen);         /* Length in blocks of derived key. */
+    $dk   = '';                           /* Derived key. */
 
     /* Step 1. Check dkLen. */
-    if($dkLen > (2^32-1)*$hLen) {
-      phpsec::error('derived key too long');
+    if($dkLen > (2^32-1) * $hLen) {
+      phpsec::error('Derived key too long');
       return false;
     }
 
