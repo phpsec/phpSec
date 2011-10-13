@@ -39,12 +39,25 @@ class phpsecCrypt {
    *   Serialized array containing the encrypted data along with some meta data.
    */
   public static function encrypt($data, $key) {
-    if(strlen($key) < 4) {
-      phpsec::error('Key is to short. Expected 4 characters or more');
-      return false;
-    }
 
     $td = mcrypt_module_open(self::$_algo, '', self::$_mode, '');
+
+    /* Check key size. */
+    $keySize = strlen($key);
+    $keySizes = mcrypt_enc_get_supported_key_sizes($td);
+    if(count($keySizes) > 0) {
+      /* Encryption method requires a specific key size. */
+      if(!in_array($keySize, $keySizes)) {
+        phpsec::error('Key is out of range. Should be one of: '. var_export($keySizes ,1));
+        return false;
+      }
+    } else {
+      /* No spsecific size is needed. */
+      if($keySize == 0 || $keySize > mcrypt_enc_get_key_size($td)) {
+        phpsec::error('Key is out of range. Should be: 1 - ' . mcrypt_enc_get_key_size($td).' bytes.');
+        return false;
+      }
+    }
 
     /* Create IV. */
     $iv = phpsecRand::bytes(mcrypt_enc_get_iv_size($td));
