@@ -16,12 +16,12 @@ abstract class phpsecStore {
    * Open/prepeare the storage.
    *
    * @param string $target
-   *   The exact storage target as configured by user.
+   *   Storage location.
    *
    * @return bool
    *   Returns true on success and false on error.
    */
-  abstract public function __construct($target);
+  abstract public function __construct($loc);
 
   /**
    * Read data from storage.
