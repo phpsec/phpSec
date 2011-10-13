@@ -33,22 +33,11 @@ class phpsecCache {
    *   Time to live in seconds.
    */
   public static function cacheSet($name, $data, $ttl = 3600) {
-    $fileName =  self::$_datadir.'/'.self::cacheFilename($name);
     $saveData['data'] = serialize($data);
     $saveData['ttl']  = time() + $ttl;
-    $saveData['hash'] = hash(self::HASH_TYPE, $saveData['data']);
 
-    $data = json_encode($saveData);
-    $fp = fopen($fileName, 'w');
-    if($fp !== false) {
-      if(flock($fp, LOCK_EX)) {
-        fwrite($fp, $data);
-        flock($fp, LOCK_UN);
-        fclose($fp);
-      } else {
-        self::error('Could not lock logfile');
-      }
-    }
+    return phpsec::$store->write('cache', self::cacheId($name), $saveData);
+
   }
 
   /**
@@ -64,15 +53,13 @@ class phpsecCache {
     /* Do cache garbage collection. */
     self::cacheGc();
 
-    $fileName =  self::$_datadir.'/'.self::cacheFilename($name);
-    if(file_exists($fileName)) {
-      $data = json_decode(file_get_contents($fileName), true);
+    $data = phpsec::$store->read('cache', self::cacheId($name));
+    if($data ==! false) {
       if($data['ttl'] > time()) {
-        if(hash(self::HASH_TYPE, $data['data']) == $data['hash']) {
-          return unserialize($data['data']);
-        }
+        return unserialize($data['data']);
+      } else {
+        phpsec::$store->delete('cache', self::cacheId($name));
       }
-
     }
     return false;
   }
@@ -87,12 +74,7 @@ class phpsecCache {
    *   True on success, false otherwise.
    */
   public static function cacheRem($name) {
-    $fileName =  self::$_datadir.'/'.self::cacheFilename($name);
-    if(unlink($fileName)) {
-      return true;
-    } else {
-      return false;
-    }
+    return phpsec::$store->delete('cache', self::cacheId($name));
   }
 
   /**
@@ -105,24 +87,11 @@ class phpsecCache {
       /* Skipping GC this time. */
       return false;
     }
-    if ($handle = opendir(self::$_datadir)) {
-      while (false !== ($file = readdir($handle))) {
-        if ($file != "." && $file != "..") {
-          if(substr($file, 0 ,6) == 'cache_') {
-            $fileName = self::$_datadir.'/'.$file;
-            $data = json_decode(file_get_contents($fileName), true);
-            if($data['ttl'] < time()) {
-              unlink($fileName);
-            }
-          }
-        }
-      }
-      closedir($handle);
-    }
+    //TODO: Do garbage collection.
     return true;
   }
 
-  private static function cacheFilename($name) {
-    return 'cache_'.$name.'_'.hash(self::HASH_TYPE, phpsec::$uid);
+  private static function cacheId($name) {
+    return $name.'_'.hash(self::HASH_TYPE, phpsec::$uid);
   }
 }
