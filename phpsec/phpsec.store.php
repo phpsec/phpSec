@@ -46,10 +46,13 @@ abstract class phpsecStore {
    * @param string $id
    *   Unique identifier.
    *
+   * @param mixed $data
+   *   Data to write.
+   *
    * @return bool
    *   Returns true on success, false on error.
    */
-  abstract public function write($type, $id);
+  abstract public function write($type, $id, $data);
 
   /**
    * Delete data from storeage.
