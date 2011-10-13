@@ -68,11 +68,13 @@ class phpsecCrypt {
     /* Prepeare the array with data. */
     $serializedData = serialize($data);
 
-    $encrypted['algo']  = self::$_algo;
-    $encrypted['mode']  = self::$_mode;
-    $encrypted['iv']    = base64_encode($iv);
-    $encrypted['cdata'] = base64_encode(mcrypt_generic($td, $serializedData));
-    $encrypted['mac']   = base64_encode(self::pbkdf2($encrypted['cdata'], $key, 1000, 32));
+    $encrypted['algo']  = self::$_algo;                                        /* Algorithm used to encrypt. */
+    $encrypted['mode']  = self::$_mode;                                        /* Algorithm mode. */
+    $encrypted['iv']    = base64_encode($iv);                                  /* Initialization vector, just a bunch of randomness. */
+    $encrypted['cdata'] = base64_encode(mcrypt_generic($td, $serializedData)); /* The encrypted data. */
+    $encrypted['mac']   = base64_encode(                                       /* The message authentication code. Used to make sure the */
+                            self::pbkdf2($encrypted['cdata'], $key, 1000, 32)  /* message is valid when decrypted. */
+                          );
 
     return json_encode($encrypted);
   }
