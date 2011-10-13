@@ -32,6 +32,9 @@ class phpsecCrypt {
    * @param mixed $data
    *   Data to encrypt.
    *
+   * @param string $key
+   *   Key to encrypt data with.
+   *
    * @return string
    *   Serialized array containing the encrypted data along with some meta data.
    */
