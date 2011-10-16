@@ -103,7 +103,6 @@ class phpsecSession {
   public static function write($id, $data) {
     /* Save session with the new ID. */
     $file = self::fileName(self::$_newID);
-    echo $file;
     $encrypted = phpsecCrypt::encrypt($data, self::$_secret);
     $fp = @fopen($file, 'w');
     if($fp) {
