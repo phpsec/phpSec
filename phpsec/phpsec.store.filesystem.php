@@ -47,6 +47,7 @@ class phpsecStoreFilesystem extends phpsecStore {
     $data = serialize($data);
     $saveData['id']   = base64_encode($id);
     $saveData['mac']  = base64_encode(phpsecCrypt::pbkdf2($data, $id, 1000, 32));
+    $saveData['time'] = time();
 
     $jsonData = json_encode($saveData);
     $fp = fopen($fileName, 'w');
@@ -80,6 +81,20 @@ class phpsecStoreFilesystem extends phpsecStore {
 
     }
     return $ids;
+  }
+
+  public function meta($type, $id) {
+    $fileName = $this->fileName($type, $id);
+    if(!file_exists($fileName)) {
+      return false;
+    }
+    $data = file_get_contents($fileName);
+    list($meta, $data) = explode("\n\n", $data);
+
+    $data = json_decode($meta);
+    $data->id  = base64_decode($data->id);
+    $data->mac = base64_decode($data->mac);
+    return $data;
   }
 
   private function fileName($type, $id) {

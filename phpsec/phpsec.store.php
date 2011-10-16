@@ -24,7 +24,7 @@ abstract class phpsecStore {
   abstract public function __construct($loc);
 
   /**
-   * Read data from storage.
+   * Read object from storage.
    *
    * @param string $type
    *   Type of data (session, cache, etc.).
@@ -38,7 +38,7 @@ abstract class phpsecStore {
   abstract public function read($type, $id);
 
   /**
-   * Write data to storeage.
+   * Write object to storeage.
    *
    * @param string $type
    *   Type of data (session, cache, etc.).
@@ -55,7 +55,7 @@ abstract class phpsecStore {
   abstract public function write($type, $id, $data);
 
   /**
-   * Delete data from storeage.
+   * Delete object from storeage.
    *
    * @param string $type
    *   Type of data (session, cache, etc.).
@@ -69,7 +69,7 @@ abstract class phpsecStore {
   abstract public function delete($type, $id);
 
   /**
-   * List exists IDs for a store type.
+   * List existing object IDs for a store type.
    *
    * @param string $type
    *   Type of data (session, cache, etc.).
@@ -77,5 +77,19 @@ abstract class phpsecStore {
    * @return array
    */
   abstract public function listIds($type);
+
+  /**
+   * Read metadata for object in store.
+   *
+   * @param string $type
+   *   Type of data (session, cache, etc.).
+   *
+   * @param string $id
+   *   Unique identifier.
+   *
+   * @return obj
+   *   Return object with metadata.
+   */
+  abstract public function meta($type, $id);
 
 }
