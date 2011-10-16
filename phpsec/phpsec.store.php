@@ -68,4 +68,14 @@ abstract class phpsecStore {
    */
   abstract public function delete($type, $id);
 
+  /**
+   * List exists IDs for a store type.
+   *
+   * @param string $type
+   *   Type of data (session, cache, etc.).
+   *
+   * @return array
+   */
+  abstract public function listIds($type);
+
 }

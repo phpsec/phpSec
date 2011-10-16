@@ -40,6 +40,7 @@ class phpsecStoreFilesystem extends phpsecStore {
 
   public function write($type, $id, $data) {
     $fileName =  $this->fileName($type, $id);
+    $saveData['id']   = base64_encode($id);
     $saveData['data'] = base64_encode(serialize($data));
     $saveData['mac']  = base64_encode(phpsecCrypt::pbkdf2($saveData['data'], $id, 1000, 32));
 
@@ -59,7 +60,18 @@ class phpsecStoreFilesystem extends phpsecStore {
   }
 
   public function delete($type, $id) {
-    @unlink(fileName($type, $id));
+    @unlink(self::fileName($type, $id));
+  }
+
+  public function listIds($type) {
+    $ids = array();
+    $files = glob($this->_dataDir.'/store_'.$type.'_*');
+    foreach($files as $file) {
+      $data = json_decode(file_get_contents($file));
+      $ids[] = base64_decode($data->id);
+
+    }
+    return $ids;
   }
 
   private function fileName($type, $id) {
