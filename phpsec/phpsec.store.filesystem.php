@@ -24,30 +24,35 @@ class phpsecStoreFilesystem extends phpsecStore {
   }
 
   public function read($type, $id) {
-    $fileName =  $this->fileName($type, $id);
+    $fileName = $this->fileName($type, $id);
     if(!file_exists($fileName)) {
       return false;
     }
-    $data = json_decode(file_get_contents($fileName));
-    $mac = phpsecCrypt::pbkdf2($data->data, $id, 1000, 32);
+    $data = file_get_contents($fileName);
+    list($meta, $data) = explode("\n\n", $data);
+    $jsonData = json_decode($meta);
 
-    if($mac != base64_decode($data->mac)) {
+    $mac = phpsecCrypt::pbkdf2($data, $id, 1000, 32);
+
+    if($mac != base64_decode($jsonData->mac)) {
       phpsec::error('Message authentication code invalid while reading store');
       return false;
     }
-    return unserialize(base64_decode($data->data));
+    return unserialize($data);
   }
 
   public function write($type, $id, $data) {
     $fileName =  $this->fileName($type, $id);
-    $saveData['id']   = base64_encode($id);
-    $saveData['data'] = base64_encode(serialize($data));
-    $saveData['mac']  = base64_encode(phpsecCrypt::pbkdf2($saveData['data'], $id, 1000, 32));
 
-    $data = json_encode($saveData);
+    $data = serialize($data);
+    $saveData['id']   = base64_encode($id);
+    $saveData['mac']  = base64_encode(phpsecCrypt::pbkdf2($data, $id, 1000, 32));
+
+    $jsonData = json_encode($saveData);
     $fp = fopen($fileName, 'w');
     if($fp !== false) {
       if(flock($fp, LOCK_EX)) {
+        fwrite($fp, $jsonData."\n\n");
         fwrite($fp, $data);
         flock($fp, LOCK_UN);
         fclose($fp);
@@ -67,8 +72,11 @@ class phpsecStoreFilesystem extends phpsecStore {
     $ids = array();
     $files = glob($this->_dataDir.'/store_'.$type.'_*');
     foreach($files as $file) {
-      $data = json_decode(file_get_contents($file));
-      $ids[] = base64_decode($data->id);
+      $data = file_get_contents($file);
+
+      list($meta, $data) = explode("\n\n", $data);
+      $jsonData = json_decode($meta);
+      $ids[] = base64_decode($jsonData->id);
 
     }
     return $ids;
