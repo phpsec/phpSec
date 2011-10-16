@@ -16,7 +16,7 @@ class phpsecStoreFilesystem extends phpsecStore {
 
   public function __construct($loc) {
     if(!is_writeable($loc)) {
-      phpsec::error('Storage directory('.$loc.') not writeable');
+      phpsec::error('Storage directory('.$loc.') not writeable', E_USER_ERROR);
       return false;
     }
     $this->_dataDir = $loc;
