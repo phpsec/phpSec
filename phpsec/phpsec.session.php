@@ -79,18 +79,24 @@ class phpsecSession {
    * @return mixed
    */
   public static function read($id) {
+    /* If no cookie is set, just dropi it! */
     if(!isset($_COOKIE[self::$_name])) {
       return false;
     }
-    $file = self::fileName($_COOKIE[self::$_name]);
-    if(file_exists($file)) {
-      $data = phpsecCrypt::decrypt(file_get_contents($file), self::$_secret);
-      if(gmdate('U') - strtotime(substr(self::$_secret, 0, 22)) > 30) {
-        self::setSecret();
-      }
-      return $data;
+
+    /* Read from store and decrypt. */
+    $sessData = phpsec::$store->read('session', $_COOKIE[self::$_name]);
+    if($sessData !== false ) {
+      $return = phpsecCrypt::decrypt($sessData, self::$_secret);
+    } else {
+      $return = false;
     }
-    return false;
+
+    /* Make new secret if the old one is.. old. Duh! */
+    if(gmdate('U') - strtotime(substr(self::$_secret, 0, 22)) > 30) {
+      self::setSecret();
+    }
+    return $return;
   }
 
   /**
@@ -101,18 +107,15 @@ class phpsecSession {
    * @return bool
    */
   public static function write($id, $data) {
-    /* Save session with the new ID. */
-    $file = self::fileName(self::$_newID);
+    /* Encrypt session. */
     $encrypted = phpsecCrypt::encrypt($data, self::$_secret);
-    $fp = @fopen($file, 'w');
-    if($fp) {
-      $success = fwrite($fp, $encrypted);
-      fclose($fp);
-      /* Destroy old session. */
-      self::destroy($id);
-      return $success;
-    }
-    return false;
+
+    /* Destroy old session. */
+    self::destroy(self::$_currID);
+
+    /* Write new session, with new ID. */
+    return phpsec::$store->write('session', self::$_newID, $encrypted);
+
   }
   /**
    * Destroy/remove a session.
@@ -121,8 +124,7 @@ class phpsecSession {
    * @return bool
    */
   public static function destroy($id) {
-    $file = self::fileName($id);
-    return(@unlink($file));
+    return phpsec::$store->delete('session', $id);
   }
   /**
    * Do garbage collection.
@@ -131,10 +133,11 @@ class phpsecSession {
    * @return bool
    */
   public static function gc($ttl) {
-    $fileNames = glob(self::$_savePath.'/'.self::$_name.'_*');
-    foreach($fileNames as $fileName) {
-      if(filemtime($fileName) + $ttl < time()) {
-        @unlink($fileName);
+    $Ids = phpsec::$store->listIds('session');
+    foreach($Ids as $Id) {
+      $data = phpsec::$store->meta('session', $Id);
+      if($data->time + $ttl < time()) {
+        phpsec::$store->delete('session', $Id);
       }
     }
     return true;
