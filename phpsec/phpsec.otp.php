@@ -155,9 +155,8 @@ class phpsecOtp {
    *   A array containing the card data.
    */
   public static function cardLoad($cardId) {
-    $filename = phpsec::$_datadir.'/otp-card-'.$cardId;
-    if(file_exists($filename)) {
-      $card = json_decode(file_get_contents($filename), true);
+    $card = phpsec::$store->read('otp-card', $cardId);
+    if($card !== false) {
       if($card['hash'] !== hash(self::HASH_TYPE, $card['list'])) {
         return false;
       }
@@ -193,22 +192,7 @@ class phpsecOtp {
    */
   private static function cardSave($card) {
     /* TODO: Encrypt before saving. */
-    $fp = @fopen(phpsec::$_datadir.'/otp-card-'.$card['id'], 'w');
-    if($fp !== false) {
-      /* We are trying to lock the file, altough it's really not that fu*king
-       * important. We are truncating the file with the 'w' option to fopen()
-       * anyways. But if for some reason someone should see this. Just don't
-       * pay to much attention to it. And yeah I know  we should check if
-       * the lock was successfull, and yes I know I probably used more time
-       * writing this comment than I would writing the code doing that.
-       * So sue me! */
-      flock($fp, LOCK_EX);
-      fwrite($fp, json_encode($card));
-      flock($fp, LOCK_UN);
-      fclose($fp);
-      return true;
-    }
-    return false;
+    return phpsec::$store->write('otp-card', $card['id'], $card);
   }
 
   /**
