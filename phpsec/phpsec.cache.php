@@ -87,7 +87,13 @@ class phpsecCache {
       /* Skipping GC this time. */
       return false;
     }
-    //TODO: Do garbage collection.
+    $cahceIds = phpsec::$store->listIds('cache');
+    foreach($cahceIds as $cahceId) {
+      $data = phpsec::$store->read('cache', $cahceId);
+      if($data['ttl'] < time()) {
+        phpsec::$store->delete('cache', $cahceId);
+      }
+    }
     return true;
   }
 
