@@ -14,9 +14,10 @@
  */
 class phpsec {
   public static $_charset    = 'utf-8';
-  public static $_datadir    = null;
+  public static $_storeName  = null;
   public static $_sessenable = true;
   public static $uid         = null; // User identifier.
+  public static $store       = null;
 
   /* Constants. */
   const HASH_TYPE      = 'sha256';
@@ -55,16 +56,15 @@ class phpsec {
        spl_autoload_register($autoLoadFunction);
      }
 
-    /* Check write permissions to directories */
-    if(!is_writeable(self::$_datadir)) {
-      self::error('Data directory('.self::$_datadir.') not writeable');
-    }
-
     /* Open store. */
-    $store = new phpsecStoreFilesystem();
-
-    /* Set the data dir for the cache class. */
-    phpsecCache::$_datadir = self::$_datadir;
+    list($storeType, $storeDest) = explode(':', self::$_storeName);
+    switch($storeType) {
+      case 'filesystem':
+        self::$store = new phpsecStoreFilesystem($storeDest);
+      break;
+      default:
+      self::error('Store type('.$storeType.') invalid', E_USER_ERROR);
+    }
 
     /* Set the charset of the multibyte functions in PHP. */
     mb_internal_encoding(self::$_charset);
