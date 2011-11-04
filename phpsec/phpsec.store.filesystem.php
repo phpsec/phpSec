@@ -30,7 +30,7 @@ class phpsecStoreFilesystem extends phpsecStore {
       return false;
     }
     $data = file_get_contents($fileName);
-    list($meta, $data) = explode("\n\n", $data);
+    list($meta, $data) = explode("\n\n", $data, 2);
     $jsonData = json_decode($meta);
 
     $mac = phpsecCrypt::pbkdf2($data, $id, 1000, 32);
@@ -76,7 +76,7 @@ class phpsecStoreFilesystem extends phpsecStore {
     foreach($files as $file) {
       $data = file_get_contents($file);
 
-      list($meta, $data) = explode("\n\n", $data);
+      list($meta, $data) = explode("\n\n", $data, 2);
       $jsonData = json_decode($meta);
       $ids[] = base64_decode($jsonData->id);
 
@@ -90,7 +90,7 @@ class phpsecStoreFilesystem extends phpsecStore {
       return false;
     }
     $data = file_get_contents($fileName);
-    list($meta, $data) = explode("\n\n", $data);
+    list($meta, $data) = explode("\n\n", $data, 2);
 
     $data = json_decode($meta);
     $data->id  = base64_decode($data->id);
