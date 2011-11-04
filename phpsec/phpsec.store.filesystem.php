@@ -9,6 +9,7 @@
   @package   phpSec
  */
 
+/* Class for handling flat file storage. */
 class phpsecStoreFilesystem extends phpsecStore {
 
   private $_dataDir  = null;
@@ -59,7 +60,7 @@ class phpsecStoreFilesystem extends phpsecStore {
         fclose($fp);
         return true;
       } else {
-        self::error('Could not lock logfile while writing to store');
+        phpsec::error('Could not lock logfile while writing to store');
       }
     }
     return false;
