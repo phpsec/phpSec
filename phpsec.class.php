@@ -28,14 +28,13 @@ class phpsec {
   public static function load($class) {
     $basePath = dirname(__FILE__);
     $classes = array(
-      'phpsecCache'   => 'phpsec.cache.php',
-      'phpsecSession' => 'phpsec.session.php',
-      'phpsecRand'    => 'phpsec.rand.php',
-      'phpsecCrypt'   => 'phpsec.crypt.php',
-      'phpsecYubikey' => 'phpsec.yubikey.php',
-      'phpsecOtp'     => 'phpsec.otp.php',
-      'phpsecLog'     => 'phpsec.log.php',
-      'phpsecStore'   => 'phpsec.store.php',
+      'phpsecCache'           => 'phpsec.cache.php',
+      'phpsecSession'         => 'phpsec.session.php',
+      'phpsecRand'            => 'phpsec.rand.php',
+      'phpsecCrypt'           => 'phpsec.crypt.php',
+      'phpsecYubikey'         => 'phpsec.yubikey.php',
+      'phpsecOtp'             => 'phpsec.otp.php',
+      'phpsecStore'           => 'phpsec.store.php',
       'phpsecStoreFilesystem' => 'phpsec.store.filesystem.php',
     );
 
