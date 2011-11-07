@@ -13,15 +13,16 @@
  * phpSec core functionality.
  */
 class phpsec {
-  public static $_charset    = 'utf-8';
-  public static $_storeName  = null;
-  public static $_sessenable = true;
-  public static $uid         = null; // User identifier.
-  public static $store       = null;
+  public static $_charset    = 'utf-8'; // Config: Charset used for filter methods.
+  public static $_storeName  = null;    // Config: Store destination.
+  public static $_sessenable = true;    // Config: Enable phpSec session handler.
+  public static $uid         = null;    // User identifier.
+  public static $store       = null;    // Storage object.
 
   /* Constants. */
   const HASH_TYPE      = 'sha256';
   const VERSION        = '0.1-dev';
+
   /**
    * Autoload function to load required files when needed.
    */
@@ -126,7 +127,6 @@ class phpsec {
     trigger_error($msg.'. (Called from <strong>'.$callee['file'].' line '.$callee['line'].'</strong>)', $level);
   }
 
-
   /**
    * Returns a unique identifier in the format spsecified in
    * OpenID Authentication 2.0 protocol.
@@ -148,3 +148,4 @@ class phpsec {
     return $timeStamp.phpsecRand::str($randLength);
   }
 }
+
