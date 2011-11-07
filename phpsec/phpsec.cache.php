@@ -15,7 +15,6 @@
  * it if you want.
  */
 class phpsecCache {
-  public static $_datadir = null;
 
   const GC_PROB   = 0.2;
   const HASH_TYPE = 'sha256';
