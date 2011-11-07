@@ -9,6 +9,7 @@
   @package   phpSec
  */
 
+/* Provides methods for hashing and salting of passwords. */
 class phpsecPw {
   /**
    * Create a hashed version of a password, safe for storage in a database.

@@ -10,7 +10,7 @@
  */
 
 /**
- * phpSec basic functionality.
+ * phpSec core functionality.
  */
 class phpsec {
   public static $_charset    = 'utf-8';
