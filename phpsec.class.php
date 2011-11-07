@@ -36,6 +36,7 @@ class phpsec {
       'phpsecOtp'             => 'phpsec.otp.php',
       'phpsecStore'           => 'phpsec.store.php',
       'phpsecToken'           => 'phpsec.token.php',
+      'phpsecPw'              => 'phpsec.pw.php',
       'phpsecStoreFilesystem' => 'phpsec.store.filesystem.php',
     );
 
@@ -246,122 +247,5 @@ class phpsec {
     $timeStamp = gmdate('Y-m-d\TH:i:se');
     $randLength = $length-strlen($timeStamp);
     return $timeStamp.phpsecRand::str($randLength);
-  }
-
-  /**
-   * Create a hashed version of a password, safe for storage in a database.
-   * This function return a json encodeed array that can be stored directly
-   * in a database. The array has the following layout:
-   * array(
-   *   'hash'      => The hash created from the password and a salt.
-   *   'salt'      => The salt that was used along with the password to create the hash.
-   *   'nse?algo'      => The hashing algorythm used.
-   *   'injection' => How the salt was injected into the password.
-   * )
-   * The following injection methods exists:
-   * before: The salt is placed diectly in front of the password, without using any
-   * seperation characters.
-   * after: The salt is placed directly after the password without any seperation
-   * characters.
-   *
-   * @param string $password
-   *   The password to hash.
-   *
-   * @return string
-   *   Returns a json encoded array containing the password hash, salt and
-   *   some meta data.
-   */
-  public static function pwHash($password) {
-    $salt     = self::genUid();
-    $injected = self::pwInject($password, $salt);
-    $hash     = hash(self::HASH_TYPE, $injected);
-
-    $return = array(
-      'hash'      => $hash,
-      'salt'      => $salt,
-      'algo'      => self::HASH_TYPE,
-    );
-    return json_encode($return);
-  }
-
-  /**
-   * Validate a user-supplied  password against a stored password saved
-   * using the pwHash() method.
-   *
-   * @param string $password
-   *   The password supplied by the user in the login form.
-   *
-   * @param string $dbPassword
-   *   The json string fetched from the database, in the exact format
-   *   as created by pwHash().
-   *
-   * @return boolean
-   *   True on password match, false otherwise.
-   */
-  public static function pwCheck($password, $dbPassword) {
-    /**
-     * Unserialize registerd password array and validate it to ensure
-     * we got a valid array.
-     */
-    $data = json_decode($dbPassword, true);
-    if(isset($data['algo']) && sizeof($data) == 3) {
-      /**
-       * Ok, we are pretty sure this is good stuff. Now inject the salt
-       * into the user supplied password, to see if it matches the registerd
-       * data from $dbPassword.
-       */
-      $pwInjected = self::pwInject($password, $data['salt']);
-      /* Create a hash and see if it matches. */
-      if(hash($data['algo'], $pwInjected) == $data['hash']) {
-        return true;
-      }
-    } else {
-      /* Invalid array supplied. */
-      self::error('Invalid data supplied. Expected serialized array as returned by pwHash()');
-    }
-    return false;
-  }
-
-  /**
-   * Check the age of a salted password.
-   *
-   * @param string $dbPassword
-   *   The json string fetched from the database, in the exact format
-   *   as created by pwHash().
-   *
-   * @return integer
-   *   Age of password in seconds.
-   */
-  public static function pwAge($dbPassword) {
-    $data = json_decode($dbPassword, true);
-    if(isset($data['salt'])) {
-      $date = substr($data['salt'], 0, 22);
-      return gmdate('U') - strtotime($date);
-    } else {
-      /* Invalid array supplied. */
-      self::error('Invalid data supplied. Expected serialized array as returned by pwHash()');
-    }
-    return false;
-  }
-
-  /**
-   * Inject a salt into a password to create the string to be hashed.
-   *
-   * @param string $password
-   *   Plain-text password.
-   *
-   * @param string $salt
-   *   Well, the salt to inject into the password.
-   *
-   * @return string
-   *   Returns the salted password, ready to be hashed.
-   *
-   */
-  private static function pwInject($password, $salt) {
-    $hex = hexdec(substr(hash(self::HASH_TYPE, $password), 0, 1));
-    $len = strlen($password);
-    $pos = floor($hex*($len/16));
-
-    return substr($password, 0, $pos).$salt.substr($password, $pos);
   }
 }
