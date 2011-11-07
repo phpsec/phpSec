@@ -119,7 +119,7 @@ class phpsec {
    *
    * @param constant $level
    *   Error level (optional).
-   *   If none is specified PHPSEC_E_WARN is used.
+   *   If none is specified E_USER_WARNING is used.
    */
   public static function error($msg, $level = E_USER_WARNING) {
     $callee = next(debug_backtrace());
