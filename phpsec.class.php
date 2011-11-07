@@ -35,6 +35,7 @@ class phpsec {
       'phpsecYubikey'         => 'phpsec.yubikey.php',
       'phpsecOtp'             => 'phpsec.otp.php',
       'phpsecStore'           => 'phpsec.store.php',
+      'phpsecToken'           => 'phpsec.token.php',
       'phpsecStoreFilesystem' => 'phpsec.store.filesystem.php',
     );
 
@@ -248,58 +249,13 @@ class phpsec {
   }
 
   /**
-   * Generate and save a one-time-token for a form. Used to protect against
-   * CSRF attacks.
-   *
-   * @param string $name
-   *   Name of the form to generate a token for.
-   *
-   * @param integer $ttl
-   *   How long the token should be valid in seconds.
-   *
-   * @return string
-   *   The token to supply with the form data.
-   */
-  public static function getToken($name, $ttl = 3600) {
-    $token = phpsecRand::str(32);
-    /* Save the token to the cahce. */
-    phpsecCache::cacheSet('token-'.$name, $token, $ttl);
-    return $token;
-  }
-
-  /**
-   * Validate a one-time-token generated with setToken();
-   * This function should be called before accepting data from a user-submitted form.
-   * @see setToken();
-   *
-   * @param string $name
-   *   Name of the form to validate the token for.
-   *
-   * @return boolean
-   *   Returns true if the token is valid. Returns false otherwise.
-   */
-  public static function validToken($name, $token) {
-    if(strlen($token) == 0) {
-      return false;
-    }
-    $cacheToken = phpsecCache::cacheGet('token-'.$name);
-    /* Check if the provided token matches the token in the cache. */
-    if($cacheToken == $token) {
-      /* Remove the token from the cahche so it can't be reused. */
-      phpsecCache::cacheRem('token-'.$name);
-      return true;
-    }
-    return false;
-  }
-
-  /**
    * Create a hashed version of a password, safe for storage in a database.
    * This function return a json encodeed array that can be stored directly
    * in a database. The array has the following layout:
    * array(
    *   'hash'      => The hash created from the password and a salt.
    *   'salt'      => The salt that was used along with the password to create the hash.
-   *   'algo'      => The hashing algorythm used.
+   *   'nse?algo'      => The hashing algorythm used.
    *   'injection' => How the salt was injected into the password.
    * )
    * The following injection methods exists:
