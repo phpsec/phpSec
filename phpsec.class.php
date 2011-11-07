@@ -30,16 +30,16 @@ class phpsec {
     $basePath = dirname(__FILE__);
     $classes = array(
       'phpsecCache'           => 'phpsec.cache.php',
-      'phpsecFilter'          => 'phpsec.filter.php',
-      'phpsecSession'         => 'phpsec.session.php',
-      'phpsecRand'            => 'phpsec.rand.php',
       'phpsecCrypt'           => 'phpsec.crypt.php',
-      'phpsecYubikey'         => 'phpsec.yubikey.php',
+      'phpsecFilter'          => 'phpsec.filter.php',
       'phpsecOtp'             => 'phpsec.otp.php',
-      'phpsecStore'           => 'phpsec.store.php',
-      'phpsecToken'           => 'phpsec.token.php',
       'phpsecPw'              => 'phpsec.pw.php',
+      'phpsecRand'            => 'phpsec.rand.php',
+      'phpsecSession'         => 'phpsec.session.php',
+      'phpsecStore'           => 'phpsec.store.php',
       'phpsecStoreFilesystem' => 'phpsec.store.filesystem.php',
+      'phpsecToken'           => 'phpsec.token.php',
+      'phpsecYubikey'         => 'phpsec.yubikey.php',
     );
 
     if(isset($classes[$class])) {
