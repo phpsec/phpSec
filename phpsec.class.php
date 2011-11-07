@@ -14,7 +14,7 @@
  */
 class phpsec {
   public static $_charset    = 'utf-8'; // Config: Charset used for filter methods.
-  public static $_storeName  = null;    // Config: Store destination.
+  public static $_dsn        = null;    // Config: Database Source Name.
   public static $_sessenable = true;    // Config: Enable phpSec session handler.
   public static $uid         = null;    // User identifier.
   public static $store       = null;    // Storage object.
@@ -60,7 +60,7 @@ class phpsec {
      }
 
     /* Open store. */
-    list($storeType, $storeDest) = explode(':', self::$_storeName);
+    list($storeType, $storeDest) = explode(':', self::$_dsn);
     switch($storeType) {
       case 'filesystem':
         self::$store = new phpsecStoreFilesystem($storeDest);
