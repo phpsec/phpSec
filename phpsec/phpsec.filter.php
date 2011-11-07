@@ -11,6 +11,7 @@
 
 /* Provides methods for XSS filtering. */
 class phpsecFilter {
+
   /**
    * XSS text filter. Returns a string that is safe to use on the page.
    *

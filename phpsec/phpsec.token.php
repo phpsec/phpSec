@@ -11,7 +11,7 @@
 
 /* Provides CSRF protection methods. */
 class phpsecToken {
-    /**
+  /**
    * Generate and save a one-time-token for a form. Used to protect against
    * CSRF attacks.
    *

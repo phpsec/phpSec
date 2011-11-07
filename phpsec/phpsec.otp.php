@@ -14,6 +14,7 @@
  */
 class phpsecOtp {
   const HASH_TYPE = 'sha256';
+
   /**
    * Generate a one-time-password (OTP). The password is only valid for a given time,
    * and must be delivered to the user instantly. The password is also only valid
