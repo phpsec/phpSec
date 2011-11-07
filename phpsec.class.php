@@ -21,7 +21,7 @@ class phpsec {
 
   /* Constants. */
   const HASH_TYPE      = 'sha256';
-  const VERSION        = '0.1-dev';
+  const VERSION        = '0.1-beta';
 
   /**
    * Autoload function to load required files when needed.

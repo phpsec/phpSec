@@ -1,3 +1,25 @@
+November 7. 2011 - xqus
+  beta-0.1 release.
+- [#33, #34]phpsec::f() is now phpsec::t(), and phpsec::f() is a simple XSS
+  filter method.
+- Removed the examples.php from source. See the online manual for examples:
+  http://phpsec.xqus.com/manual
+- Don't use session_regenerate_id() anymore, since it causes many bugs.
+- Generate a stronger PHP session ID.
+- [#30] Improve session hijacking protection.
+- Improved the password hashing methods.
+- Changed default encryption algorithm to RIJNDAEL-256.
+- Added implemention of PBKDF2 as described in RFC 2898.
+- Create a PBKDF2 MAC to ensure message integrity in phpsecCrypt. This breaks
+  compability with older versions of phpSec.
+- [#37] phpsecCrypt don't modify the encryption key anymore.
+- Regenerate session ID in custom session handler.
+- Stronger keys for encryption of session.
+- Better error handling in phpSecCrypt.
+- [#38] Storage class for general data storage for all sub-classes.
+- [#41] Separate password, token and filter methods from core.
+- Many minor fixes..
+
 August 14. 2011 - xqus
   alpha-0.0.5 release.
 - Added phpsecRand::arrayRand(): Method to select random keys from an array.
