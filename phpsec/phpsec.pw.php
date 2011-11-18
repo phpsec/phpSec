@@ -13,8 +13,8 @@
 class phpsecPw {
   /**
    * Create a hashed version of a password, safe for storage in a database.
-   * This function return a json encodeed array that can be stored directly
-   * in a database. The array has the following layout:
+   * This function return a json encoded array that can be stored directly
+   * into a database. The array has the following layout:
    * array(
    *   'hash'      => The hash created from the password and a salt.
    *   'salt'      => The salt that was used along with the password to create the hash.
@@ -47,7 +47,7 @@ class phpsecPw {
   }
 
   /**
-   * Validate a user-supplied  password against a stored password saved
+   * Validate a user-supplied  password against a stored password which is saved
    * using the phpsecPw::hash() method.
    *
    * @param string $password
@@ -68,7 +68,7 @@ class phpsecPw {
     $data = json_decode($dbPassword, true);
     if(isset($data['algo']) && sizeof($data) == 3) {
       /**
-       * Ok, we are pretty sure this is good stuff. Now inject the salt
+       * Ok, we are pretty sure that this is a good stuff. Now inject the salt
        * into the user supplied password, to see if it matches the registerd
        * data from $dbPassword.
        */
