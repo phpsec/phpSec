@@ -9,7 +9,9 @@
   @package   phpSec
  */
 
-/* Class for handling flat file storage. */
+/**
+ *  Class for handling flat file storage.
+ */
 class phpsecStoreFilesystem extends phpsecStore {
 
   private $_dataDir  = null;

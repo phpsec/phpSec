@@ -9,7 +9,9 @@
   @package   phpSec
  */
 
-/* Abstract class desribing the phpSec storage interface class. */
+/**
+ * Abstract class describing the phpSec storage interface class.
+ */
 abstract class phpsecStore {
 
   /**
