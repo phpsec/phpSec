@@ -88,7 +88,8 @@ class phpsecCrypt {
   }
 
   /**
-   * Decrypt a data encrypted by encrypt().
+   * Strip PKCS7 padding and decrypt
+   * data encrypted by encrypt().
    *
    * @param string $data
    *   JSON string containing the encrypted data and meta information in the
