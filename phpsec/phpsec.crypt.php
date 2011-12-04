@@ -28,7 +28,7 @@ class phpsecCrypt {
    *   'iv'    => 'Base64 encoded IV',
    *   'algo'  => 'Algorythm used',
    *   'mode'  => 'Mode used',
-   *   'hash'  => 'A SHA256 hash of the data'
+   *   'mac'   => 'Message Authentication Code'
    * )
    *
    * @param mixed $data
@@ -73,7 +73,6 @@ class phpsecCrypt {
     /* Add padding if enabled. */
     if(self::$_padding === true) {
       $block = mcrypt_enc_get_block_size($td);
-
       $serializedData = self::pad($block, $serializedData);
     }
 
