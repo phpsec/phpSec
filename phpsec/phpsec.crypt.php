@@ -13,8 +13,10 @@
  * Provides methods for encrypting data.
  */
 class phpsecCrypt {
-  public static $_algo = 'rijndael-256';
-  public static $_mode = 'ctr';
+  public static $_algo    = 'rijndael-256';
+  public static $_mode    = 'ctr';
+  public static $_padding = false;
+
 
   const HASH_TYPE = 'sha256';
 
@@ -68,6 +70,13 @@ class phpsecCrypt {
     /* Prepeare the array with data. */
     $serializedData = serialize($data);
 
+    /* Add padding if enabled. */
+    if(self::$_padding === true) {
+      $block = mcrypt_enc_get_block_size($td);
+
+      $serializedData = self::pad($block, $serializedData);
+    }
+
     $encrypted['algo']  = self::$_algo;                                        /* Algorithm used to encrypt. */
     $encrypted['mode']  = self::$_mode;                                        /* Algorithm mode. */
     $encrypted['iv']    = base64_encode($iv);                                  /* Initialization vector, just a bunch of randomness. */
@@ -99,6 +108,7 @@ class phpsecCrypt {
     }
     /* Everything looks good so far. Let's continue.*/
     $td = mcrypt_module_open($data['algo'], '', $data['mode'], '');
+    $block = mcrypt_enc_get_block_size($td);
 
     /* Check MAC. */
     if(base64_decode($data['mac']) != self::pbkdf2($data['cdata'], $key, 1000, 32)) {
@@ -109,7 +119,7 @@ class phpsecCrypt {
     /* Init mcrypt. */
     mcrypt_generic_init($td, $key, base64_decode($data['iv']));
 
-    $decrypted = rtrim(mdecrypt_generic($td, base64_decode($data['cdata'])));
+    $decrypted = rtrim(mdecrypt_generic($td, base64_decode(self::stripPadding($block, $data['cdata']))));
 
     /* Close up. */
     mcrypt_generic_deinit($td);
@@ -162,5 +172,46 @@ class phpsecCrypt {
     }
     /* Returned derived key. */
     return substr($dk, 0, $dkLen);
+  }
+
+  /**
+   * PKCS7-pad data.
+   *
+   * @param integer $block
+   *   Block size.
+   *
+   * @param string $data
+   *   Data to pad.
+   *
+   * @return string
+   *   Padded data.
+   */
+  public static function pad($block, $data) {
+    $pad = $block - (strlen($data) % $block);
+    $data .= str_repeat(chr($pad), $pad);
+
+    return $data;
+  }
+
+  /**
+   * PKCS7-pad data.
+   *
+   * @param integer $block
+   *   Block size.
+   *
+   * @param string $data
+   *   Padded data.
+   *
+   * @return string
+   *   Original data.
+   */
+  public static function stripPadding($block, $data) {
+    $pad = ord($data[($len = strlen($data)) - 1]);
+
+    /* Check that what we have at the end of the string really is padding, and if it is remove it. */
+    if ($pad && $pad < $block && preg_match('/' . chr($pad) . '{' . $pad . '}$/', $data)) {
+      return substr($data, 0, -$pad);
+    }
+    return $data;
   }
 }
