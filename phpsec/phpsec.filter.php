@@ -41,18 +41,18 @@ class phpsecFilter {
       $filterType = mb_substr($name, 0, 1);
       switch($filterType) {
         case '%':
-          /* %variables: HTML is stripped from the string
+          /* %variables: HTML tags are stripped of from the string
              before it is in inserted. */
           $safeData = self::f($data, 'strip');
           break;
         case '!':
-          /* !variables: HTML and special characters is escaped from the string
-             before it is in inserted. */
+          /* !variables: HTML and special characters are escaped from the string
+             before it is used. */
           $safeData = self::f($data, 'escapeAll');
           break;
         case '@':
           /* @variables: Only HTML is escaped from the string. Special characters
-             is kept as is. */
+             is kept as it is. */
           $safeData = self::f($data, 'escape');
           break;
         case '&':
@@ -94,15 +94,15 @@ class phpsecFilter {
   public static function f($str, $mode = 'escape') {
     switch($mode) {
       case 'strip':
-        /* HTML is stripped from the string
-           before it is in inserted. */
+        /* HTML tags are stripped from the string
+           before it is used. */
         return strip_tags($str);
       case 'escapeAll':
-        /* HTML and special characters is escaped from the string
-           before it is in inserted. */
+        /* HTML and special characters are escaped from the string
+           before it is used. */
         return htmlentities($str, ENT_QUOTES, self::$_charset);
       case 'escape':
-        /* Only HTML is escaped from the string. Special characters
+        /* Only HTML tags are escaped from the string. Special characters
            is kept as is. */
         return htmlspecialchars($str, ENT_NOQUOTES, self::$_charset);
       case 'url':
