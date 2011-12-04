@@ -194,7 +194,7 @@ class phpsecCrypt {
   }
 
   /**
-   * PKCS7-pad data.
+   * Strip PKCS7-padding.
    *
    * @param integer $block
    *   Block size.
