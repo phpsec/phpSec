@@ -49,7 +49,7 @@ class phpsecPw {
   }
 
   /**
-   * Validate a user-supplied  password against a stored password which is saved
+   * Validate a user-supplied password against a stored password generated
    * using the phpsecPw::hash() method.
    *
    * @param string $password
@@ -70,7 +70,7 @@ class phpsecPw {
     $data = json_decode($dbPassword, true);
     if(isset($data['algo']) && sizeof($data) == 3) {
       /**
-       * Ok, we are pretty sure that this is a good stuff. Now inject the salt
+       * Ok, we are pretty sure that this is a good array. Now inject the salt
        * into the user supplied password, to see if it matches the registerd
        * data from $dbPassword.
        */
