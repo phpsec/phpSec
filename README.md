@@ -33,7 +33,7 @@ PHP 5.3.0 or greater with the following extensions is required to use phpSec:
 Getting help
 ------------
 If you need any help with using phpSec or need to report a bug/security issue or you
-want to request a new feature please use the [phpSec issues](https://github.com/xqus/phpSec/issues).
+want to request a new feature please use the [phpSec issues](https://github.com/phpsec/phpSec/issues).
 Make sure you label the issue with a appropriate label.
 
 [1]:http://en.wikipedia.org/wiki/Cross-site_scripting        "Wikipedia on XSS"
