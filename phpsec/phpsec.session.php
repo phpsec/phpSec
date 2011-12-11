@@ -144,16 +144,6 @@ class phpsecSession {
   }
 
   /**
-   * Get the filname for a session ID.
-   *
-   * @param string $id
-   * @return string
-   */
-  private static function fileName($id) {
-    return self::$_savePath.'/'.self::$_name."_".$id;
-  }
-
-  /**
    * Set the cookie with the secret.
    *
    * @return true
