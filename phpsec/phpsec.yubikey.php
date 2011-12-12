@@ -58,12 +58,6 @@ class phpsecYubikey {
       return false;
     }
 
-    /* If tokens don't match return false. */
-    if($response['otp'] != $otp) {
-      self::$lastError = 'YUBIKEY_NO_MATCH';
-      return false;
-    }
-
     /* Check status of response. If not OK return false. */
     if($response['status'] != 'OK') {
       switch($response['status']) {
@@ -83,6 +77,12 @@ class phpsecYubikey {
           self::$lastError = 'YUBIKEY_SERVER_SAYS_NO';
           break;
       }
+      return false;
+    }
+
+    /* If tokens don't match return false. */
+    if($response['otp'] != $otp) {
+      self::$lastError = 'YUBIKEY_NO_MATCH';
       return false;
     }
 
@@ -160,7 +160,6 @@ class phpsecYubikey {
       /* select a Yubico API server. */
       $server = array_rand(self::$_servers);
       $response = @file_get_contents(self::$_servers[$server].'?'.$query, null, $context);
-      echo self::$_servers[$server];
       $attempts++;
     }
 
