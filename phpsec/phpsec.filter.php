@@ -9,7 +9,9 @@
   @package   phpSec
  */
 
-/* Provides methods for XSS filtering. */
+/**
+ * Provides methods for XSS filtering.
+ */
 class phpsecFilter {
 
   /**
