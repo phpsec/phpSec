@@ -147,6 +147,9 @@ class phpsecCrypt {
    *
    * @param string $a
    *   A hash algorithm.
+   *
+   * @return binary
+   *   Derived key.
    */
   public static function pbkdf2($p, $s, $c, $dkLen, $a = 'sha256') {
     $hLen = strlen(hash($a, null, true)); /* Hash length. */
