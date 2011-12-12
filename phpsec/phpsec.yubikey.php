@@ -18,6 +18,13 @@ class phpsecYubikey {
   public static $lastError     = null;
 
   private static $_charset = 'cbdefghijklnrtuv';
+  private static $_servers = array(
+    'http://api.yubico.com/wsapi/2.0/verify',
+    'http://api2.yubico.com/wsapi/2.0/verify',
+    'http://api3.yubico.com/wsapi/2.0/verify',
+    'http://api4.yubico.com/wsapi/2.0/verify',
+    'http://api5.yubico.com/wsapi/2.0/verify',
+  );
 
   /**
    * Verify Yubikey one time password against the Yubico servers.
@@ -146,12 +153,22 @@ class phpsecYubikey {
     /* Create context. Allowing us to specify User-Agent. */
     $context = stream_context_create($opts);
 
-    /* Get response from Yubico server. */
-    $response = @file_get_contents('http://api.yubico.com/wsapi/2.0/verify?'.$query, null, $context);
+    /* Try to get response from Yubico server. */
+    $attempts = 0;
+    $response = false;
+    while($response === false && $attempts < 3) {
+      /* select a Yubico API server. */
+      $server = array_rand(self::$_servers);
+      $response = @file_get_contents(self::$_servers[$server].'?'.$query, null, $context);
+      echo self::$_servers[$server];
+      $attempts++;
+    }
+
     if($response === false) {
       /* Could not make request. */
       return false;
     }
+
     /* Parse response and create an array with the data. */
     $lines = explode("\r\n", $response);
      foreach($lines as $line) {
