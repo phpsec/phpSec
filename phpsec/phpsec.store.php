@@ -13,7 +13,7 @@
 abstract class phpsecStore {
 
   /**
-   * Open/prepeare the storage.
+   * Open/prepare the storage.
    *
    * @param string $target
    *   Storage location.
@@ -38,7 +38,7 @@ abstract class phpsecStore {
   abstract public function read($type, $id);
 
   /**
-   * Write object to storeage.
+   * Write object to storage.
    *
    * @param string $type
    *   Type of data (session, cache, etc.).
@@ -50,7 +50,7 @@ abstract class phpsecStore {
    *   Data to write.
    *
    * @return bool
-   *   Returns true on success, false on error.
+   *   Returns true on success and false on error.
    */
   abstract public function write($type, $id, $data);
 
