@@ -102,7 +102,16 @@ class phpsecCrypt {
 
     /* Decode the JSON string */
     $data = json_decode($data, true);
-    if($data === NULL || sizeof($data) !== 5) {
+
+    $dataStructure = array(
+      'algo'  => true,
+      'mode'  => true,
+      'iv'    => true,
+      'cdata' => true,
+      'mac'   => true,
+    );
+
+    if($data === NULL || phpsec::arrayCheck($data, $dataStructure) !== true) {
       phpsec::error('Invalid data passed to decrypt()');
       return false;
     }
