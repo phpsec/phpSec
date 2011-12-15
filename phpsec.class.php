@@ -147,5 +147,39 @@ class phpsec {
     $randLength = $length-strlen($timeStamp);
     return $timeStamp.phpsecRand::str($randLength);
   }
+
+  /**
+   * Check structure of an array.
+   * This method checks the structure of an array (only the first layer of it) against
+   * a defined set of rules.
+   *
+   * @param array $array
+   *   Array to check.
+   *
+   * @param array $structure
+   *   Expected array structure. Defined for example like this:
+   *   array(
+   *    'string' => array(
+   *      'callback' => 'strlen',
+   *      'params'   => array('%val'),
+   *      'match'    => 3,
+   *     ),
+   *   ),
+   */
+  public static function arrayCheck($array, $structure) {
+    $success = true;
+    if(sizeof($array) != sizeof($structure)) {
+      self::error('Array does not match defined structure');
+      return false;
+    }
+    foreach($structure as $key => $callbackArray) {
+      $callbackArray['params'] = str_replace('%val', $array[$key], $callbackArray['params']);
+      if(call_user_func_array($callbackArray['callback'], $callbackArray['params']) !== $callbackArray['match']) {
+        self::error('Array does not match defined structure. The '.$key.' key did not pass the '.$callbackArray['callback'].' callback');
+        $success = false;
+      }
+    }
+    return $success;
+  }
 }
 
