@@ -159,24 +159,41 @@ class phpsec {
    * @param array $structure
    *   Expected array structure. Defined for example like this:
    *   array(
-   *    'string' => array(
-   *      'callback' => 'strlen',
-   *      'params'   => array('%val'),
-   *      'match'    => 3,
+   *     'string' => array(
+   *       'callback' => 'strlen',
+   *       'params'   => array('%val'),
+   *       'match'    => 3,
    *     ),
+   *     'not allowed' = false, // Only maked sense with $strict = false
+   *     'needed'      = true,
    *   ),
+   *
+   * @param bool $strict
+   *   If strict is set to false we will allow keys that's not defined in the structure.
    */
-  public static function arrayCheck($array, $structure) {
+  public static function arrayCheck($array, $structure, $strict = true) {
     $success = true;
-    if(sizeof($array) != sizeof($structure)) {
+    if(sizeof($array) != sizeof($structure) && $strict === true) {
       self::error('Array does not match defined structure');
       return false;
     }
     foreach($structure as $key => $callbackArray) {
-      $callbackArray['params'] = str_replace('%val', $array[$key], $callbackArray['params']);
-      if(call_user_func_array($callbackArray['callback'], $callbackArray['params']) !== $callbackArray['match']) {
-        self::error('Array does not match defined structure. The '.$key.' key did not pass the '.$callbackArray['callback'].' callback');
-        $success = false;
+      if(isset($array[$key])) {
+        if(is_array($callbackArray) && isset($callbackArray['callback'])) {
+          $callbackArray['params'] = str_replace('%val', $array[$key], $callbackArray['params']);
+          if(call_user_func_array($callbackArray['callback'], $callbackArray['params']) !== $callbackArray['match']) {
+            self::error('Array does not match defined structure. The '.$key.' key did not pass the '.$callbackArray['callback'].' callback');
+            $success = false;
+          }
+        } elseif($callbackArray === false) {
+          self::error('Array does not match defined structure. '.$key.' is not allowed');
+            $success = false;
+        }
+      } else {
+        if($callbackArray !== false) {
+          self::error('Array does not match defined structure. '.$key.' not defined');
+          $success = false;
+        }
       }
     }
     return $success;
