@@ -72,6 +72,8 @@ abstract class phpsecStore {
 
   /**
    * List existing object IDs for a store type.
+   * This method should return an array with all id's of the
+   * selected type.
    *
    * @param string $type
    *   Type of data (session, cache, etc.).
@@ -82,6 +84,10 @@ abstract class phpsecStore {
 
   /**
    * Read metadata for object in store.
+   * The object returned should have the following structure:
+   *   obj->id    Id of the object.
+   *   obj->mac   Message authentication code.
+   *   obj->time  A Unix timestamp telling when the object was created.
    *
    * @param string $type
    *   Type of data (session, cache, etc.).
