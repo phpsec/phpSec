@@ -87,28 +87,6 @@ class phpsecPw {
   }
 
   /**
-   * Check the age of a salted password.
-   *
-   * @param string $dbPassword
-   *   The json string fetched from the database, in the exact format
-   *   as created by phpsecPw::hash().
-   *
-   * @return integer
-   *   Age of password in seconds.
-   */
-  public static function age($dbPassword) {
-    $data = json_decode($dbPassword, true);
-    if(isset($data['salt'])) {
-      $date = substr($data['salt'], 0, 22);
-      return gmdate('U') - strtotime($date);
-    } else {
-      /* Invalid array supplied. */
-      self::error('Invalid data supplied. Expected serialized array as returned by pwHash()');
-    }
-    return false;
-  }
-
-  /**
    * Inject a salt into a password to create the string to be hashed.
    *
    * @param string $password
