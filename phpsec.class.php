@@ -164,7 +164,7 @@ class phpsec {
    *       'params'   => array('%val'),
    *       'match'    => 3,
    *     ),
-   *     'not allowed' = false, // Only maked sense with $strict = false
+   *     'not allowed' = false, // Only makes sense with $strict = false
    *     'needed'      = true,
    *   ),
    *
