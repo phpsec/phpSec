@@ -20,7 +20,7 @@ Features
 Getting started
 ---------------
 For more information on installation and usage, please check out the
-[phpSec manual](http://phpsec.xqus.com/manual).
+[phpSec manual](http://phpseclib.com/manual).
 
 System requirements
 -------------------
