@@ -36,13 +36,13 @@ class phpsecPw {
    *   some meta data.
    */
   public static function hash($password) {
-    $salt     = phpsec::genUid();
+    $salt     = phpsecRand::bytes(64);
     $injected = self::inject($password, $salt);
     $hash     = hash(phpsec::HASH_TYPE, $injected);
 
     $return = array(
       'hash'      => $hash,
-      'salt'      => $salt,
+      'salt'      => base64_encode($salt),
       'algo'      => phpsec::HASH_TYPE,
     );
     return json_encode($return);
@@ -68,12 +68,29 @@ class phpsecPw {
      * we got a valid array.
      */
     $data = json_decode($dbPassword, true);
-    if(isset($data['algo']) && sizeof($data) == 3) {
+
+    $dataStructure = array(
+      'hash'  => true,
+      'salt'  => true,
+      'algo'  => true,
+    );
+
+    if($data !== null && phpsec::arrayCheck($data, $dataStructure)) {
       /**
        * Ok, we are pretty sure that this is a good array. Now inject the salt
        * into the user supplied password, to see if it matches the registerd
        * data from $dbPassword.
        */
+
+      /* Try to Base64 decode the salt.  base64_decode() will return false
+       * if the string passed is not Base64 encoded. This way we can separate
+       * binary salts from the old type of salts. */
+      $decodedSalt = base64_decode($data['salt'], true);
+      if($decodedSalt !== false) {
+        /* The salt was Base64 encoded. Use the decoded version. */
+        $data['salt'] = $decodedSalt;
+      }
+
       $pwInjected = self::inject($password, $data['salt']);
       /* Create a hash and see if it matches. */
       if(hash($data['algo'], $pwInjected) == $data['hash']) {
@@ -81,7 +98,7 @@ class phpsecPw {
       }
     } else {
       /* Invalid array supplied. */
-      self::error('Invalid data supplied. Expected serialized array as returned by pwHash()');
+      phpsec::error('Invalid data supplied. Expected serialized array as returned by pwHash()');
     }
     return false;
   }
