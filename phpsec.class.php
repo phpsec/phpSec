@@ -38,6 +38,7 @@ class phpsec {
       'phpsecSession'         => 'phpsec.session.php',
       'phpsecStore'           => 'phpsec.store.php',
       'phpsecStoreFilesystem' => 'phpsec.store.filesystem.php',
+      'phpsecStorePdo'        => 'phpsec.store.pdo.php',
       'phpsecToken'           => 'phpsec.token.php',
       'phpsecYubikey'         => 'phpsec.yubikey.php',
     );
@@ -64,6 +65,9 @@ class phpsec {
     switch($storeType) {
       case 'filesystem':
         self::$store = new phpsecStoreFilesystem($storeDest);
+      break;
+      case 'mysql':
+        self::$store = new phpsecStorePdo($storeDest);
       break;
       default:
       self::error('Store type('.$storeType.') invalid', E_USER_ERROR);
