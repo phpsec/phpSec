@@ -17,7 +17,7 @@ class phpsecYubikey {
    * Yubico client Id.
    * @see https://upgrade.yubico.com/getapikey/
    */
-  public static $_clientId     = null;
+  public static $_clientId = null;
 
   /**
    * Yubico client shared secret.
@@ -39,7 +39,7 @@ class phpsecYubikey {
    * Last error produced by phpsecYubikey::verify().
    * @see http://phpseclib.com/manual/yubikey/errors
    */
-  public static $lastError     = null;
+  public static $lastError = null;
 
   /**
    * Yubico authentication servers.
