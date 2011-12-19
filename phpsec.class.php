@@ -13,11 +13,31 @@
  * phpSec core functionality.
  */
 class phpsec {
-  public static $_charset    = 'utf-8'; // Config: Charset used for filter methods.
-  public static $_dsn        = null;    // Config: Database Source Name.
-  public static $_sessenable = true;    // Config: Enable phpSec session handler.
-  public static $uid         = null;    // User identifier.
-  public static $store       = null;    // Storage object.
+
+  /**
+   * Config: Charset used for filter methods.
+   */
+  public static $_charset    = 'utf-8';
+
+  /**
+   * Config: Database Source Name.
+   */
+  public static $_dsn        = null;
+
+  /**
+   * Config: Enable phpSec session handler.
+   */
+  public static $_sessenable = true;
+
+  /**
+   * User identifier.
+   */
+  public static $uid         = null;
+
+  /**
+   * Storage object.
+   */
+  public static $store       = null;
 
   /* Constants. */
   const HASH_TYPE      = 'sha256';
