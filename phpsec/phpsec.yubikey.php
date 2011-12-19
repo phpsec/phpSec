@@ -146,7 +146,7 @@ class phpsecYubikey {
       'http'=>array(
         'method' => "GET",
         'header' => "Accept-language: en\r\n" .
-                    "User-Agent: phpSec (http://phpsec.xqus.com)\r\n"
+                    "User-Agent: phpSec (http://phpseclib.com)\r\n"
       )
     );
 
