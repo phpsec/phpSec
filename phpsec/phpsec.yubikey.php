@@ -13,11 +13,26 @@
  * Implements validation of Yubikey against Yubico servers. This code is experimental.
  */
 class phpsecYubikey {
+  /**
+   * Yubico client Id.
+   * @see https://upgrade.yubico.com/getapikey/
+   */
   public static $_clientId     = null;
+
+  /**
+   * Yubico client shared secret.
+   * @see https://upgrade.yubico.com/getapikey/
+   */
   public static $_clientSecret = null;
+
+  /**
+   * Last error produced by phpsecYubikey::verify()
+   */
   public static $lastError     = null;
 
-  private static $_charset = 'cbdefghijklnrtuv';
+  /**
+   * Yubico authentication servers.
+   */
   private static $_servers = array(
     'http://api.yubico.com/wsapi/2.0/verify',
     'http://api2.yubico.com/wsapi/2.0/verify',
@@ -199,6 +214,7 @@ class phpsecYubikey {
       return false;
     }
 
+    /* Check for printable charcters (no whitespace). */
     return ctype_graph($otp);
   }
 
@@ -219,6 +235,7 @@ class phpsecYubikey {
     if(!self::validOtp($otp)) {
       return false;
     }
+
     $idLen = strlen($otp) - 32;
     return substr($otp, 0, $idLen);
   }
