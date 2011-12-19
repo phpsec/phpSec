@@ -36,7 +36,8 @@ class phpsecYubikey {
   public static $_serverTimeout = 3;
 
   /**
-   * Last error produced by phpsecYubikey::verify()
+   * Last error produced by phpsecYubikey::verify().
+   * @see http://phpseclib.com/manual/yubikey/errors
    */
   public static $lastError     = null;
 
@@ -58,6 +59,9 @@ class phpsecYubikey {
    *   One time password to verify.
    *
    * @return boolean
+   *   True on valid OTP, false on invalid. If this method returns false
+   *   phpsecYubikey::$lastError will contain details.
+   *   @see http://phpseclib.com/manual/yubikey/errors
    */
   public static function verify($otp) {
     if(self::$_clientId === null || self::$_clientSecret === null) {
