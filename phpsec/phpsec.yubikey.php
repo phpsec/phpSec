@@ -183,30 +183,23 @@ class phpsecYubikey {
 
   /**
    * Validate a string as a one-time-password.
+   * A valid OTP should consist of 32-48 printable characters.
    *
    * @param string $otp
    *   String to Validate
    *
    * @return boolean
+   *   True if the OTP is valid, false on error.
    */
   private static function validOtp($otp) {
     $length  = strlen($otp);
 
     /* Check length. */
-    if($length != 44) {
+    if($length > 48 || $length < 32) {
       return false;
     }
 
-    /* Check for invalid characters. */
-    for ($i = 0; $i < $length; $i=$i+2 ) {
-      $high = strpos(self::$_charset, $otp[$i]);
-      $low  = strpos(self::$_charset, $otp[$i+1]);
-      if($high === false || $low === false) {
-        return false;
-      }
-    }
-
-    return true;
+    return ctype_graph($otp);
   }
 
   /**
@@ -220,7 +213,7 @@ class phpsecYubikey {
    *   The one time password to get the identity from.
    *
    * @return string
-   *   Returns the Yubikey identity, or FALSE on failure.
+   *   Returns the Yubikey identity, or false on failure.
    */
   public static function getYubikeyId($otp) {
     if(!self::validOtp($otp)) {
