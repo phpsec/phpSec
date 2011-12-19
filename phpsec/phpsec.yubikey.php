@@ -10,7 +10,7 @@
  */
 
 /**
- * Implements validation of Yubikey against Yubico servers. This code is experimental.
+ * Implements validation of Yubikey against Yubico servers.
  */
 class phpsecYubikey {
   /**
@@ -101,6 +101,9 @@ class phpsecYubikey {
           break;
         case 'NO_SUCH_CLIENT':
           self::$lastError = 'YUBIKEY_SERVER_NO_SUCH_CLIENT';
+          break;
+        case 'BAD_SIGNATURE':
+          self::$lastError = 'YUBIKEY_SERVER_BAD_SIGNATURE';
           break;
         default:
           self::$lastError = 'YUBIKEY_SERVER_SAYS_NO';
