@@ -210,18 +210,23 @@ class phpsecYubikey {
   }
 
   /**
-   * Get the Yubico ID from a OTP.
+   * Get the identity of a Yubikey OTP.
+   * The identity part is the same for every OTP, and it is the initial 2-16 modhex characters of the OTP.
+   * Since the rest of the OTP is always 32 characters, the method to extract the identity is to remove
+   * 32 characters from the end and then use the remaining string, which should be 2-16 characters,
+   * as the YubiKey identity.
    *
    * @param string $otp
-   *   The one time password to get the ID from.
+   *   The one time password to get the identity from.
    *
    * @return string
-   *   Returns the Yubikey ID, or FALSE on failure.
+   *   Returns the Yubikey identity, or FALSE on failure.
    */
   public static function getYubikeyId($otp) {
     if(!self::validOtp($otp)) {
       return false;
     }
-    return substr($otp, 0, 12);
+    $idLen = strlen($otp) - 32;
+    return substr($otp, 0, $idLen);
   }
 }
