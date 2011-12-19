@@ -191,7 +191,6 @@ class phpsecYubikey {
       $server = array_rand(self::$_servers);
       $response = @file_get_contents(self::$_servers[$server].'?'.$query, null, $context);
       $attempts++;
-      echo self::$_servers[$server];
     }
 
     if($response === false) {
