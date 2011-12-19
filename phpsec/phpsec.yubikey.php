@@ -26,6 +26,16 @@ class phpsecYubikey {
   public static $_clientSecret = null;
 
   /**
+   * Number of servers to try before giving up.
+   */
+  public static $_numServers = 3;
+
+  /**
+   * Timeout in seconds for each server.
+   */
+  public static $_serverTimeout = 3;
+
+  /**
    * Last error produced by phpsecYubikey::verify()
    */
   public static $lastError     = null;
@@ -159,9 +169,10 @@ class phpsecYubikey {
     /* Set up array with options for the context used by file_get_contents(). */
     $opts = array(
       'http'=>array(
-        'method' => "GET",
-        'header' => "Accept-language: en\r\n" .
-                    "User-Agent: phpSec (http://phpseclib.com)\r\n"
+        'method'  => 'GET',
+        'timeout' => self::$_serverTimeout,
+        'header'  => "Accept-language: en\r\n" .
+                     "User-Agent: phpSec (http://phpseclib.com)\r\n"
       )
     );
 
@@ -171,11 +182,12 @@ class phpsecYubikey {
     /* Try to get response from Yubico server. */
     $attempts = 0;
     $response = false;
-    while($response === false && $attempts < 3) {
+    while($response === false && $attempts < self::$_numServers) {
       /* select a Yubico API server. */
       $server = array_rand(self::$_servers);
       $response = @file_get_contents(self::$_servers[$server].'?'.$query, null, $context);
       $attempts++;
+      echo self::$_servers[$server];
     }
 
     if($response === false) {
