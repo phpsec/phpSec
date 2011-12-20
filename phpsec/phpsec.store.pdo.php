@@ -14,9 +14,9 @@
  */
 class phpsecStorePdo extends phpsecStore {
 
-  public  static  $_hashType = 'sha256';
-  private static  $dbh       = null;
-  private static  $table     = null;
+  public  $_hashType = 'sha256';
+  private $dbh       = null;
+  private $table     = null;
 
   public function __construct($loc) {
     /* Separate username and password from DSN */
@@ -26,18 +26,84 @@ class phpsecStorePdo extends phpsecStore {
     try {
       $this->dbh = new PDO($loc, $parts['username'], $parts['password']);
     } catch(PDOException $e) {
-      phpsec::error('Database connection failed: ' . $e->getMessage());
+      phpsec::error('Database connection failed: ' . $e->getMessage(), E_USER_ERROR);
+      return false;
+    }
+    $this->table = $parts['table'];
+
+    $storeTable = array(
+      array(
+        'Field'   => 'type',
+        'Type'    => 'varchar(255)',
+        'Null'    => 'NO',
+        'Key'     => 'MUL',
+        'Default' => NULL,
+        'Extra'   => '',
+      ),
+      array(
+        'Field'   => 'id',
+        'Type'    => 'varchar(255)',
+        'Null'    => 'NO',
+        'Key'     => 'PRI',
+        'Default' => NULL,
+        'Extra'   => '',
+      ),
+      array(
+        'Field'   => 'mac',
+        'Type'    => 'binary(32)',
+        'Null'    => 'NO',
+        'Key'     => '',
+        'Default' => NULL,
+        'Extra'   => '',
+      ),
+      array(
+        'Field'   => 'time',
+        'Type'    => 'int(11) unsigned',
+        'Null'    => 'NO',
+        'Key'     => '',
+        'Default' => NULL,
+        'Extra'   => '',
+      ),
+      array(
+        'Field'   => 'data',
+        'Type'    => 'text',
+        'Null'    => 'NO',
+        'Key'     => '',
+        'Default' => NULL,
+        'Extra'   => '',
+      ),
+    );
+
+
+    $sth = $this->dbh->prepare(
+      'DESCRIBE `'.addslashes($this->table).'`'
+    );
+    $sth->execute(array());
+
+    $currentStructure = $sth->fetchAll(PDO::FETCH_ASSOC);
+
+    if(sizeof($currentStructure) !== sizeof($storeTable)) {
+      phpsec::error('Invalid table ('.$parts['dbname'].'.'.$this->table.') structure', E_USER_ERROR);
       return false;
     }
 
-    // TODO: Check table structure.
-    self::$table = $parts['table'];
+    for($i=0; $i < sizeof($storeTable); $i++) {
+      $diff = array_diff_assoc($currentStructure[$i], $storeTable[$i]);
+      if(sizeof($diff) > 0) {
+        phpsec::error('Invalid table ('.$parts['dbname'].'.'.$this->table.') structure. '.var_export($diff, true), E_USER_ERROR);
+        return false;
+      }
+    }
+
+
+
+
     return true;
   }
 
   public function read($type, $id) {
     $sth = $this->dbh->prepare(
-      'SELECT * FROM '.self::$table.' WHERE type = :type AND id = :id LIMIT 1'
+      'SELECT * FROM '.$this->table.' WHERE type = :type AND id = :id LIMIT 1'
     );
 
     $data = array(
@@ -64,7 +130,7 @@ class phpsecStorePdo extends phpsecStore {
   public function write($type, $id, $data) {
     $this->delete($type, $id);
     $sth = $this->dbh->prepare(
-      'INSERT INTO '.self::$table.' (`id`, `mac`, `time`, `type`, `data`)' .
+      'INSERT INTO '.$this->table.' (`id`, `mac`, `time`, `type`, `data`)' .
       'VALUES(:id, :mac, :time, :type, :data)'
     );
 
@@ -85,7 +151,7 @@ class phpsecStorePdo extends phpsecStore {
 
   public function delete($type, $id){
     $sth = $this->dbh->prepare(
-      'DELETE FROM '.self::$table.' WHERE type = :type AND id = :id'
+      'DELETE FROM '.$this->table.' WHERE type = :type AND id = :id'
     );
 
     $data = array(
@@ -100,7 +166,7 @@ class phpsecStorePdo extends phpsecStore {
     $ids = array();
 
     $sth = $this->dbh->prepare(
-      'SELECT * FROM '.self::$table.' WHERE type = :type'
+      'SELECT * FROM '.$this->table.' WHERE type = :type'
     );
 
     $data = array(
@@ -118,7 +184,7 @@ class phpsecStorePdo extends phpsecStore {
 
   public function meta($type, $id) {
     $sth = $this->dbh->prepare(
-      'SELECT * FROM '.self::$table.' WHERE type = :type AND id = :id'
+      'SELECT * FROM '.$this->table.' WHERE type = :type AND id = :id'
     );
 
     $data = array(
