@@ -36,7 +36,7 @@ class phpsecToken {
   /**
    * Validate a one-time-token generated with setToken();
    * This function should be called before accepting data from a user-submitted form.
-   * @see setToken();
+   * @see phpsecToken::setToken();
    *
    * @param string $name
    *   Name of the form to validate the token for.
