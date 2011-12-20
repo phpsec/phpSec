@@ -85,11 +85,15 @@ class phpsecStorePdo extends phpsecStore {
 
     /* Ok, so. Let's get the structure of the table that's configured. Since PDO obviously
      * don't expect people to have nothing else than hard coded table names there is no
-     * proper escape function for table/column names. We'll use addslashes() and since the
-     * table name comes from server config I'm not freaking out... *deep breath* I think. */
+     * proper escape function for table/column names. We will do as suggested here
+     * http://stackoverflow.com/questions/1542627/escaping-field-names-in-pdo-statements
+     * by bobince and dissallow backquote, backslash and the nul character.
+     * We will only do this here since we will verify the existence of the table later.
+     * Oh.. I almost forgot. This fix is mySQL only! */
     $sth = $this->dbh->prepare(
-      'DESCRIBE `'.addslashes($this->table).'`'
+      'DESCRIBE `'.str_replace(array('\\',"\0" ,'`'), '', $this->table).'`'
     );
+
     $sth->execute(array());
     $currentStructure = $sth->fetchAll(PDO::FETCH_ASSOC);
 
