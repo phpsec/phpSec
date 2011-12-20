@@ -18,19 +18,28 @@ class phpsecStorePdo extends phpsecStore {
   private $dbh       = null;
   private $table     = null;
 
+  /**
+   * @see phpsecStore::__construct()
+   */
   public function __construct($loc) {
     /* Separate username and password from DSN */
     $parts = phpsecStorePdo::parseDsn($loc);
     $loc   = 'mysql:dbname='.$parts['dbname'].';host='.$parts['host'];
 
+    /* We try to connect to the database. If this fails throw an error. */
     try {
       $this->dbh = new PDO($loc, $parts['username'], $parts['password']);
     } catch(PDOException $e) {
       phpsec::error('Database connection failed: ' . $e->getMessage(), E_USER_ERROR);
       return false;
     }
-    $this->table = $parts['table'];
 
+    /* Cool, we connected to the databse with no problems.
+     * Now let's try to find the table we want. */
+    $this->table = $parts['table'];
+    /* Got it!! No just kidding. */
+
+    /* This is the expected structure of the table. Neat eh? */
     $storeTable = array(
       array(
         'Field'   => 'type',
@@ -74,19 +83,25 @@ class phpsecStorePdo extends phpsecStore {
       ),
     );
 
-
+    /* Ok, so. Let's get the structure of the table that's configured. Since PDO obviously
+     * don't expect people to have nothing else than hard coded table names there is no
+     * proper escape function for table/column names. We'll use addslashes() and since the
+     * table name comes from server config I'm not freaking out... *deep breath* I think. */
     $sth = $this->dbh->prepare(
       'DESCRIBE `'.addslashes($this->table).'`'
     );
     $sth->execute(array());
-
     $currentStructure = $sth->fetchAll(PDO::FETCH_ASSOC);
 
+    /* First we just match number of columns to make sure everything looks good, and to avoid
+     * total disaster in the next part. Oh.. I almost forgot. If this fails everything explodes
+     * in a nice old USER_ERROR! */
     if(sizeof($currentStructure) !== sizeof($storeTable)) {
       phpsec::error('Invalid table ('.$parts['dbname'].'.'.$this->table.') structure', E_USER_ERROR);
       return false;
     }
 
+    /* Cool. The number is good. Check that the fields and stuff are all right. */
     for($i=0; $i < sizeof($storeTable); $i++) {
       $diff = array_diff_assoc($currentStructure[$i], $storeTable[$i]);
       if(sizeof($diff) > 0) {
@@ -95,13 +110,16 @@ class phpsecStorePdo extends phpsecStore {
       }
     }
 
-
-
-
+    /* Cool. No wait.. It was cool 10 lines ago. Supercool! We got this far. All is good. Go pary! */
     return true;
   }
 
+  /**
+   * @see phpsecStore::read()
+   */
   public function read($type, $id) {
+
+    /* The first part is prettu basic. Get stuff from databse. */
     $sth = $this->dbh->prepare(
       'SELECT * FROM '.$this->table.' WHERE type = :type AND id = :id LIMIT 1'
     );
@@ -112,31 +130,39 @@ class phpsecStorePdo extends phpsecStore {
     );
     $sth->execute($data);
 
-    $data = $sth->fetchAll(PDO::FETCH_ASSOC);
-
-    if(!isset($data[0])) {
+    $data = $sth->fetch(PDO::FETCH_ASSOC);
+    if($data === false) {
       return false;
     }
 
-    $mac = phpsecCrypt::pbkdf2($data[0]['data'], $id, 1000, 32);
+    /* Calculate expected MAC. */
+    $mac = phpsecCrypt::pbkdf2($data['data'], $id, 1000, 32);
 
-    if($mac != $data[0]['mac']) {
+    /* Compare... */
+    if($mac != $data['mac']) {
       phpsec::error('Message authentication code invalid while reading store');
       return false;
     }
-    return unserialize($data[0]['data']);
+
+    /* And success! */
+    return unserialize($data['data']);
   }
 
   public function write($type, $id, $data) {
+    /* Delete existing data first, to prevent a huge database. */
     $this->delete($type, $id);
+
+    /* Prepeare query. */
     $sth = $this->dbh->prepare(
       'INSERT INTO '.$this->table.' (`id`, `mac`, `time`, `type`, `data`)' .
       'VALUES(:id, :mac, :time, :type, :data)'
     );
 
+    /* Serialize data, and create a MAC. */
     $data = serialize($data);
     $mac  = phpsecCrypt::pbkdf2($data, $id, 1000, 32);
 
+    /* We use this array to say what data goes where in the query. */
     $data = array(
       'id'   => $id,
       'mac'  => $mac,
@@ -145,10 +171,13 @@ class phpsecStorePdo extends phpsecStore {
       'data' => $data,
     );
 
-    $sth->execute($data);
-
+    /* And, insert. */
+    return $sth->execute($data);
   }
 
+  /**
+   * @see phpsecStore::delete()
+   */
   public function delete($type, $id){
     $sth = $this->dbh->prepare(
       'DELETE FROM '.$this->table.' WHERE type = :type AND id = :id'
@@ -159,9 +188,12 @@ class phpsecStorePdo extends phpsecStore {
       'type' => $type,
     );
 
-    $sth->execute($data);
+    return $sth->execute($data);
   }
 
+  /**
+   * @see phpsecStore::listIds()
+   */
   public function listIds($type) {
     $ids = array();
 
@@ -175,16 +207,19 @@ class phpsecStorePdo extends phpsecStore {
 
     $sth->execute($data);
 
-    $rows = $sth->fetchAll(PDO::FETCH_ASSOC);
-    foreach($rows as $row) {
+    while($row = $sth->fetch(PDO::FETCH_ASSOC)) {
       $ids[] = $row['id'];
     }
+
     return $ids;
   }
 
+  /**
+   * @see phpsecStore::meta()
+   */
   public function meta($type, $id) {
     $sth = $this->dbh->prepare(
-      'SELECT * FROM '.$this->table.' WHERE type = :type AND id = :id'
+      'SELECT * FROM '.$this->table.' WHERE type = :type AND id = :id LIMIT 1'
     );
 
     $data = array(
@@ -194,19 +229,27 @@ class phpsecStorePdo extends phpsecStore {
 
     $sth->execute($data);
 
-    $rows = $sth->fetchAll(PDO::FETCH_ASSOC);
-    if(isset($rows[0])) {
-      $obj = object();
-      $obj->id   = $rows[0]['id'];
-      $obj->mac  = $rows[0]['mac'];
-      $obj->time = $rows[0]['time'];
-
-      return $obj;
-    } else {
+    $meta = $sth->fetch(PDO::FETCH_ASSOC);
+    if($meta === false) {
       return false;
     }
+
+    $obj->id   = $meta['id'];
+    $obj->mac  = $meta['mac'];
+    $obj->time = $meta['time'];
+
+    return $obj;
   }
 
+  /**
+   * Extract configuration variables from the DSN.
+   *
+   * @param string $dsn
+   *   DSN to extract variables from.
+   *
+   * @return array
+   *   Returns an array with variable names as keys with corresponding values.
+   */
   private static function parseDsn($dsn) {
     $parsed = array();
     $parts = explode(';', $dsn);
