@@ -61,7 +61,8 @@ class phpsecYubikey {
    * @return boolean
    *   True on valid OTP, false on invalid. If this method returns false
    *   phpsecYubikey::$lastError will contain details.
-   *   @see http://phpseclib.com/manual/yubikey/errors
+   *
+   * @see http://phpseclib.com/manual/yubikey/errors
    */
   public static function verify($otp) {
     if(self::$_clientId === null || self::$_clientSecret === null) {
