@@ -14,8 +14,9 @@
  */
 class phpsecStorePdo extends phpsecStore {
 
-  public  $_hashType = 'sha256';
-  private $dbh       = null;
+  public  static  $_hashType = 'sha256';
+  private static  $dbh       = null;
+  private static  $table     = null;
 
   public function __construct($loc) {
     /* Separate username and password from DSN */
@@ -28,19 +29,21 @@ class phpsecStorePdo extends phpsecStore {
       phpsec::error('Database connection failed: ' . $e->getMessage());
       return false;
     }
+
+    // TODO: Check table structure.
+    self::$table = $parts['table'];
     return true;
   }
 
   public function read($type, $id) {
     $sth = $this->dbh->prepare(
-      'SELECT * FROM phpsec WHERE type = :type AND id = :id LIMIT 1'
+      'SELECT * FROM '.self::$table.' WHERE type = :type AND id = :id LIMIT 1'
     );
 
     $data = array(
-      'id'   => $id,
-      'type' => $type,
+      'id'    => $id,
+      'type'  => $type,
     );
-
     $sth->execute($data);
 
     $data = $sth->fetchAll(PDO::FETCH_ASSOC);
@@ -61,7 +64,7 @@ class phpsecStorePdo extends phpsecStore {
   public function write($type, $id, $data) {
     $this->delete($type, $id);
     $sth = $this->dbh->prepare(
-      'INSERT INTO phpsec (`id`, `mac`, `time`, `type`, `data`)' .
+      'INSERT INTO '.self::$table.' (`id`, `mac`, `time`, `type`, `data`)' .
       'VALUES(:id, :mac, :time, :type, :data)'
     );
 
@@ -82,7 +85,7 @@ class phpsecStorePdo extends phpsecStore {
 
   public function delete($type, $id){
     $sth = $this->dbh->prepare(
-      'DELETE FROM phpsec WHERE type = :type AND id = :id'
+      'DELETE FROM '.self::$table.' WHERE type = :type AND id = :id'
     );
 
     $data = array(
@@ -97,7 +100,7 @@ class phpsecStorePdo extends phpsecStore {
     $ids = array();
 
     $sth = $this->dbh->prepare(
-      'SELECT * FROM phpsec WHERE type = :type'
+      'SELECT * FROM '.self::$table.' WHERE type = :type'
     );
 
     $data = array(
@@ -115,7 +118,7 @@ class phpsecStorePdo extends phpsecStore {
 
   public function meta($type, $id) {
     $sth = $this->dbh->prepare(
-      'SELECT * FROM phpsec WHERE type = :type AND id = :id'
+      'SELECT * FROM '.self::$table.' WHERE type = :type AND id = :id'
     );
 
     $data = array(
