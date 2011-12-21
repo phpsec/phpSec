@@ -1,3 +1,21 @@
+December 21. 2011 - xqus
+  beta-0.2 release.
+- [#43] Implemented PKCS7 padding in phpsecCrypt.
+- [#62] Added phpsec::arrayCheck().
+- [#63] Improved checking of json data passed to phpSec.
+- Fixed call to error method in phpsecPw::check()
+- [#51] phpsecPw now uses a binary salts.
+- phpsecPw::age() removed.
+- [#50] Session handler now uses a binary key to encrypt session data.
+- [#42] Added mySQL support.
+- Yubikey integration not considered experimental anymore.
+  - [#48, #49] Improvements of the Yubikey integration.
+  - [#75] Fixed: phpsecYubikey::getYubikeyId() could retrive wrong ID.
+  - [#76] Fixed: phpsecYubikey::validOtp() to strict.
+  - [#74] Fixed: phpsecYubikey::getResponse(): Number of attempts and timeout
+          should be possible to configure.
+
+
 November 7. 2011 - xqus
   beta-0.1 release.
 - [#33, #34]phpsec::f() is now phpsec::t(), and phpsec::f() is a simple XSS
