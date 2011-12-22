@@ -48,20 +48,27 @@ class phpsec {
    */
   public static function load($class) {
     $basePath = dirname(__FILE__);
-    $classes = array(
-      'phpsecCache'           => 'phpsec.cache.php',
+
+    $classes['stateless'] = array(
       'phpsecCrypt'           => 'phpsec.crypt.php',
       'phpsecFilter'          => 'phpsec.filter.php',
-      'phpsecOtp'             => 'phpsec.otp.php',
       'phpsecPw'              => 'phpsec.pw.php',
       'phpsecRand'            => 'phpsec.rand.php',
+      'phpsecYubikey'         => 'phpsec.yubikey.php',
+    );
+
+    $classes['stateful'] = array(
+      'phpsecCache'           => 'phpsec.cache.php',
+      'phpsecCookie'          => 'phpsec.cookie.php',
+      'phpsecOtp'             => 'phpsec.otp.php',
       'phpsecSession'         => 'phpsec.session.php',
       'phpsecStore'           => 'phpsec.store.php',
       'phpsecStoreFilesystem' => 'phpsec.store.filesystem.php',
       'phpsecStorePdo'        => 'phpsec.store.pdo.php',
       'phpsecToken'           => 'phpsec.token.php',
-      'phpsecYubikey'         => 'phpsec.yubikey.php',
     );
+
+    $classes = array_merge($classes['stateful'], $classes['stateless']);
 
     if(isset($classes[$class])) {
       require_once $basePath.'/phpsec/'.$classes[$class];
