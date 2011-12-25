@@ -30,6 +30,11 @@ class phpsec {
   public static $_sessenable = true;
 
   /**
+   * Config: Enable phpSec secure cookies.
+   */
+  public static $_cookieenable = false;
+
+  /**
    * User identifier.
    */
   public static $uid         = null;
@@ -139,6 +144,11 @@ class phpsec {
       $_SESSION['phpSec-uid'] = self::$uid;
     } else {
       self::$uid = $_SESSION['phpSec-uid'];
+    }
+
+    /* If the phpSec secure cookie monster is enabled detect encrypted cookies. */
+    if(self::$_cookieenable === true) {
+      phpsecCookie::detect();
     }
   }
 
