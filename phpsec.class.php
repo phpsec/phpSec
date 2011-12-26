@@ -75,7 +75,7 @@ class phpsec {
 
     $classes = array_merge($classes['stateful'], $classes['stateless']);
 
-    if(isset($classes[$class])) {
+    if(isset($classes[$class]) && file_exists($basePath.'/phpsec/'.$classes[$class])) {
       require_once $basePath.'/phpsec/'.$classes[$class];
     }
   }
