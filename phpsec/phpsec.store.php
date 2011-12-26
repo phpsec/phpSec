@@ -57,7 +57,7 @@ abstract class phpsecStore {
   abstract public function write($type, $id, $data);
 
   /**
-   * Delete object from storeage.
+   * Delete object from storage.
    *
    * @param string $type
    *   Type of data (session, cache, etc.).
