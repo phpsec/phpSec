@@ -105,6 +105,11 @@ class phpsecPw {
 
   /**
    * Inject a salt into a password to create the string to be hashed.
+   * What we really do is to create an hash from the password, and retrieve
+   * the first character from this hash. This is then converted to its decimal value.
+   * We now have a number between 0 and 15. We use this to calculate where to place the salt.
+   * We take the length of the password and dividing it by 16, and then we multiply this by the
+   * number we got from the hash.
    *
    * @param string $password
    *   Plain-text password.
