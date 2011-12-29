@@ -188,6 +188,9 @@ class phpsecCrypt {
 
   /**
    * PKCS7-pad data.
+   * Add bytes of data to fill up the last block.
+   * PKCS7 padding adds bytes with the same value that the number of bytes that are added.
+   * @see http://tools.ietf.org/html/rfc5652#section-6.3
    *
    * @param integer $block
    *   Block size.
