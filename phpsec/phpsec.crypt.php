@@ -15,7 +15,7 @@
 class phpsecCrypt {
   public static $_algo    = 'rijndael-256';
   public static $_mode    = 'ctr';
-  public static $_padding = false;
+  public static $_padding = true;
 
 
   const HASH_TYPE = 'sha256';
