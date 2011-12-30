@@ -96,6 +96,18 @@ class phpsec {
 
   /**
    * Initialize the library.
+   * This method actually does several things:
+   * 1. Registers the phpsec::load() method as autoload function.
+   * 2. Opens the store. (connect to database etc.)
+   * 3. Set charset for multibyte functions.
+   * 4. Enable the phpSec session handler and starts a session (if session handler is enabled).
+   * 5. Set's or get a UID that is used by phpsecCache.
+   * 6. Decrypts cookies (if enabled).
+   *
+   * If no DSN (storage method) is configured. This method will stop after completing step 1.
+   *
+   * @return bool true
+   *   Will always return true.
    */
   public static function init() {
     /* First of all, register the autoloading function.
@@ -169,6 +181,7 @@ class phpsec {
     if(self::$_cookieenable === true) {
       phpsecCookie::detect();
     }
+    return true;
   }
 
   /**
