@@ -13,6 +13,15 @@
  *  Provides methods for hashing and salting of passwords.
  */
 class phpsecPw {
+  const phpsecPw_PBKDF2 = 'pbkdf2';
+  const phpsecPw_SHA256 = 'sha256';
+  const phpsecPw_SHA512 = 'sha512';
+
+  public static $_method       = self::phpsecPw_PBKDF2;
+  public static $_pbkdf2_c     = 4096;
+  public static $_pbkdf2_dkLen = 256;
+  public static $_pbkdf2_prf   = self::phpsecPw_SHA512;
+
   /**
    * Create a hashed version of a password, safe for storage in a database.
    * This function return a json encoded array that can be stored directly
@@ -20,7 +29,7 @@ class phpsecPw {
    * array(
    *   'hash'      => The hash created from the password and a salt.
    *   'salt'      => The salt that was used along with the password to create the hash.
-   *   'algo'      => The hashing algorythm used.
+   *   'algo'      => The hashing algorithm used.
    * )
    * The following injection methods exists:
    * before: The salt is placed diectly in front of the password, without using any
@@ -37,13 +46,25 @@ class phpsecPw {
    */
   public static function hash($password) {
     $salt     = phpsecRand::bytes(64);
-    $injected = self::inject($password, $salt);
-    $hash     = hash(phpsec::HASH_TYPE, $injected);
+    switch(self::$_method) {
+      case self::phpsecPw_PBKDF2:
+        $hash = phpsecCrypt::pbkdf2($password, $salt, self::$_pbkdf2_c, self::$_pbkdf2_dkLen, self::$_pbkdf2_prf);
+        /* phpsecCrypt::pbkdf2() returns a binary string. So let's base64 encode it.*/
+        $hash = base64_encode($hash);
+        /* We append the iteration count, derived key length and PRF as we need this later. */
+        $algo = 'pbkdf2:'.self::$_pbkdf2_c.':'.self::$_pbkdf2_dkLen.':'.self::$_pbkdf2_prf;
+      break;
+      default:
+        $injected = self::inject($password, $salt);
+        $hash     = hash(self::$_method, $injected);
+        $algo     = self::$_method;
+    }
+
 
     $return = array(
       'hash'      => $hash,
       'salt'      => base64_encode($salt),
-      'algo'      => phpsec::HASH_TYPE,
+      'algo'      => $algo,
     );
     return json_encode($return);
   }
@@ -75,12 +96,8 @@ class phpsecPw {
       'algo'  => true,
     );
 
+    /* Check structure of array. */
     if($data !== null && phpsec::arrayCheck($data, $dataStructure)) {
-      /**
-       * Ok, we are pretty sure that this is a good array. Now inject the salt
-       * into the user supplied password, to see if it matches the registerd
-       * data from $dbPassword.
-       */
 
       /* Try to Base64 decode the salt.  base64_decode() will return false
        * if the string passed is not Base64 encoded. This way we can separate
@@ -91,10 +108,39 @@ class phpsecPw {
         $data['salt'] = $decodedSalt;
       }
 
-      $pwInjected = self::inject($password, $data['salt']);
-      /* Create a hash and see if it matches. */
-      if(hash($data['algo'], $pwInjected) == $data['hash']) {
-        return true;
+      /**
+       * We do a switch on the 6 first characters on the used hashing method.
+       * This way we are able to catch when pbkdf2 is used, since this has
+       * it's iteration count, derived key length and PRF attached to it:
+       * "pbkdf2:iteration count:derived key length:PRF"
+       */
+      switch(substr($data['algo'], 0, 6)) {
+        case self::phpsecPw_PBKDF2:
+          /* As described above, we need to seperate out the iteration count
+           * and derived key length. */
+          list($method, $iterationCount, $dkLen, $prf) = explode(':', $data['algo']);
+          /* Just to make sure anything fishy isn't going on. */
+          if(!is_numeric($iterationCount) || !is_numeric($dkLen)) {
+            return false;
+          }
+
+          /* Create a new derived key, with the iteration count and derived key length
+           * that were used when generating the original dk. */
+          $dk = phpsecCrypt::pbkdf2($password, $data['salt'], $iterationCount, $dkLen, $prf);
+
+          /* Check the new dk against the old base64 encoded dk. */
+          if($dk === base64_decode($data['hash'])) {
+            return true;
+          }
+        break;
+
+        default:
+          /* If not pbkdf2, we assume normal hash. */
+          $pwInjected = self::inject($password, $data['salt']);
+          /* Create a hash and see if it matches. */
+          if(hash($data['algo'], $pwInjected) == $data['hash']) {
+            return true;
+          }
       }
     } else {
       /* Invalid array supplied. */
