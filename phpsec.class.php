@@ -44,8 +44,16 @@ class phpsec {
    */
   public static $store       = null;
 
-  /* Constants. */
+  /**
+   * Constant: Hash method to use.
+   * This is on it's way to be deprecated.
+   */
   const HASH_TYPE      = 'sha256';
+
+  /**
+   * Constant: Version number. Isn't really
+   * used for something... yet.
+   */
   const VERSION        = '0.2-beta';
 
   /**
