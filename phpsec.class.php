@@ -49,7 +49,13 @@ class phpsec {
   const VERSION        = '0.2-beta';
 
   /**
-   * Autoload function to load required files when needed.
+   * Autoload methos to load required files when needed.
+   *
+   * @param string $class
+   *   Class that PHP is looking for.
+   *
+   * @return bool
+   *   True on success, false on error.
    */
   public static function load($class) {
     $basePath = dirname(__FILE__);
@@ -80,9 +86,12 @@ class phpsec {
       $classes = array_merge($classes['stateful'], $classes['stateless']);
     }
 
+    /* Check if we know about the class, and if the file exists. */
     if(isset($classes[$class]) && file_exists($basePath.'/phpsec/'.$classes[$class])) {
       require_once $basePath.'/phpsec/'.$classes[$class];
+      return true;
     }
+    return false;
   }
 
   /**
