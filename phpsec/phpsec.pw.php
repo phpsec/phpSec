@@ -31,11 +31,6 @@ class phpsecPw {
    *   'salt'      => The salt that was used along with the password to create the hash.
    *   'algo'      => The hashing algorithm used.
    * )
-   * The following injection methods exists:
-   * before: The salt is placed diectly in front of the password, without using any
-   * seperation characters.
-   * after: The salt is placed directly after the password without any seperation
-   * characters.
    *
    * @param string $password
    *   The password to hash.
@@ -78,14 +73,14 @@ class phpsecPw {
    *
    * @param string $dbPassword
    *   The json string fetched from the database, in the exact format
-   *   as created by pwHash().
+   *   as created by phpsecPw::hash().
    *
    * @return boolean
    *   True on password match, false otherwise.
    */
   public static function check($password, $dbPassword) {
     /**
-     * Unserialize registerd password array and validate it to ensure
+     * Unserialize registered password array and validate it to ensure
      * we got a valid array.
      */
     $data = json_decode($dbPassword, true);
