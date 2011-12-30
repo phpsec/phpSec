@@ -14,11 +14,18 @@
  */
 class phpsecPw {
   const phpsecPw_PBKDF2 = 'pbkdf2';
+  const phpsecPw_BCRYPT = 'bcrypt';
   const phpsecPw_SHA256 = 'sha256';
   const phpsecPw_SHA512 = 'sha512';
 
   public static $_method       = self::phpsecPw_PBKDF2;
-  public static $_pbkdf2_c     = 4096;
+
+  /**
+   * Iteration count that PBKDF2 will use.
+   * 8192 is just a little slower than a work load of 11 when using bcrypt.
+   * Oh, slow is good.
+   */
+  public static $_pbkdf2_c     = 8192;
   public static $_pbkdf2_dkLen = 256;
   public static $_pbkdf2_prf   = self::phpsecPw_SHA512;
 
