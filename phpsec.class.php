@@ -73,7 +73,12 @@ class phpsec {
       'phpsecToken'           => 'phpsec.token.php',
     );
 
-    $classes = array_merge($classes['stateful'], $classes['stateless']);
+    /* If we don't have a DSN, only get the parts of phpSec that don't need storage.  */
+    if(self::$_dsn === null) {
+      $classes = $classes['stateless'];
+    } else {
+      $classes = array_merge($classes['stateful'], $classes['stateless']);
+    }
 
     if(isset($classes[$class]) && file_exists($basePath.'/phpsec/'.$classes[$class])) {
       require_once $basePath.'/phpsec/'.$classes[$class];
@@ -92,6 +97,11 @@ class phpsec {
        spl_autoload_register($autoLoadFunction);
      }
 
+    /* Autoloader all good to go. If we don't have a storage set
+     * we can skip the rest of this method. */
+    if(self::$_dsn === null) {
+      return true;
+    }
     /* Open store. */
     list($storeType, $storeDest) = explode(':', self::$_dsn);
     switch($storeType) {
@@ -109,7 +119,7 @@ class phpsec {
     mb_internal_encoding(self::$_charset);
     mb_regex_encoding(self::$_charset);
 
-    /* Register the custom session handler if enabled. */
+    /* Enable the custom session handler if enabled. */
     if(self::$_sessenable === true) {
       ini_set('session.save_handler', 'user');
       session_set_save_handler(
