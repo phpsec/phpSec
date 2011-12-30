@@ -65,13 +65,18 @@ class phpsecRand {
    * Generate a random string.
    *
    * @param integer $len
+   * @param string $_charset
    * @return string
    */
-  public static function str($len) {
+  public static function str($len, $_charset = null) {
+    if($_charset == null) {
+      $_charset = self::$_charset;
+    }
+
     $str = '';
     for ($i = 0; $i < $len; $i++) {
-      $pos = self::int(0,strlen(self::$_charset)-1);
-      $str .= self::$_charset[$pos];
+      $pos = self::int(0,strlen($_charset)-1);
+      $str .= $_charset[$pos];
     }
     return $str;
   }
