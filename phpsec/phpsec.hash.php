@@ -16,13 +16,39 @@ class phpsecHash {
   const SHA256 = '$5$';
   const SHA512 = '$6$';
 
+  /**
+   * Default hashing method.
+   */
   public static $_method       = self::SHA256;
+
+  /**
+   * PBKDF2: Iteration count.
+   */
   public static $_pbkdf2_c     = 8192;
+
+  /**
+   * PBKDF2: Derived key length.
+   */
   public static $_pbkdf2_dkLen = 128;
+
+  /**
+   * PBKDF2: Underlying hash method.
+   */
   public static $_pbkdf2_prf   = 'sha256';
+
+  /**
+   * Bcrypt: Work factor.
+   */
   public static $_bcrypt_cost  = 12;
+
+  /**
+   * SHA2: Number of rounds.
+   */
   public static $_sha2_c       = 6000;
 
+  /**
+   * Salt charsets.
+   */
   public static $charsets = array(
     'bcrypt' => './abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
     'sha2'   => './abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
