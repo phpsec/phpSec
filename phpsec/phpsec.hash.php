@@ -19,7 +19,7 @@ class phpsecHash {
   /**
    * Default hashing method.
    */
-  public static $_method       = self::SHA256;
+  public static $_method       = self::PBKDF2;
 
   /**
    * PBKDF2: Iteration count.
