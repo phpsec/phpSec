@@ -10,7 +10,8 @@
  */
 
 /**
- *  Provides methods for hashing and salting of passwords.
+ *  Provides methods for hashing and salting of passwords. Note: This class is deprecated. Use phpsecHash instead.
+ *  @see phpsecHash
  */
 class phpsecPw {
   const phpsecPw_PBKDF2 = 'pbkdf2';
