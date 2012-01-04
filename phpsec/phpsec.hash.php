@@ -9,6 +9,9 @@
   @package   phpSec
  */
 
+/**
+ * Implements password hashing using crypt().
+ */
 class phpsecHash {
 
   const PBKDF2 = '$pbkdf2$';
@@ -54,6 +57,15 @@ class phpsecHash {
     'sha2'   => './abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
   );
 
+  /**
+   * Creates a salted hash from a string.
+   *
+   *   @param string $str
+   *     String to hash.
+   *
+   *   @return string
+   *     Returns hashed string, or false on error.
+   */
   public static function make($str) {
 
     switch(self::$_method) {
@@ -90,6 +102,18 @@ class phpsecHash {
     return false;
   }
 
+  /**
+   * Check a string against a hash.
+   *
+   * @param string $str
+   *   String to check.
+   *
+   * @param string $hash
+   *   The hash to check the string against.
+   *
+   * @return bool
+   *   Returns true on match.
+   */
   public static function check($str, $hash) {
     $regex_pattern = '/^\$[a-z, 1-6]{1,6}\$/i';
     preg_match($regex_pattern, $hash, $matches);
