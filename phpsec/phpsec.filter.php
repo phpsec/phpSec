@@ -102,11 +102,11 @@ class phpsecFilter {
       case 'escapeAll':
         /* HTML and special characters are escaped from the string
            before it is used. */
-        return htmlentities($str, ENT_QUOTES, self::$_charset);
+        return htmlentities($str, ENT_QUOTES, phpSec::$_charset);
       case 'escape':
         /* Only HTML tags are escaped from the string. Special characters
            is kept as is. */
-        return htmlspecialchars($str, ENT_NOQUOTES, self::$_charset);
+        return htmlspecialchars($str, ENT_NOQUOTES, phpSec::$_charset);
       case 'url':
         /* Encode a string according to RFC 3986 for use in a URL. */
         return rawurlencode($str);
