@@ -1,20 +1,17 @@
 phpSec - PHP security library
 =============================
-* phpSec is a PHP5 library that provides you as a developer with a set of
-commonly (and some that should be) used methods, protecting your application
-against various attacks.
+* phpSec is a open-source [PHP](http://php.net) security library that takes care
+  of the common security tasks a web developer faces.
 
 Features
 --------
-*    [XSS][1] filter.
-*    [CSRF][2] protection.
-*    Password hashing helper functions.
-*    Logging functions.
-*    Data encryption.
-*    Enhanced session security.
-*    Session encryption.
-*    Random data generator.
-*    [Yubikey][3] integration.
+* Data encryption
+* XSS filter
+* Password hashing
+* Secure session handler
+* CSRF protection
+* Yubikey integration
+* Random data generator
 
 
 Getting started
@@ -26,16 +23,16 @@ System requirements
 -------------------
 PHP 5.3.0 or greater with the following extensions is required to use phpSec:
 
-*   Mcrypt
-*   Hash
+* Mcrypt
+* Hash
 
 
 Getting help
 ------------
 If you need any help with using phpSec or need to report a bug/security issue or you
 want to request a new feature please use the [phpSec issues](https://github.com/phpsec/phpSec/issues).
-Make sure you label the issue with a appropriate label.
 
-[1]:http://en.wikipedia.org/wiki/Cross-site_scripting        "Wikipedia on XSS"
-[2]:http://en.wikipedia.org/wiki/Cross-site_request_forgery  "Wikipedia on CSRF"
-[3]:http://yubico.com                                        "Yubikey"
+Support phpSec
+--------------
+If you like phpSec please consider a small donation of [bitcoins](http://bitcoin.org) to:
+173kCNeud3BrTY4mQnAiC6jqsTfvbpXfhM
