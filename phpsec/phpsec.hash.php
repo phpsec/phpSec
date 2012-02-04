@@ -53,8 +53,7 @@ class phpsecHash {
    * Salt charsets.
    */
   public static $charsets = array(
-    'bcrypt' => './abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-    'sha2'   => './abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    'itoa64' => './abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
   );
 
   /**
@@ -70,7 +69,7 @@ class phpsecHash {
 
     switch(self::$_method) {
       case self::BCRYPT:
-        $saltRnd = phpsecRand::str(22, self::$charsets['bcrypt']);
+        $saltRnd = phpsecRand::str(22, self::$charsets['itoa64']);
         $salt = sprintf('$2a$%s$%s', self::$_bcrypt_cost, $saltRnd);
         $hash = crypt($str, $salt);
       break;
@@ -90,7 +89,7 @@ class phpsecHash {
 
       case self::SHA256:
       case self::SHA512:
-        $saltRnd = phpsecRand::str(16, self::$charsets['sha2']);
+        $saltRnd = phpsecRand::str(16, self::$charsets['itoa64']);
         $salt = sprintf('%srounds=%s$%s', self::$_method, self::$_sha2_c, $saltRnd);
         $hash = crypt($str, $salt);
       break;
