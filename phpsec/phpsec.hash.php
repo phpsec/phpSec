@@ -22,12 +22,12 @@ class phpsecHash {
   /**
    * Default hashing method.
    */
-  public static $_method       = self::PBKDF2;
+  public static $_method = self::PBKDF2;
 
   /**
    * PBKDF2: Iteration count.
    */
-  public static $_pbkdf2_c     = 8192;
+  public static $_pbkdf2_c = 8192;
 
   /**
    * PBKDF2: Derived key length.
@@ -37,17 +37,17 @@ class phpsecHash {
   /**
    * PBKDF2: Underlying hash method.
    */
-  public static $_pbkdf2_prf   = 'sha256';
+  public static $_pbkdf2_prf = 'sha256';
 
   /**
    * Bcrypt: Work factor.
    */
-  public static $_bcrypt_cost  = 12;
+  public static $_bcrypt_cost = 12;
 
   /**
    * SHA2: Number of rounds.
    */
-  public static $_sha2_c       = 6000;
+  public static $_sha2_c = 6000;
 
   /**
    * Salt charsets.
