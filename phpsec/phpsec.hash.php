@@ -120,13 +120,10 @@ class phpsecHash {
     switch($method) {
       case self::PBKDF2:
         $param = array();
-        $hashPart = explode('$', $hash);
-        parse_str($hashPart[2], $param);
+        list( , , $params, $hash, $salt) = explode('$', $hash);
+        parse_str($params, $param);
 
-        $hash = base64_decode($hashPart[3]);
-        $salt = base64_decode($hashPart[4]);
-
-        if($hash === phpsecCrypt::pbkdf2($str, $salt, $param['c'], $param['dk'], $param['f'])) {
+        if(base64_decode($hash) === phpsecCrypt::pbkdf2($str, base64_decode($salt), $param['c'], $param['dk'], $param['f'])) {
           return true;
         }
         return false;
