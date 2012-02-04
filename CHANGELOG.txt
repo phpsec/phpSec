@@ -1,3 +1,12 @@
+January 4. 2012 - xqus
+  beta-0.3 release.
+- [#66] phpSec can now run without storage configured.
+- [#58] phpsecCrypt now pads data by default.
+- [#81] phpsecPw now supports PBKDF2, and uses it as default.
+- Added new password hashing class: phpsecHash. phpsecPw should not be used
+  anymore.
+- Fixed phpsecFilter::f().
+
 December 21. 2011 - xqus
   beta-0.2 release.
 - [#43] Implemented PKCS7 padding in phpsecCrypt.
