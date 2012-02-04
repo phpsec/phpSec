@@ -65,7 +65,7 @@ class phpsecHash {
    *   @return string
    *     Returns hashed string, or false on error.
    */
-  public static function make($str) {
+  public static function create($str) {
 
     switch(self::$_method) {
       case self::BCRYPT:
