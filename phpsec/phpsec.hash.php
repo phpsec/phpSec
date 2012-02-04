@@ -10,7 +10,7 @@
  */
 
 /**
- * Implements password hashing using crypt().
+ * Implements password hashing using crypt() with PBKDF2 support.
  */
 class phpsecHash {
 
