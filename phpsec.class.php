@@ -54,7 +54,7 @@ class phpsec {
    * Constant: Version number. Isn't really
    * used for something... yet.
    */
-  const VERSION        = '0.3-dev';
+  const VERSION        = '0.3-beta';
 
   /**
    * Autoload methos to load required files when needed.
