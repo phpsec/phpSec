@@ -17,12 +17,12 @@ class phpsec {
   /**
    * Config: Charset used for filter methods.
    */
-  public static $_charset    = 'utf-8';
+  public static $_charset = 'utf-8';
 
   /**
    * Config: Database Source Name.
    */
-  public static $_dsn        = null;
+  public static $_dsn = null;
 
   /**
    * Config: Enable phpSec session handler.
@@ -37,24 +37,24 @@ class phpsec {
   /**
    * User identifier.
    */
-  public static $uid         = null;
+  public static $uid = null;
 
   /**
    * Storage object.
    */
-  public static $store       = null;
+  public static $store = null;
 
   /**
    * Constant: Hash method to use.
    * This is on it's way to be deprecated.
    */
-  const HASH_TYPE      = 'sha256';
+  const HASH_TYPE = 'sha256';
 
   /**
    * Constant: Version number. Isn't really
    * used for something... yet.
    */
-  const VERSION        = '0.3-beta';
+  const VERSION = '0.3-beta';
 
   /**
    * Autoload methos to load required files when needed.
