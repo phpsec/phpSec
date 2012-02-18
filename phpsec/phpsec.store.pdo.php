@@ -3,7 +3,7 @@
   phpSec - A PHP security library
 
   @author    Audun Larsen <larsen@xqus.com>
-  @copyright Copyright (c) Audun Larsen, 2011
+  @copyright Copyright (c) Audun Larsen, 2011, 2012
   @link      https://github.com/phpsec/phpSec
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
@@ -142,7 +142,7 @@ class phpsecStorePdo extends phpsecStore {
     /* Calculate expected MAC. */
     $mac = phpsecCrypt::pbkdf2($data['data'], $id, 1000, 32);
 
-    /* Compare... */
+    /* Compare MAC */
     if($mac != $data['mac']) {
       phpsec::error('Message authentication code invalid while reading store');
       return false;
@@ -152,6 +152,9 @@ class phpsecStorePdo extends phpsecStore {
     return unserialize($data['data']);
   }
 
+  /**
+   * @see phpsecStore::write()
+   */
   public function write($type, $id, $data) {
     /* Delete existing data first, to prevent a huge database. */
     $this->delete($type, $id);
