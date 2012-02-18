@@ -3,7 +3,7 @@
   phpSec - A PHP security library
 
   @author    Audun Larsen <larsen@xqus.com>
-  @copyright Copyright (c) Audun Larsen, 2011
+  @copyright Copyright (c) Audun Larsen, 2011, 2012
   @link      https://github.com/phpsec/phpSec
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
@@ -72,6 +72,7 @@ abstract class phpsecStore {
 
   /**
    * List existing object IDs for a store type.
+   *
    * This method should return an array with all id's of the
    * selected type.
    *
@@ -84,6 +85,7 @@ abstract class phpsecStore {
 
   /**
    * Read metadata for object in store.
+   *
    * The object returned should have the following structure:
    *   obj->id    Id of the object.
    *   obj->mac   Message authentication code.
