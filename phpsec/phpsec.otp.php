@@ -13,8 +13,6 @@
  * Provides one time password functionality.
  */
 class phpsecOtp {
-  const HASH_TYPE = 'sha256';
-
   /**
    * Generate a one-time-password (OTP). The password is only valid for a given time,
    * and must be delivered to the user instantly. The password is also only valid
@@ -38,14 +36,20 @@ class phpsecOtp {
    *   One time password that should be delivered to the user by for example email or SMS.
    *
    */
-  public static function generate($action, $data = null, $length = 6, $ttl = 480) {
-    $otp['pw'] = phpsecRand::str($length);
+  public static function generate($action, $data = '', $length = 6, $ttl = 480) {
+    $pw = phpsecRand::str($length);
+
+    $otp['pw'] = phpsecHash::create($pw);
+
     if($data !== null) {
-      $otp['hash'] = hash(self::HASH_TYPE, serialize($data));
+     $otp['data'] = phpsecHash::create(serialize($data));
+    } else {
+      $otp['data'] = $data;
     }
+
     phpsecCache::cacheSet('otp-'.$action, $otp, $ttl);
 
-    return $otp['pw'];
+    return $pw;
   }
 
   /**
@@ -61,16 +65,13 @@ class phpsecOtp {
    *   See phpsecOtp::generate().
    *
    */
-  public static function validate($otp, $action, $data = null) {
+  public static function validate($otp, $action, $data = '') {
     $cache = phpsecCache::cacheGet('otp-'.$action);
-    /* This is totally backwards. We check for what should not have been and
-     * return false if we stubmle across something fishy. Unless something good happened,
-     * and we somehow did't find anything wrong. Then we return true. But if something really
-     * bad happens we still return false. */
+
     if($cache !== false) {
-      if($cache['pw'] !== $otp) {
+      if(!phpsecHash::check($otp, $cache['pw'])) {
         return false;
-      } elseif(isset($cache['hash']) && $cache['hash'] !== hash(self::HASH_TYPE, serialize($data))) {
+      } elseif(!phpsecHash::check(serialize($data), $cache['data'])) {
         return false;
       }
       phpsecCache::cacheRem('otp-'.$action);
