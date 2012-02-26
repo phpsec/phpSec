@@ -80,6 +80,7 @@ class phpsec {
     $classes['stateful'] = array(
       'phpsecCache'           => 'phpsec.cache.php',
       'phpsecOtp'             => 'phpsec.otp.php',
+      'phpsecOtpcard'         => 'phpsec.otpcard.php',
       'phpsecSession'         => 'phpsec.session.php',
       'phpsecStore'           => 'phpsec.store.php',
       'phpsecStoreFilesystem' => 'phpsec.store.filesystem.php',
