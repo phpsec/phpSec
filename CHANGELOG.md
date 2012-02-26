@@ -3,7 +3,7 @@ phpSec changelog
 
 beta-0.4
 --------
-* [ #83 ] Added class phpsecOtpcard and moved PS OTP functionality from phpsecOtp
+* Added class phpsecOtpcard and moved PS OTP functionality from phpsecOtp. Fixes #83.
    to it.
 * [ #84, #85 ] Improvements to phpsecOtp.
 
