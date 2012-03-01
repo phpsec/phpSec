@@ -29,8 +29,7 @@ class phpsecOtpcard {
       $card['usable'][$i] = true;
     }
 
-    $card = self::hash($card);
-    self::save($card);
+    $card = self::save($card);
 
     return $card['id'];
   }
@@ -56,9 +55,7 @@ class phpsecOtpcard {
       if($card['list'][$selected] == $otp) {
         unset($card['usable'][$selected]);
 
-        $card = self::hash($card);
         self::save($card);
-
         return true;
       }
     }
@@ -119,28 +116,32 @@ class phpsecOtpcard {
   }
 
   /**
-   * Save a password card. Can only be called after phpsecOtp::cardHash().
+   * Save a password card.
    *
    * @param array $card
    *   Array containing a already hashed card.
    *
-   * @return bolean
-   *   Returns true on success and false on error.
+   * @return mixed
+   *   Returns card arryar on success and false on error.
    */
   private static function save($card) {
+    $card = self::hash($card);
+
     /* TODO: Encrypt before saving. */
-    return phpsec::$store->write('otp-card', $card['id'], $card);
+    if(phpsec::$store->write('otp-card', $card['id'], $card)) {
+      return $card;
+    }
+    return false;
   }
 
   /**
    * Prepeare the password card for saving.
-   * Must be called before phpsecOtp::cardSave().
    *
    * @param array $card
    *   Array containing the card data to hash.
    *
    * @return array
-   *   Arrray containing hashed card data. Ready for phpsecOtp::cardSave().
+   *   Array containing hashed card data. Ready for phpsecOtpcard::save().
    */
   private static function hash($card) {
     /* We are encoding the password list just because we want to make
