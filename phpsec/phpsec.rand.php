@@ -3,7 +3,7 @@
   phpSec - A PHP security library
 
   @author    Audun Larsen <larsen@xqus.com>
-  @copyright Copyright (c) Audun Larsen, 2011
+  @copyright Copyright (c) Audun Larsen, 2011, 2012
   @link      https://github.com/phpsec/phpSec
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
@@ -23,7 +23,7 @@ class phpsecRand {
    */
   public static function bytes($len) {
     /* Code inspired by this blogpost by Enrico Zimuel
-     * http://www.zimuel.it/blog/2011/01/strong-cryptography-in-php/ */
+     * http://www.zimuel.it/en/strong-cryptography-in-php/ */
     $strong = false;
     if(function_exists('openssl_random_pseudo_bytes')) {
       $rnd = openssl_random_pseudo_bytes($len, $strong);
