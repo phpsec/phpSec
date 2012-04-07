@@ -3,7 +3,7 @@
   phpSec - A PHP security library
 
   @author    Audun Larsen <larsen@xqus.com>
-  @copyright Copyright (c) Audun Larsen, 2011
+  @copyright Copyright (c) Audun Larsen, 2011, 2012
   @link      https://github.com/phpsec/phpSec
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
@@ -24,7 +24,7 @@ class phpsecFilter {
    * &variables: url mode of phpsec::f() is used.
    *
    * @see phpsec::f()
-   * @see http://phpsec.xqus.com/node/2424
+   * @see https://phpseclib.com/manual/filter
    * @see http://www.faqs.org/rfcs/rfc3986
    *
    * @param string $str
@@ -84,7 +84,7 @@ class phpsecFilter {
    * is kept as is.
    * url: Encode a string according to RFC 3986 for use in a URL.
    *
-   * @see http://phpsec.xqus.com/node/2424
+   * @see https://phpseclib.com/manual/filter
    * @see http://www.faqs.org/rfcs/rfc3986
    *
    * @param string $str
