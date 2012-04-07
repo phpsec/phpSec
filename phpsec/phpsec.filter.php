@@ -62,7 +62,7 @@ class phpsecFilter {
           $safeData = self::f($data, 'url');
           break;
         default:
-          self::error('Unknown variable type', E_USER_NOTICE);
+          phpsec::error('Unknown variable type', E_USER_NOTICE);
           break;
       }
       if($safeData !== false) {
@@ -111,7 +111,7 @@ class phpsecFilter {
         /* Encode a string according to RFC 3986 for use in a URL. */
         return rawurlencode($str);
       default:
-        self::error('Unknown variable type', E_USER_NOTICE);
+        phpsec::error('Unknown variable type', E_USER_NOTICE);
     }
   }
 }
