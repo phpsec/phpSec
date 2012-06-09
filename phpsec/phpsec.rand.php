@@ -31,15 +31,7 @@ class phpsecRand {
         return $rnd;
       }
     }
-    
     /* Either we dont have the OpenSSL library or the data returned was not
-     * considered secure. Fall back on this less secure code. */
-    if(function_exists('mcrypt_create_iv')) {
-      $rnd = mcrypt_create_iv($len, MCRYPT_RAND);
-      return $rnd;
-    }
-    
-    /* Either we dont have the MCrypt library and OpenSSL library or the data returned was not
      * considered secure. Fall back on this less secure code. */
     $rnd = '';
     for ($i=0;$i<$len;$i++) {
