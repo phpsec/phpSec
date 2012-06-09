@@ -16,7 +16,7 @@ class phpsecRand {
   public static $_charset = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
   /**
-   * Generate random data.
+   * Generate pseudorandom bytes.
    *
    * @param integer $len
    * @return binary
