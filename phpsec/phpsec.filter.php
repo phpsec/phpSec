@@ -83,6 +83,7 @@ class phpsecFilter {
    * escape: Only HTML is escaped from the string. Special characters
    * is kept as is.
    * url: Encode a string according to RFC 3986 for use in a URL.
+   * filename: Escape a string so it's safe to be used as filename.
    *
    * @see https://phpseclib.com/manual/filter
    * @see http://www.faqs.org/rfcs/rfc3986
@@ -110,6 +111,9 @@ class phpsecFilter {
       case 'url':
         /* Encode a string according to RFC 3986 for use in a URL. */
         return rawurlencode($str);
+      case 'filename':
+        /* Escape a string so it's safe to be used as filename. */ 
+        return str_replace('/', '_', $str);      
       default:
         phpsec::error('Unknown variable type', E_USER_NOTICE);
     }
