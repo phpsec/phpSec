@@ -74,6 +74,7 @@ class phpsecCrypt {
     if(self::$_padding === true) {
       $block = mcrypt_enc_get_block_size($td);
       $serializedData = self::pad($block, $serializedData);
+      $encrypted['padding'] = 'PKCS7';
     }
 
     $encrypted['algo']  = self::$_algo;                                        /* Algorithm used to encrypt. */
@@ -83,7 +84,6 @@ class phpsecCrypt {
     $encrypted['mac']   = base64_encode(                                       /* The message authentication code. Used to make sure the */
                             self::pbkdf2($encrypted['cdata'], $key, 1000, 32)  /* message is valid when decrypted. */
                           );
-
     return json_encode($encrypted);
   }
 
@@ -111,7 +111,7 @@ class phpsecCrypt {
       'mac'   => true,
     );
 
-    if($data === NULL || phpsec::arrayCheck($data, $dataStructure) !== true) {
+    if($data === NULL || phpsec::arrayCheck($data, $dataStructure, false) !== true) {
       phpsec::error('Invalid data passed to decrypt()');
       return false;
     }
