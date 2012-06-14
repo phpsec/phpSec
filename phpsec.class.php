@@ -196,6 +196,8 @@ class phpsec {
   /**
    * Provides the library a simple way of reporting errors to the developer using PHPs error
    * handler.
+   * 
+   * @see http://php.net/manual/en/errorfunc.constants.php
    *
    * @param string $msg
    *   String containing the error message
