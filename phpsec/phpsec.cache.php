@@ -3,14 +3,14 @@
   phpSec - A PHP security library
 
   @author    Audun Larsen <larsen@xqus.com>
-  @copyright Copyright (c) Audun Larsen, 2011
+  @copyright Copyright (c) Audun Larsen, 2011, 2012
   @link      https://github.com/phpsec/phpSec
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
 
 /**
- * Provides us with simple cahce engine.
+ * Provides us with a simple cahce engine.
  * Only intended for use by phpSec, but feel free to use
  * it if you want.
  */
@@ -95,7 +95,13 @@ class phpsecCache {
     }
     return true;
   }
-
+  
+  /**
+   * Get cache ID.
+   * 
+   * @param string $name
+   *   Name to get ID from.
+   */
   private static function cacheId($name) {
     return $name.'_'.hash(self::HASH_TYPE, phpsec::$uid);
   }
