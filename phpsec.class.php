@@ -28,6 +28,7 @@ class phpsec {
    * Config: Enable phpSec session handler.
    */
   public static $_sessenable = true;
+  public static $_sessIdRegen = true;
 
   /**
    * Config: Enable phpSec secure cookies.
@@ -151,6 +152,7 @@ class phpsec {
 
     /* Enable the custom session handler if enabled. */
     if(self::$_sessenable === true) {
+      phpsecSession::$_sessIdRegen = phpsec::$_sessIdRegen;
       ini_set('session.save_handler', 'user');
       session_set_save_handler(
         'phpsecSession::open',

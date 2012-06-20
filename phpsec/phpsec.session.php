@@ -13,12 +13,13 @@
  * Implements a session handler to save session data encrypted.
  */
 class phpsecSession {
+  public  static $_sessIdRegen;
   private static $_savePath;
   private static $_name;
   private static $_keyCookie;
   private static $_secret;
   private static $_currID;
-  private static $_newID;
+  private static $_newID;  
 
   /**
    * Open a session.
@@ -39,7 +40,11 @@ class phpsecSession {
     } else {
       self::$_currID = null;
     }
-    self::$_newID  = phpsecRand::str(128);
+    if(self::$_sessIdRegen === true || self::$_currID === null) {
+    	self::$_newID = phpsecRand::str(128);
+    } else {
+    	self::$_newID = self::$_currID;
+    }
 
     /* Set cookie with new session ID. */
     $cookieParam = session_get_cookie_params();
@@ -106,7 +111,9 @@ class phpsecSession {
     $encrypted = phpsecCrypt::encrypt($data, self::$_secret);
 
     /* Destroy old session. */
-    self::destroy(self::$_currID);
+    if(self::$_newID != self::$_currID) {
+    	self::destroy(self::$_currID);
+    }    
 
     /* Write new session, with new ID. */
     return phpsec::$store->write('session', self::$_newID, $encrypted);
