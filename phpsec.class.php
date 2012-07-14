@@ -209,7 +209,8 @@ class phpsec {
    *   If none is specified E_USER_WARNING is used.
    */
   public static function error($msg, $level = E_USER_WARNING) {
-    $callee = next(debug_backtrace());
+    $trace = debug_backtrace();
+    $callee = next($trace);
     trigger_error($msg.'. (Called from <strong>'.$callee['file'].' line '.$callee['line'].'</strong>)', $level);
   }
 
