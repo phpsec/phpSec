@@ -13,6 +13,8 @@
  * Provides one time password functionality.
  */
 class phpsecOtp {
+  public static $_charset = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  
   /**
    * Generate a one-time-password (OTP). The password is only valid for a given time,
    * and must be delivered to the user instantly. The password is also only valid
@@ -45,7 +47,7 @@ class phpsecOtp {
 	    $uid = phpsec::$uid;
 	  }
 	
-	  $pw = phpsecRand::str($length);
+	  $pw = phpsecRand::str($length, self::$_charset);
 
     $otp['pw']   = phpsecHash::create($pw);
     $otp['data'] = phpsecHash::create(serialize($data));
