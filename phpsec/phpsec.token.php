@@ -3,7 +3,7 @@
   phpSec - A PHP security library
 
   @author    Audun Larsen <larsen@xqus.com>
-  @copyright Copyright (c) Audun Larsen, 2011
+  @copyright Copyright (c) Audun Larsen, 2011, 2012
   @link      https://github.com/phpsec/phpSec
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
@@ -13,6 +13,8 @@
  * Provides CSRF protection methods.
  */
 class phpsecToken {
+  public static $_charset = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  
   /**
    * Generate and save a one-time-token for a form. Used to protect against
    * CSRF attacks.
@@ -27,7 +29,7 @@ class phpsecToken {
    *   The token to supply with the form data.
    */
   public static function set($name, $ttl = 3600) {
-    $token = phpsecRand::str(32);
+    $token = phpsecRand::str(32, self::$_charset);
     /* Save the token to the cahce. */
     phpsecCache::cacheSet('token-'.$name, $token, $ttl);
     return $token;
