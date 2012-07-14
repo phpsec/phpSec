@@ -22,6 +22,10 @@ class phpsecOtp {
    *   The action to generate a OTP for. This should be as specific as possible.
    *   Used to ensure that the OTP is used for the intended action.
    *
+   * @param string $uid
+   *   User identifier. Default is a session identifier. Can be set to a username or user id
+   *   if you want the OTP to be valid outside the session active when creating it.
+   *
    * @param array $data
    *   Optional array of data that belongs to $action. Used to ensure that the action
    *   is performed with the same data as when the OTP was generated.
@@ -36,20 +40,22 @@ class phpsecOtp {
    *   One time password that should be delivered to the user by for example email or SMS.
    *
    */
-  public static function generate($action, $data = '', $length = 6, $ttl = 480) {
-    $pw = phpsecRand::str($length);
+  public static function generate($action, $uid = null, $data = null, $length = 6, $ttl = 480) {
+    if($uid === null) {
+	    $uid = phpsec::$uid;
+	  }
+	
+	  $pw = phpsecRand::str($length);
 
-    $otp['pw'] = phpsecHash::create($pw);
+    $otp['pw']   = phpsecHash::create($pw);
+    $otp['data'] = phpsecHash::create(serialize($data));
+    $otp['ttl']  = time() + $ttl;
 
-    if($data !== null) {
-     $otp['data'] = phpsecHash::create(serialize($data));
+    if( phpsec::$store->write('otp', self::storeId($uid, $action), $otp)) {
+      return $pw;
     } else {
-      $otp['data'] = $data;
+      return false;
     }
-
-    phpsecCache::cacheSet('otp-'.$action, $otp, $ttl);
-
-    return $pw;
   }
 
   /**
@@ -61,23 +67,36 @@ class phpsecOtp {
    * @param string $action
    *   See phpsecOtp::generate().
    *
+   * @param string $uid
+   *   See phpsecOtp::generate().
+   *
    * @param array $data
    *   See phpsecOtp::generate().
    *
    */
-  public static function validate($otp, $action, $data = '') {
-    $cache = phpsecCache::cacheGet('otp-'.$action);
+  public static function validate($otp, $action, $uid = null, $data = null) {
+    if($uid === null) {
+	    $uid = phpsec::$uid;
+	  }
 
-    if($cache !== false) {
-      if(!phpsecHash::check($otp, $cache['pw'])) {
-        return false;
-      } elseif(!phpsecHash::check(serialize($data), $cache['data'])) {
+    $store = phpsec::$store->read('otp', self::storeId($uid, $action));
+
+    if($store !== false) {
+      if($store['ttl'] < time()) {
+        phpsec::$store->delete('otp', self::storeId($uid, $action));
         return false;
       }
-      phpsecCache::cacheRem('otp-'.$action);
-      return true;
+      
+      if(phpsecHash::check($otp, $store['pw']) && phpsecHash::check(serialize($data), $store['data'])) {
+        phpsec::$store->delete('otp', self::storeId($uid, $action));
+        return true;
+      }
     }
     return false;
+  }
+  
+  private static function storeId($uid, $action) {
+    return hash('sha512', $uid.$action);
   }
 
 }
