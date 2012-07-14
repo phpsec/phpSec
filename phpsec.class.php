@@ -134,7 +134,7 @@ class phpsec {
       return true;
     }
     /* Open store. */
-    list($storeType, $storeDest) = explode(':', self::$_dsn);
+    list($storeType, $storeDest) = explode(':', self::$_dsn, 2);
     switch($storeType) {
       case 'filesystem':
         self::$store = new phpsecStoreFilesystem($storeDest);
