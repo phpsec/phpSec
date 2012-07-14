@@ -5,7 +5,7 @@ beta-0.4
 --------
 * [#83] Added class phpsecOtpcard and moved PS OTP functionality from phpsecOtp
    to it.
-* [#84, #85] Improvements to phpsecOtp.
+* [#84, #85, #94] Improvements to phpsecOtp.
 * Fixed bug setting up storage on Windows platforms.
 * [#93] phpsecOtp: Allow cross session tokens. Note: This may changes the order
   of parameters from beta-0.3.
