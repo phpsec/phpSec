@@ -10,6 +10,10 @@ beta-0.4
 * [#93] phpsecOtp: Allow cross session tokens. Note: This may changes the order
   of parameters from beta-0.3.
 * New configuration option: Disable regeneration of session id for each request.
+* [#91] Throw PHP notice id insecure pseudo-random data is generated.
+* [#23] Added filename filter to phpsecFilter::f().
+* [#90] Improvements to pseudo-random data generator. (@ph-il)
+
 
 beta-0.3: January 4. 2012 - xqus
 --------------------------------
