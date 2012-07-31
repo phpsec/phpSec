@@ -28,6 +28,11 @@ class phpsec {
    * Config: Enable phpSec session handler.
    */
   public static $_sessenable = true;
+
+
+  /**
+   * Config: Enable/disable regeneration of session IDs.
+   */
   public static $_sessIdRegen = true;
 
   /**
@@ -198,7 +203,7 @@ class phpsec {
   /**
    * Provides the library a simple way of reporting errors to the developer using PHPs error
    * handler.
-   * 
+   *
    * @see http://php.net/manual/en/errorfunc.constants.php
    *
    * @param string $msg
