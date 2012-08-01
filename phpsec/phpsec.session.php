@@ -13,13 +13,46 @@
  * Implements a session handler to save session data encrypted.
  */
 class phpsecSession {
-  public  static $_sessIdRegen;
+  private static $_sessIdRegen;
   private static $_savePath;
   private static $_name;
   private static $_keyCookie;
   private static $_secret;
   private static $_currID;
-  private static $_newID;  
+  private static $_newID;
+
+  /**
+   * Init the phpSec session handler.
+   */
+  public static function init($_sessIdRegen) {
+  	self::$_sessIdRegen = $_sessIdRegen;
+
+  	ini_set('session.save_handler', 'user');
+    session_set_save_handler(
+      'phpsecSession::open',
+      'phpsecSession::close',
+      'phpsecSession::read',
+      'phpsecSession::write',
+      'phpsecSession::destroy',
+      'phpsecSession::gc'
+    );
+
+    /* Since we set a session cookie on our session handler, disable the built-in cookies. */
+    ini_set('session.use_cookies', 0);
+
+    /* Start a new session. */
+    session_start();
+
+    /* Check the fingerprint to see if it matches, if not clear session data. */
+    $fingerprint = hash(phpsec::HASH_TYPE, 'phpSec-fingerprint'.$_SERVER['HTTP_USER_AGENT']);
+    if(!isset($_SESSION['phpSec-fingerprint'])) {
+      $_SESSION['phpSec-fingerprint'] = $fingerprint;
+    }
+    if($fingerprint != $_SESSION['phpSec-fingerprint']) {
+      $_SESSION = array();
+    }
+  }
+
 
   /**
    * Open a session.
@@ -113,7 +146,7 @@ class phpsecSession {
     /* Destroy old session. */
     if(self::$_newID != self::$_currID) {
     	self::destroy(self::$_currID);
-    }    
+    }
 
     /* Write new session, with new ID. */
     return phpsec::$store->write('session', self::$_newID, $encrypted);

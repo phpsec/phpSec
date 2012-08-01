@@ -159,31 +159,7 @@ class phpsec {
 
     /* Enable the custom session handler if enabled. */
     if(self::$_sessenable === true) {
-      phpsecSession::$_sessIdRegen = phpsec::$_sessIdRegen;
-      ini_set('session.save_handler', 'user');
-      session_set_save_handler(
-        'phpsecSession::open',
-        'phpsecSession::close',
-        'phpsecSession::read',
-        'phpsecSession::write',
-        'phpsecSession::destroy',
-        'phpsecSession::gc'
-      );
-
-      /* Since we set a session cookie on our session handler, disable the built-in cookies. */
-      ini_set('session.use_cookies', 0);
-
-      /* Start a new session. */
-      session_start();
-
-      /* Check the fingerprint to see if it matches, if not clear session data. */
-      $fingerprint = hash(self::HASH_TYPE, 'phpSec-fingerprint'.$_SERVER['HTTP_USER_AGENT']);
-      if(!isset($_SESSION['phpSec-fingerprint'])) {
-        $_SESSION['phpSec-fingerprint'] = $fingerprint;
-      }
-      if($fingerprint != $_SESSION['phpSec-fingerprint']) {
-        $_SESSION = array();
-      }
+      phpsecSession::init(phpsec::$_sessIdRegen);
     }
 
     /* Create a random token for each visitor and store it the users session.
