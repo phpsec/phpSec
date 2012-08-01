@@ -133,6 +133,12 @@ class phpsec {
        spl_autoload_register($autoLoadFunction);
      }
 
+    /* Set the charset of the multibyte functions in PHP. */
+    if(function_exists('mb_internal_encoding')) {
+    	mb_internal_encoding(self::$_charset);
+      mb_regex_encoding(self::$_charset);
+    }
+
     /* Autoloader all good to go. If we don't have a storage set
      * we can skip the rest of this method. */
     if(self::$_dsn === null) {
@@ -150,10 +156,6 @@ class phpsec {
       default:
       self::error('Store type('.$storeType.') invalid', E_USER_ERROR);
     }
-
-    /* Set the charset of the multibyte functions in PHP. */
-    mb_internal_encoding(self::$_charset);
-    mb_regex_encoding(self::$_charset);
 
     /* Enable the custom session handler if enabled. */
     if(self::$_sessenable === true) {
