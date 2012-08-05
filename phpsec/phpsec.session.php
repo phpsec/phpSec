@@ -74,7 +74,7 @@ class phpsecSession {
       self::$_currID = null;
     }
     if(self::$_sessIdRegen === true || self::$_currID === null) {
-    	self::$_newID = phpsecRand::str(128);
+    	self::$_newID = phpsecRand::str(128, 'abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ-_.!*#=%');
     } else {
     	self::$_newID = self::$_currID;
     }
