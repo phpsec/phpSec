@@ -60,7 +60,7 @@ class phpsec {
    * Constant: Version number. Isn't really
    * used for something... yet.
    */
-  const VERSION = '0.3-beta';
+  const VERSION = '0.4-beta';
 
   /**
    * Autoload methos to load required files when needed.
@@ -75,6 +75,7 @@ class phpsec {
     $basePath = dirname(__FILE__);
 
     $classes['stateless'] = array(
+      'phpsecAuthy'           => 'phpsec.authy.php',
       'phpsecCrypt'           => 'phpsec.crypt.php',
       'phpsecFilter'          => 'phpsec.filter.php',
       'phpsecPw'              => 'phpsec.pw.php',
