@@ -1,0 +1,19 @@
+{
+    "name": "phpsec/phpsec",
+    "type": "library",
+    "description": "A PHP security library",
+    "keywords": ["security"],
+    "homepage": "https://phpseclib.com/",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Audun Larsen",
+            "email": "larsen@xqus.com",
+            "homepage": "http://xqus.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    }
+}
