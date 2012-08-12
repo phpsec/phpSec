@@ -10,7 +10,7 @@
  */
 
 /**
- * Implements Authy authentication.
+ * Implements Authy authentication. It's like magic, except it's math.
  * @link https://www.authy.com
  */
 class phpsecAuthy {
