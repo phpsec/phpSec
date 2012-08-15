@@ -1,4 +1,4 @@
-<?php
+<?php namespace phpSec\Common;
 /**
   phpSec - A PHP security library
 
@@ -8,11 +8,14 @@
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
+use \phpSec\Crypt\Crypto;
+use \phpSec\Common\Core;
+use \phpSec\Crypt\Rand;
 
 /**
  * Implements a session handler to save session data encrypted.
  */
-class phpsecSession {
+class Session {
   private static $_sessIdRegen;
   private static $_savePath;
   private static $_name;
@@ -22,6 +25,11 @@ class phpsecSession {
   private static $_newID;
 
   /**
+   * Constant: Hash method to use.
+   */
+  const HASH_TYPE = 'sha256';
+
+  /**
    * Init the phpSec session handler.
    */
   public static function init($_sessIdRegen) {
@@ -29,12 +37,12 @@ class phpsecSession {
 
   	ini_set('session.save_handler', 'user');
     session_set_save_handler(
-      'phpsecSession::open',
-      'phpsecSession::close',
-      'phpsecSession::read',
-      'phpsecSession::write',
-      'phpsecSession::destroy',
-      'phpsecSession::gc'
+      '\phpSec\Common\Session::open',
+      '\phpSec\Common\Session::close',
+      '\phpSec\Common\Session::read',
+      '\phpSec\Common\Session::write',
+      '\phpSec\Common\Session::destroy',
+      '\phpSec\Common\Session::gc'
     );
 
     /* Since we set a session cookie on our session handler, disable the built-in cookies. */
@@ -44,13 +52,15 @@ class phpsecSession {
     session_start();
 
     /* Check the fingerprint to see if it matches, if not clear session data. */
-    $fingerprint = hash(phpsec::HASH_TYPE, 'phpSec-fingerprint'.$_SERVER['HTTP_USER_AGENT']);
+    $fingerprint = hash(self::HASH_TYPE, 'phpSec-fingerprint'.$_SERVER['HTTP_USER_AGENT']);
     if(!isset($_SESSION['phpSec-fingerprint'])) {
       $_SESSION['phpSec-fingerprint'] = $fingerprint;
     }
     if($fingerprint != $_SESSION['phpSec-fingerprint']) {
       $_SESSION = array();
     }
+
+    Core::getUid();
   }
 
 
@@ -74,7 +84,7 @@ class phpsecSession {
       self::$_currID = null;
     }
     if(self::$_sessIdRegen === true || self::$_currID === null) {
-    	self::$_newID = phpsecRand::str(128, 'abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ-_.!*#=%');
+    	self::$_newID = Rand::str(128, 'abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ-_.!*#=%');
     } else {
     	self::$_newID = self::$_currID;
     }
@@ -123,9 +133,9 @@ class phpsecSession {
     }
 
     /* Read from store and decrypt. */
-    $sessData = phpsec::$store->read('session', $_COOKIE[self::$_name]);
+    $sessData = Core::$store->read('session', $_COOKIE[self::$_name]);
     if($sessData !== false ) {
-      $return = phpsecCrypt::decrypt($sessData, self::$_secret);
+      $return = Crypto::decrypt($sessData, self::$_secret);
     } else {
       $return = false;
     }
@@ -141,7 +151,7 @@ class phpsecSession {
    */
   public static function write($id, $data) {
     /* Encrypt session. */
-    $encrypted = phpsecCrypt::encrypt($data, self::$_secret);
+    $encrypted = Crypto::encrypt($data, self::$_secret);
 
     /* Destroy old session. */
     if(self::$_newID != self::$_currID) {
@@ -149,7 +159,7 @@ class phpsecSession {
     }
 
     /* Write new session, with new ID. */
-    return phpsec::$store->write('session', self::$_newID, $encrypted);
+    return Core::$store->write('session', self::$_newID, $encrypted);
 
   }
   /**
@@ -159,7 +169,7 @@ class phpsecSession {
    * @return bool
    */
   public static function destroy($id) {
-    return phpsec::$store->delete('session', $id);
+    return Core::$store->delete('session', $id);
   }
   /**
    * Do garbage collection.
@@ -168,11 +178,11 @@ class phpsecSession {
    * @return bool
    */
   public static function gc($ttl) {
-    $Ids = phpsec::$store->listIds('session');
+    $Ids = Core::$store->listIds('session');
     foreach($Ids as $Id) {
-      $data = phpsec::$store->meta('session', $Id);
+      $data = Core::$store->meta('session', $Id);
       if($data->time + $ttl < time()) {
-        phpsec::$store->delete('session', $Id);
+        Core::$store->delete('session', $Id);
       }
     }
     return true;
@@ -184,7 +194,7 @@ class phpsecSession {
    * @return true
    */
   private static function setSecret() {
-    self::$_secret = phpsecRand::bytes(32);
+    self::$_secret = Rand::bytes(32);
     $cookieParam = session_get_cookie_params();
     setcookie(
       self::$_keyCookie,

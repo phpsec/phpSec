@@ -1,4 +1,4 @@
-<?php
+<?php namespace phpSec\Auth;
 /**
   phpSec - A PHP security library
 
@@ -8,11 +8,13 @@
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
+use phpSec\Crypt\Rand;
+use phpSec\Common\Core;
 
 /**
  * Providees pre shared one-time-password functionality. Experimental.
  */
-class phpsecOtpcard {
+class Otpcard {
   const HASH_TYPE = 'sha256';
 
   /**
@@ -75,7 +77,7 @@ class phpsecOtpcard {
     $card = self::load($cardId);
 
     $available = array_keys($card['usable']);
-    $selected  = phpsecRand::int(0, count($available)-1);
+    $selected  = Rand::int(0, count($available)-1);
 
     return $available[$selected];
   }
@@ -89,7 +91,7 @@ class phpsecOtpcard {
    *   A array containing the card data.
    */
   public static function load($cardId) {
-    $card = phpsec::$store->read('otp-card', $cardId);
+    $card = Core::$store->read('otp-card', $cardId);
     if($card !== false) {
       if($card['hash'] !== hash(self::HASH_TYPE, $card['list'])) {
         return false;
@@ -128,7 +130,7 @@ class phpsecOtpcard {
     $card = self::hash($card);
 
     /* TODO: Encrypt before saving. */
-    if(phpsec::$store->write('otp-card', $card['id'], $card)) {
+    if(Core::$store->write('otp-card', $card['id'], $card)) {
       return $card;
     }
     return false;

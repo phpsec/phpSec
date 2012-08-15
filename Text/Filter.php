@@ -1,4 +1,4 @@
-<?php
+<?php namespace phpSec\Text;
 /**
   phpSec - A PHP security library
 
@@ -8,11 +8,12 @@
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
+use phpSec\Common\Core;
 
 /**
  * Provides methods for XSS filtering.
  */
-class phpsecFilter {
+class Filter {
 
   /**
    * XSS text filter. Returns a string that is safe to use on the page.
@@ -62,7 +63,7 @@ class phpsecFilter {
           $safeData = self::f($data, 'url');
           break;
         default:
-          phpsec::error('Unknown variable type', E_USER_NOTICE);
+          Core::error('Unknown variable type', E_USER_NOTICE);
           break;
       }
       if($safeData !== false) {
@@ -112,10 +113,10 @@ class phpsecFilter {
         /* Encode a string according to RFC 3986 for use in a URL. */
         return rawurlencode($str);
       case 'filename':
-        /* Escape a string so it's safe to be used as filename. */ 
-        return str_replace('/', '_', $str);      
+        /* Escape a string so it's safe to be used as filename. */
+        return str_replace('/', '_', $str);
       default:
-        phpsec::error('Unknown variable type', E_USER_NOTICE);
+        Core::error('Unknown variable type', E_USER_NOTICE);
     }
   }
 }

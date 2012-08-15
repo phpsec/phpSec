@@ -1,4 +1,4 @@
-<?php
+<?php namespace phpSec\Auth;
 /**
   phpSec - A PHP security library
 
@@ -8,12 +8,13 @@
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
+use phpSec\Common\Core;
 
 /**
  * Implements Authy authentication. It's like magic, except it's math.
  * @link https://www.authy.com
  */
-class phpsecAuthy {
+class Authy {
 
   public static $_apiKey  = null;
   public static $_sandbox = false;
@@ -164,7 +165,7 @@ class phpsecAuthy {
     $result  = @file_get_contents($url, false, $context);
 
     if($result === false) {
-    	phpsec::error('Error communicating with Authy servers');
+    	Core::error('Error communicating with Authy servers');
     	return false;
     }
 

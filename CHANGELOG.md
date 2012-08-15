@@ -1,5 +1,9 @@
 phpSec changelog
 ================
+0.4.0
+-----
+* Total restructure of library to comply with PSR-0.
+
 
 beta-0.4
 --------

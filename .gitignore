@@ -1,2 +1,4 @@
 /.project
 /examples.php
+/SplClassLoader.php
+/.gitignore

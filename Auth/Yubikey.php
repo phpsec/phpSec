@@ -1,4 +1,4 @@
-<?php
+<?php namespace phpSec\Auth;
 /**
   phpSec - A PHP security library
 
@@ -8,11 +8,12 @@
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
+use phpSec\Crypt\Rand;
 
 /**
  * Implements validation of Yubikey against Yubico servers.
  */
-class phpsecYubikey {
+class Yubikey {
   /**
    * Yubico client Id.
    * @see https://upgrade.yubico.com/getapikey/
@@ -77,7 +78,7 @@ class phpsecYubikey {
     /* Setup the data needed to make the request. */
     $data['otp']       = $otp;
     $data['id']        = self::$_clientId;
-    $data['nonce']     = phpsecRand::str(20);
+    $data['nonce']     = Rand::str(20);
     $data['timestamp'] = 1;
     $data['h']         = self::sign($data);
 

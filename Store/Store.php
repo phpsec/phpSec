@@ -1,4 +1,4 @@
-<?php
+<?php namespace phpSec\Store;
 /**
   phpSec - A PHP security library
 
@@ -12,7 +12,7 @@
 /**
  * Abstract class describing the phpSec storage interface class.
  */
-abstract class phpsecStore {
+abstract class Store {
 
   /**
    * Open/prepare the storage.

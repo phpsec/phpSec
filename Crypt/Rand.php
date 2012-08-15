@@ -1,4 +1,4 @@
-<?php
+<?php namespace phpSec\Crypt;
 /**
   phpSec - A PHP security library
 
@@ -8,11 +8,12 @@
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
+use \phpSec\Common\Core;
 
 /**
  * Provides methods for generating random data.
  */
-class phpsecRand {
+class Rand {
   public static $_charset = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
   /**
@@ -31,17 +32,17 @@ class phpsecRand {
         return $rnd;
       }
     }
-    
+
     /* We don't have OpenSSL available. */
-    phpsec::error('OpenSSL not available: Using less secure method to generate random data',E_USER_NOTICE);
-    
+    Core::error('OpenSSL not available: Using less secure method to generate random data',E_USER_NOTICE);
+
     /* Either we dont have the OpenSSL library or the data returned was not
      * considered secure. Fall back on this less secure code. */
     if(function_exists('mcrypt_create_iv')) {
       $rnd = mcrypt_create_iv($len, MCRYPT_RAND);
       return $rnd;
     }
-    
+
     /* Either we dont have the MCrypt library and OpenSSL library or the data returned was not
      * considered secure. Fall back on this less secure code. */
     $rnd = '';

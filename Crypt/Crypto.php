@@ -1,4 +1,4 @@
-<?php
+<?php namespace phpSec\Crypt;
 /**
   phpSec - A PHP security library
 
@@ -8,11 +8,13 @@
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
+use \phpSec\Common\Core;
+use \phpSec\Crypt\Rand;
 
 /**
  * Provides methods for encrypting data.
  */
-class phpsecCrypt {
+class Crypto {
   public static $_algo    = 'rijndael-256';
   public static $_mode    = 'ctr';
   public static $_padding = true;
@@ -50,19 +52,19 @@ class phpsecCrypt {
     if(count($keySizes) > 0) {
       /* Encryption method requires a specific key size. */
       if(!in_array($keySize, $keySizes)) {
-        phpsec::error('Key is out of range. Should be one of: '. var_export($keySizes ,1));
+        Core::error('Key is out of range. Should be one of: '. var_export($keySizes ,1));
         return false;
       }
     } else {
       /* No spsecific size is needed. */
       if($keySize == 0 || $keySize > mcrypt_enc_get_key_size($td)) {
-        phpsec::error('Key is out of range. Should be: 1 - ' . mcrypt_enc_get_key_size($td).' bytes.');
+        Core::error('Key is out of range. Should be: 1 - ' . mcrypt_enc_get_key_size($td).' bytes.');
         return false;
       }
     }
 
     /* Create IV. */
-    $iv = phpsecRand::bytes(mcrypt_enc_get_iv_size($td));
+    $iv = Rand::bytes(mcrypt_enc_get_iv_size($td));
 
     /* Init mcrypt. */
     mcrypt_generic_init($td, $key, $iv);
@@ -111,8 +113,8 @@ class phpsecCrypt {
       'mac'   => true,
     );
 
-    if($data === NULL || phpsec::arrayCheck($data, $dataStructure, false) !== true) {
-      phpsec::error('Invalid data passed to decrypt()');
+    if($data === NULL || Core::arrayCheck($data, $dataStructure, false) !== true) {
+      Core::error('Invalid data passed to decrypt()');
       return false;
     }
     /* Everything looks good so far. Let's continue.*/
@@ -121,7 +123,7 @@ class phpsecCrypt {
 
     /* Check MAC. */
     if(base64_decode($data['mac']) != self::pbkdf2($data['cdata'], $key, 1000, 32)) {
-      phpsec::error('Message authentication code invalid');
+      Core::error('Message authentication code invalid');
       return false;
     }
 
@@ -167,7 +169,7 @@ class phpsecCrypt {
 
     /* Step 1. Check dkLen. */
     if($dkLen > (2^32-1) * $hLen) {
-      phpsec::error('Derived key too long');
+      Core::error('Derived key too long');
       return false;
     }
 

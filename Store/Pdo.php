@@ -1,4 +1,4 @@
-<?php
+<?php namespace phpSec\Store;
 /**
   phpSec - A PHP security library
 
@@ -9,10 +9,13 @@
   @package   phpSec
  */
 
+use \phpSec\Crypt\Crypto;
+use \phpSec\Common\Core;
+
 /**
  *  Class for handling database storage.
  */
-class phpsecStorePdo extends phpsecStore {
+class Pdo extends Store {
 
   public  $_hashType = 'sha256';
   private $dbh       = null;
@@ -23,14 +26,14 @@ class phpsecStorePdo extends phpsecStore {
    */
   public function __construct($loc) {
     /* Separate username and password from DSN */
-    $parts = phpsecStorePdo::parseDsn($loc);
+    $parts = self::parseDsn($loc);
     $loc   = 'mysql:dbname='.$parts['dbname'].';host='.$parts['host'];
 
     /* We try to connect to the database. If this fails throw an error. */
     try {
-      $this->dbh = new PDO($loc, $parts['username'], $parts['password']);
-    } catch(PDOException $e) {
-      phpsec::error('Database connection failed: ' . $e->getMessage(), E_USER_ERROR);
+      $this->dbh = new \PDO($loc, $parts['username'], $parts['password']);
+    } catch(\PDOException $e) {
+      \phpSec\Common\Core::error('Database connection failed: ' . $e->getMessage(), E_USER_ERROR);
       return false;
     }
 
@@ -95,13 +98,13 @@ class phpsecStorePdo extends phpsecStore {
     );
 
     $sth->execute(array());
-    $currentStructure = $sth->fetchAll(PDO::FETCH_ASSOC);
+    $currentStructure = $sth->fetchAll(\PDO::FETCH_ASSOC);
 
     /* First we just match number of columns to make sure everything looks good, and to avoid
      * total disaster in the next part. Oh.. I almost forgot. If this fails everything explodes
      * in a nice old USER_ERROR! */
     if(sizeof($currentStructure) !== sizeof($storeTable)) {
-      phpsec::error('Invalid table ('.$parts['dbname'].'.'.$this->table.') structure', E_USER_ERROR);
+      \phpSec\Common\Core::error('Invalid table ('.$parts['dbname'].'.'.$this->table.') structure', E_USER_ERROR);
       return false;
     }
 
@@ -109,7 +112,7 @@ class phpsecStorePdo extends phpsecStore {
     for($i=0; $i < sizeof($storeTable); $i++) {
       $diff = array_diff_assoc($currentStructure[$i], $storeTable[$i]);
       if(sizeof($diff) > 0) {
-        phpsec::error('Invalid table ('.$parts['dbname'].'.'.$this->table.') structure. '.var_export($diff, true), E_USER_ERROR);
+        \phpSec\Common\Core::error('Invalid table ('.$parts['dbname'].'.'.$this->table.') structure. '.var_export($diff, true), E_USER_ERROR);
         return false;
       }
     }
@@ -134,17 +137,17 @@ class phpsecStorePdo extends phpsecStore {
     );
     $sth->execute($data);
 
-    $data = $sth->fetch(PDO::FETCH_ASSOC);
+    $data = $sth->fetch(\PDO::FETCH_ASSOC);
     if($data === false) {
       return false;
     }
 
     /* Calculate expected MAC. */
-    $mac = phpsecCrypt::pbkdf2($data['data'], $id, 1000, 32);
+    $mac = \phpSec\Crypt\Crypto::pbkdf2($data['data'], $id, 1000, 32);
 
     /* Compare MAC */
     if($mac != $data['mac']) {
-      phpsec::error('Message authentication code invalid while reading store');
+      \phpSec\Common\Core::error('Message authentication code invalid while reading store');
       return false;
     }
 
@@ -167,7 +170,7 @@ class phpsecStorePdo extends phpsecStore {
 
     /* Serialize data, and create a MAC. */
     $data = serialize($data);
-    $mac  = phpsecCrypt::pbkdf2($data, $id, 1000, 32);
+    $mac  = \phpSec\Crypt\Crypto::pbkdf2($data, $id, 1000, 32);
 
     /* We use this array to say what data goes where in the query. */
     $data = array(
@@ -214,7 +217,7 @@ class phpsecStorePdo extends phpsecStore {
 
     $sth->execute($data);
 
-    while($row = $sth->fetch(PDO::FETCH_ASSOC)) {
+    while($row = $sth->fetch(\PDO::FETCH_ASSOC)) {
       $ids[] = $row['id'];
     }
 
@@ -236,7 +239,7 @@ class phpsecStorePdo extends phpsecStore {
 
     $sth->execute($data);
 
-    $meta = $sth->fetch(PDO::FETCH_ASSOC);
+    $meta = $sth->fetch(\PDO::FETCH_ASSOC);
     if($meta === false) {
       return false;
     }

@@ -1,4 +1,4 @@
-<?php
+<?php namespace phpSec\Store;
 /**
   phpSec - A PHP security library
 
@@ -9,10 +9,13 @@
   @package   phpSec
  */
 
+use \phpSec\Crypt\Crypto;
+use \phpSec\Common\Core;
+
 /**
  *  Class for handling flat file storage.
  */
-class phpsecStoreFilesystem extends phpsecStore {
+class File extends Store {
 
   private $_dataDir  = null;
   public  $_hashType = 'sha256';
@@ -22,7 +25,7 @@ class phpsecStoreFilesystem extends phpsecStore {
    */
   public function __construct($loc) {
     if(!is_writeable($loc)) {
-      phpsec::error('Storage directory('.$loc.') not writeable', E_USER_ERROR);
+      \phpSec\Common\Core::error('Storage directory('.$loc.') not writeable', E_USER_ERROR);
       return false;
     }
     $this->_dataDir = $loc;
@@ -41,10 +44,10 @@ class phpsecStoreFilesystem extends phpsecStore {
     list($meta, $data) = explode("\n\n", $data, 2);
     $jsonData = json_decode($meta);
 
-    $mac = phpsecCrypt::pbkdf2($data, $id, 1000, 32);
+    $mac = \phpSec\Crypt\Crypto::pbkdf2($data, $id, 1000, 32);
 
     if($mac != base64_decode($jsonData->mac)) {
-      phpsec::error('Message authentication code invalid while reading store');
+      \phpSec\Common\Core::error('Message authentication code invalid while reading store');
       return false;
     }
     return unserialize($data);
@@ -58,7 +61,7 @@ class phpsecStoreFilesystem extends phpsecStore {
 
     $data = serialize($data);
     $saveData['id']   = base64_encode($id);
-    $saveData['mac']  = base64_encode(phpsecCrypt::pbkdf2($data, $id, 1000, 32));
+    $saveData['mac']  = base64_encode(\phpSec\Crypt\Crypto::pbkdf2($data, $id, 1000, 32));
     $saveData['time'] = time();
 
     $jsonData = json_encode($saveData);
@@ -71,7 +74,7 @@ class phpsecStoreFilesystem extends phpsecStore {
         fclose($fp);
         return true;
       } else {
-        phpsec::error('Could not lock file while writing to store');
+        \phpSec\Common\Core::error('Could not lock file while writing to store');
       }
     }
     return false;

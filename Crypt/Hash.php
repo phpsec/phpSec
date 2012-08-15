@@ -1,4 +1,4 @@
-<?php
+<?php namespace phpSec\Crypt;
 /**
   phpSec - A PHP security library
 
@@ -8,11 +8,14 @@
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
+use phpSec\Crypt\Rand;
+use phpSec\Crypt\Crypto;
+
 
 /**
  * Implements password hashing using crypt() with PBKDF2 support.
  */
-class phpsecHash {
+class Hash {
 
   const PBKDF2 = '$pbkdf2$';
   const BCRYPT = '$2a$';
@@ -69,14 +72,14 @@ class phpsecHash {
 
     switch(self::$_method) {
       case self::BCRYPT:
-        $saltRnd = phpsecRand::str(22, self::$charsets['itoa64']);
+        $saltRnd = Rand::str(22, self::$charsets['itoa64']);
         $salt = sprintf('$2a$%s$%s', self::$_bcrypt_cost, $saltRnd);
         $hash = crypt($str, $salt);
       break;
 
       case self::PBKDF2:
-        $salt = phpsecRand::bytes(64);
-        $hash = phpsecCrypt::pbkdf2($str, $salt, self::$_pbkdf2_c, self::$_pbkdf2_dkLen, self::$_pbkdf2_prf);
+        $salt = Rand::bytes(64);
+        $hash = Crypto::pbkdf2($str, $salt, self::$_pbkdf2_c, self::$_pbkdf2_dkLen, self::$_pbkdf2_prf);
 
         $hash = sprintf('$pbkdf2$c=%s&dk=%s&f=%s$%s$%s',
                        self::$_pbkdf2_c,
@@ -89,7 +92,7 @@ class phpsecHash {
 
       case self::SHA256:
       case self::SHA512:
-        $saltRnd = phpsecRand::str(16, self::$charsets['itoa64']);
+        $saltRnd = Rand::str(16, self::$charsets['itoa64']);
         $salt = sprintf('%srounds=%s$%s', self::$_method, self::$_sha2_c, $saltRnd);
         $hash = crypt($str, $salt);
       break;
@@ -123,7 +126,7 @@ class phpsecHash {
         list( , , $params, $hash, $salt) = explode('$', $hash);
         parse_str($params, $param);
 
-        if(base64_decode($hash) === phpsecCrypt::pbkdf2($str, base64_decode($salt), $param['c'], $param['dk'], $param['f'])) {
+        if(base64_decode($hash) === Crypto::pbkdf2($str, base64_decode($salt), $param['c'], $param['dk'], $param['f'])) {
           return true;
         }
         return false;
