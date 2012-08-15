@@ -104,6 +104,6 @@ class Cache {
    *   Name to get ID from.
    */
   private static function cacheId($name) {
-    return $name.'_'.hash(self::HASH_TYPE, $_SESSION['phpSec-uid']);
+    return $name.'_'.hash(self::HASH_TYPE, Core::getUid());
   }
 }
