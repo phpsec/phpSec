@@ -66,6 +66,13 @@ Getting help / Contact
  * [Website](https://phpseclib.com)
  * E-mail: larsen@xqus.com
 
+Wishlist
+--------
+ * **Updated documentation**
+   Currently almost all the documentation needs to be converted from the "old" library to the "new".
+ * **Unit testing.**
+ * **Anything that fixes a issue.**
+
 License
 -------
 phpSec is open-sourced software licensed under the MIT License.
