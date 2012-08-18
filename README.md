@@ -3,7 +3,7 @@
 * phpSec is a open-source [PHP](http://php.net) security library that takes care
   of the common security tasks a web developer faces.
   
-[Official Website & Documentation](https://phpseclib.com/)
+[Official Website](https://phpseclib.com/) and [Documentation](https://github.com/phpsec/doc/)
 
 Features
 --------
@@ -61,9 +61,10 @@ PHP 5.3.0 or greater with the following extensions is required to use phpSec:
 
 Getting help / Contact
 ----------------------
- * [phpSec issues] (https://github.com/phpsec/phpSec/issues)
- * [Twitter (@xqus)](http://twitter.com/xqus)
- * [Website](https://phpseclib.com)
+ * [phpSec manual](https://github.com/phpsec/doc/)
+ * [phpSec issues] (https://github.com/phpsec/phpSec/issues/)
+ * [Twitter (@xqus)](http://twitter.com/xqus/)
+ * [Website](https://phpseclib.com/)
  * E-mail: larsen@xqus.com
 
 Wishlist
