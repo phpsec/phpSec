@@ -16,12 +16,29 @@ use phpSec\Common\Core;
  */
 class Authy {
 
+  /**
+   * Authy API key.
+   */
   public static $_apiKey  = null;
+
+  /**
+   * Connect to sandbox?
+   */
   public static $_sandbox = false;
+
+  /**
+   * Server timeout. In seconds.
+   */
   public static $_serverTimeout = 3;
 
+  /**
+   * Last error returned by Authy API.
+   */
   public static $lastError = null;
 
+  /**
+   * Server URLs.
+   */
   private static $_servers = array(
     'production' => 'https://api.authy.com',
     'sandbox'    => 'http://sandbox-api.authy.com',
@@ -41,7 +58,7 @@ class Authy {
    *
    * @return mixed
    *   Returns the users Authy ID on success or false on errors.
-   *   @see phpsecAuthy::$lastError.
+   *   @see \phpSec\Auth\Authy::$lastError.
    */
   public static function userNew($email, $cellphone, $countrycode = 1) {
 
@@ -78,14 +95,14 @@ class Authy {
    * Verify a Authy OTP.
    *
    * @param int $authyId
-   *   User Authy ID. @see phpsecAuthy::userNew().
+   *   User Authy ID. @see \phpSec\Auth\Authy::userNew().
    *
    * @param int $token
    *   User supplied OPT/token.
    *
    * @return boolean
    *   Return true if a valid Authy token is supplied, false on any errors.
-   *   @see phpsecAuthy::$lastError.
+   *   @see \phpSec\Auth\Authy::$lastError.
    */
   public static function verify($authyId, $token) {
     $data = array(
@@ -120,6 +137,15 @@ class Authy {
 
   /**
    * Performs a call to the Authy API.
+   *
+   * @param string $action
+   *   Action to perform: should be 'new' or 'verify'
+   *
+   * @param array $data
+   *   Data to perform the action with.
+   *
+   * @return object
+   *   Decoded JSON results from Authy server.
    */
   private static function apiCall($action, $data) {
     switch(self::$_sandbox) {
