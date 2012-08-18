@@ -1,4 +1,4 @@
-<?php
+<?php namespace phpSec\Crypt;
 /**
   phpSec - A PHP security library
 
@@ -8,8 +8,6 @@
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
-namespace phpSec\Crypt;
-
 use \phpSec\Common\Core;
 use \phpSec\Crypt\Rand;
 

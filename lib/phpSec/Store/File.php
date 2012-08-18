@@ -8,7 +8,6 @@
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
-
 use \phpSec\Crypt\Crypto;
 use \phpSec\Common\Core;
 
