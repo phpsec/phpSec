@@ -1,4 +1,4 @@
-<?php namespace phpSec\Crypt;
+<?php
 /**
   phpSec - A PHP security library
 
@@ -8,11 +8,15 @@
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
+namespace phpSec\Crypt;
+
 use \phpSec\Common\Core;
 use \phpSec\Crypt\Rand;
 
 /**
  * Provides methods for encrypting data.
+ *
+ * @namespace phpSec\Crypt
  */
 class Crypto {
   public static $_algo    = 'rijndael-256';
