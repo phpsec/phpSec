@@ -24,7 +24,10 @@
     "require": {
         "php": ">=5.3.0"
     },
-        
+     "suggest": {
+        "ext-mcrypt": "The Mcrypt extension is used to encrypt data.",
+        "ext-openssl": "The OpenSSL extension is used as a secure source of random data."
+    },
     "autoload": {
         "psr-0": {
             "phpSec": "lib/"
