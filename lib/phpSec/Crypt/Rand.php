@@ -33,15 +33,15 @@ class Rand {
       }
     }
 
-    /* We don't have OpenSSL available. */
-    Core::error('OpenSSL not available: Using less secure method to generate random data',E_USER_NOTICE);
-
     /* Either we dont have the OpenSSL library or the data returned was not
      * considered secure. Fall back on this less secure code. */
     if(function_exists('mcrypt_create_iv')) {
       $rnd = mcrypt_create_iv($len, MCRYPT_RAND);
       return $rnd;
     }
+
+    /* We don't have OpenSSL available. */
+    Core::error('OpenSSL not available: Using less secure method to generate random data',E_USER_NOTICE);
 
     /* Either we dont have the MCrypt library and OpenSSL library or the data returned was not
      * considered secure. Fall back on this less secure code. */
