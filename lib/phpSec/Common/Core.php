@@ -72,6 +72,9 @@ class Core {
    *
    * @param bool $strict
    *   If strict is set to false we will allow keys that's not defined in the structure.
+   *
+   * @return bool
+   *   Returns true on match, and false on mismatch.
    */
   public static function arrayCheck($array, $structure, $strict = true) {
     $success = true;
@@ -125,6 +128,9 @@ class Core {
    *
    * @param integer $length
    *   The total length of the uid. Must be above 25.
+   *
+   * @return string
+   *   Returns a unique identifier.
    */
   public static function genUid($length = 50) {
     if($length < 25) {
@@ -136,6 +142,15 @@ class Core {
     return $timeStamp.Rand::str($randLength);
   }
 
+  /**
+   * Get/set the current phpSec UID.
+   *
+   * The phpSec UID is required for some sub classes of phpSec, for
+   * example Cache.
+   *
+   * @return string
+   *   Return the current phpSec UID.
+   */
   public function getUid() {
   	/* Create a random token for each visitor and store it the users session.
        This is for example used to identify owners of cache data. */
@@ -146,6 +161,14 @@ class Core {
     return $_SESSION['phpSec-uid'];
   }
 
+  /**
+   * Configure/set the phpSec store.
+   *
+   * @see https://github.com/phpsec/doc/blob/master/01-Getting-Started.md
+   *
+   * @param string
+   *   Store target.
+   */
   public static function setStore($dsn) {
 
   	/* Open store. */
