@@ -25,9 +25,8 @@ To install using Composer just add phpSec to your composer.json file in your pro
 ```
 {
     "require": {
-        "phpsec/phpsec":"dev-master"
-    },
-    "minimum-stability": "dev"
+        "phpsec/phpsec":"0.4.*"
+    }
 }
 ```
 
