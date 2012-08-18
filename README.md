@@ -73,8 +73,6 @@ Getting help / Contact
 
 Wishlist
 --------
- * **Updated documentation**
-   Currently almost all the documentation needs to be converted from the "old" library to the "new".
  * **Unit testing.**
  * **Anything that fixes a issue.**
 
