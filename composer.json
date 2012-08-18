@@ -2,7 +2,15 @@
     "name": "phpsec/phpsec",
     "type": "library",
     "description": "A PHP security library",
-    "keywords": ["security"],
+    "keywords": [
+        "security",
+        "cryptography",
+        "encryption",
+        "session",
+        "yubikey",
+        "authy",
+        "otp"
+        ],
     "homepage": "https://phpseclib.com/",
     "license": "MIT",
     "authors": [
