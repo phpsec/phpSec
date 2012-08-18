@@ -1,25 +1,20 @@
 phpSec changelog
 ================
-0.4.0
------
+
+0.4.0: August 19. 2012 - xqus
+-----------------------------
 * Total restructure of library to comply with PSR-0.
-
-
-beta-0.4
---------
-* [#83] Added class phpsecOtpcard and moved PS OTP functionality from phpsecOtp
-   to it.
-* [#84, #85, #94] Improvements to phpsecOtp.
+* Version numbers now follows [Semantic Versioning](http://semver.org/)
+* [#83] Added class \phpSec\Auth\Otpcard and moved PS OTP functionality from \phpSec\Auth\Otp to it.
+* [#84, #85, #93, #94] Improvements to \phpSec\Auth\Otp.
 * Fixed bug setting up storage on Windows platforms.
-* [#93] phpsecOtp: Allow cross session tokens. Note: This may change the order
-  of parameters from beta-0.3.
 * New configuration option: Disable regeneration of session id for each request.
-* [#91] Throw PHP notice id insecure pseudo-random data is generated.
-* [#23] Added filename filter to phpsecFilter::f().
+* [#91] Throw PHP notice if insecure pseudo-random data is generated.
+* [#23] Added filename filter to \phpSec\Text\Filter::f().
 * [#90] Improvements to pseudo-random data generator. (@ph-il)
+* Adds support for [Authy](http://authy.com) authentication. 
+* New autoloader.
 * Code cleanup and small bug fixes.
-* Adds support for Authy authentication. www.authy.com
-
 
 beta-0.3: January 4. 2012 - xqus
 --------------------------------
