@@ -119,27 +119,16 @@ class Core {
   }
 
   /**
-   * Returns a unique identifier in the format spsecified in
-   * OpenID Authentication 2.0 protocol.
-   * For example: 2005-05-15T17:11:51ZUNIQUE
-   * This function is used to generate all unique tokens used by
-   * phpSec.
-   * @see http://openid.net/specs/openid-authentication-2_0.html
-   *
-   * @param integer $length
-   *   The total length of the uid. Must be above 25.
+   * Returns a unique identifier.
    *
    * @return string
    *   Returns a unique identifier.
    */
-  public static function genUid($length = 50) {
-    if($length < 25) {
-      self::error('Length must be longer than 25');
-      return false;
-    }
-    $timeStamp = gmdate('Y-m-d\TH:i:se');
-    $randLength = $length-strlen($timeStamp);
-    return $timeStamp.Rand::str($randLength);
+  public static function genUid() {
+    $hex = bin2hex(Rand::Bytes(32));
+    $str = substr($hex,0,16) . '-' . substr($hex,16,8) . '-' . substr($hex,24,8) . '-' . substr($hex,32,8) . '-' . substr($hex,40,24);
+
+		return $str;
   }
 
   /**
