@@ -24,6 +24,9 @@ class Session {
   private static $_currID;
   private static $_newID;
 
+  public static $_cryptAlgo = 'rijndael-256';
+  public static $_cryptMode = 'cfb';
+
   /**
    * Constant: Hash method to use.
    */
@@ -151,6 +154,8 @@ class Session {
    */
   public static function write($id, $data) {
     /* Encrypt session. */
+    Crypto::$_algo = self::$_cryptAlgo;
+    Crypto::$_mode = self::$_cryptMode;
     $encrypted = Crypto::encrypt($data, self::$_secret);
 
     /* Destroy old session. */
