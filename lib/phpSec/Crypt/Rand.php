@@ -127,5 +127,18 @@ class Rand {
       return $picked;
     }
   }
+
+  /**
+   * Return a random boolean.
+   *
+   * @return boolean
+   */
+  public static function bool() {
+  	$byte = self::bytes(1);
+  	if((ord($byte) + 1) % 2 === 0) {
+  		return false;
+  	}
+  	return true;
+  }
 }
 
