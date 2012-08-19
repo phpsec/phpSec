@@ -19,7 +19,8 @@ use \phpSec\Crypt\Rand;
 class Crypto {
   public static $_algo    = 'rijndael-256';
   public static $_mode    = 'ctr';
-  public static $_padding = true;
+
+  protected static $_padding = false;
 
 
   const HASH_TYPE = 'sha256';
@@ -46,6 +47,14 @@ class Crypto {
    */
   public static function encrypt($data, $key) {
 
+    /* Make sure both algorithm and mode are either block or non-block. */
+    $isBlockCipher = mcrypt_module_is_block_algorithm(self::$_algo);
+    $isBlockMode   = mcrypt_module_is_block_algorithm_mode(self::$_mode);
+    if($isBlockCipher !== $isBlockMode) {
+    	Core::error('You can not mix block and non-block ciphers and modes');
+    	return false;
+    }
+
     $td = mcrypt_module_open(self::$_algo, '', self::$_mode, '');
 
     /* Check key size. */
@@ -54,13 +63,13 @@ class Crypto {
     if(count($keySizes) > 0) {
       /* Encryption method requires a specific key size. */
       if(!in_array($keySize, $keySizes)) {
-        Core::error('Key is out of range. Should be one of: '. var_export($keySizes ,1));
+        Core::error('Key is out of range. Should be one of: '. implode(', ', $keySizes));
         return false;
       }
     } else {
       /* No spsecific size is needed. */
       if($keySize == 0 || $keySize > mcrypt_enc_get_key_size($td)) {
-        Core::error('Key is out of range. Should be: 1 - ' . mcrypt_enc_get_key_size($td).' bytes.');
+        Core::error('Key is out of range. Should be between  1 and ' . mcrypt_enc_get_key_size($td).' bytes.');
         return false;
       }
     }
@@ -73,6 +82,11 @@ class Crypto {
 
     /* Prepeare the array with data. */
     $serializedData = serialize($data);
+
+    /* Enable padding of data if block cipher moode. */
+    if (mcrypt_module_is_block_algorithm_mode(self::$_mode) === true)	{
+    	self::$_padding = true;
+    }
 
     /* Add padding if enabled. */
     if(self::$_padding === true) {
