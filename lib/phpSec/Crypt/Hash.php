@@ -21,6 +21,7 @@ class Hash {
   const BCRYPT = '$2a$';
   const SHA256 = '$5$';
   const SHA512 = '$6$';
+  const DRUPAL = '$S$';
 
   /**
    * Default hashing method.
@@ -53,10 +54,20 @@ class Hash {
   public static $_sha2_c = 6000;
 
   /**
+   * Drupal: Hash length.
+   */
+  public static $_drupal_hashLen = 55;
+
+  /**
+   * Drupal: Iteration count (log 2).
+   */
+  public static $_drupal_count = 15;
+
+  /**
    * Salt charsets.
    */
   public static $charsets = array(
-    'itoa64' => './abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    'itoa64' => './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
   );
 
   /**
@@ -90,6 +101,14 @@ class Hash {
                        );
       break;
 
+      case self::DRUPAL;
+        $setting  = '$S$';
+        $setting .= self::$charsets['itoa64'][self::$_drupal_count];
+        $setting .= self::_b64Encode(\phpSec\Crypt\Rand::bytes(6), 6);
+
+        return substr(self::_phpassHash($str, $setting), 0, self::$_drupal_hashLen);
+      break;
+
       case self::SHA256:
       case self::SHA512:
         $saltRnd = Rand::str(16, self::$charsets['itoa64']);
@@ -119,7 +138,13 @@ class Hash {
   public static function check($str, $hash) {
     $regex_pattern = '/^\$[a-z, 1-6]{1,6}\$/i';
     preg_match($regex_pattern, $hash, $matches);
-    list($method) = $matches;
+
+    if(sizeof($matches) > 0) {
+      list($method) = $matches;
+    } else {
+    	$method = null;
+    }
+
     switch($method) {
       case self::PBKDF2:
         $param = array();
@@ -132,12 +157,90 @@ class Hash {
         return false;
       break;
 
-      default:
+      case self::DRUPAL:
+        $test = strpos(self::_phpassHash($str, $hash), $hash);
+        if($test === false || $test !== 0) {
+        	return false;
+        } else {
+        	return true;
+        }
+      break;
+
+      case self::SHA256:
+      case self::SHA512:
         if(crypt($str, $hash) === $hash) {
           return true;
         }
         return false;
       break;
+
+      default:
+        /* Not any of the supported formats. Try plain hash methods. */
+      	$hashLen = strlen($hash);
+      	switch($hashLen) {
+      		case 32:
+        	  $mode = 'md5';
+      	  break;
+      		case 40:
+      		  $mode = 'sha1';
+      	  break;
+      		case 64:
+            $mode = 'sha256';
+          break;
+      		case 128:
+      		  $mode = 'sha512';
+      		break;
+      		default:
+      		  return false;
+      	}
+      	return ($hash == hash($mode, $str));
+      break;
     }
+  }
+
+  private static function _phpassHash($password, $setting, $method = 'sha512') {
+  	/* First 12 characters are the settings. */
+  	$setting = substr($setting, 0 , 12);
+  	$salt    = substr($setting, 4, 8);
+  	$count   = 1 << strpos(self::$charsets['itoa64'], $setting[3]);
+
+  	$hash = hash($method, $salt . $password, TRUE);
+  	do {
+  		$hash = hash($method, $hash . $password, TRUE);
+  	} while (--$count);
+
+  	$len = strlen($hash);
+  	$output = $setting . self::_b64Encode($hash, $len);
+  	$expected = 12 + ceil((8 * $len) / 6);
+
+  	return substr($output, 0, $expected);
+  }
+
+  private static function _b64Encode($input, $count) {
+  	$itoa64 = self::$charsets['itoa64'];
+
+  	$output = '';
+  	$i = 0;
+  	do {
+    $value = ord($input[$i++]);
+    $output .= $itoa64[$value & 0x3f];
+    if ($i < $count) {
+      $value |= ord($input[$i]) << 8;
+    }
+    $output .= $itoa64[($value >> 6) & 0x3f];
+    if ($i++ >= $count) {
+      break;
+    }
+    if ($i < $count) {
+      $value |= ord($input[$i]) << 16;
+    }
+    $output .= $itoa64[($value >> 12) & 0x3f];
+    if ($i++ >= $count) {
+      break;
+    }
+    $output .= $itoa64[($value >> 18) & 0x3f];
+  } while ($i < $count);
+
+  return $output;
   }
 }
