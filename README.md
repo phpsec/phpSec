@@ -13,6 +13,7 @@ Features
 * Secure session handler
 * CSRF protection
 * Yubikey integration
+* Authy integration
 * Random data generator
 
 Installing
@@ -54,8 +55,7 @@ $classLoader = new SplClassLoader('phpSec', '/var/www/vendor/phpSec/lib');
 $classLoader->register();
 ```
 
-For documentation on how to use the various phpSec functionality, take alook at the [phpSec manual](https://phpseclib.com/manual). 
-*Note: The manual is currently for the old version of phpSec. Updated ducumentation will be available the [phpsec/doc](https://github.com/phpsec/doc) repository.*
+For documentation on how to use the various phpSec functionality, take alook at the [phpsec/doc](https://github.com/phpsec/doc) repository. 
 
 System requirements
 -------------------
@@ -70,11 +70,6 @@ Getting help / Contact
  * [Twitter (@xqus)](http://twitter.com/xqus/)
  * [Website](https://phpseclib.com/)
  * E-mail: larsen@xqus.com
-
-Wishlist
---------
- * **Unit testing.**
- * **Anything that fixes a issue.**
 
 License
 -------
