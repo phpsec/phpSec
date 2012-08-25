@@ -1,6 +1,16 @@
 phpSec changelog
 ================
 
+0.5.0
+-----
+* Added \phpSec\Common\SplClassLoader, an improved autoloader.
+* [#101] Added \phpSec\Common\Exec, method for executing programs in a PDO like way.
+* Improved \phpSec\Common\Core\genUid().
+* Added \phpSec\Crypt\Rand::bool(): Generate random boolean.
+* Improved \phpSec\Crypt\Crypto. (Error messages and automatic padding).
+* Fixed bug in session handler when setting custom encryption settings.
+* [#100] Added support for Drupal and plain hashes in \phpSec\Crypt\Hash.
+
 0.4.0: August 19. 2012 - xqus
 -----------------------------
 * Total restructure of library to comply with PSR-0.
