@@ -10,6 +10,7 @@ phpSec changelog
 * Improved \phpSec\Crypt\Crypto. (Error messages and automatic padding).
 * Fixed bug in session handler when setting custom encryption settings.
 * [#100] Added support for Drupal and plain hashes in \phpSec\Crypt\Hash.
+* Added \phpSec\Crypt\Hash::getInfo(), returns settings used to generate a hash.
 
 0.4.0: August 19. 2012 - xqus
 -----------------------------

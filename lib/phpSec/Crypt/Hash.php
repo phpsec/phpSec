@@ -136,16 +136,9 @@ class Hash {
    *   Returns true on match.
    */
   public static function check($str, $hash) {
-    $regex_pattern = '/^\$[a-z, 1-6]{1,6}\$/i';
-    preg_match($regex_pattern, $hash, $matches);
+    $hashInfo = self::getInfo($hash);
 
-    if(sizeof($matches) > 0) {
-      list($method) = $matches;
-    } else {
-    	$method = null;
-    }
-
-    switch($method) {
+    switch($hashInfo['algo']) {
       case self::PBKDF2:
         $param = array();
         list( , , $params, $hash, $salt) = explode('$', $hash);
@@ -166,6 +159,7 @@ class Hash {
         }
       break;
 
+      case self::BCRYPT;
       case self::SHA256:
       case self::SHA512:
         if(crypt($str, $hash) === $hash) {
@@ -196,6 +190,46 @@ class Hash {
       	return ($hash == hash($mode, $str));
       break;
     }
+  }
+
+  /**
+   * Returns settings used to generate a hash.
+   *
+   * @param string $hash
+   *   Hash to get settings for.
+   *
+   * @return array
+   *   Returns an array with settings used to create $hash.
+   */
+  public static function getInfo($hash) {
+    $regex_pattern = '/^\$[a-z, 1-6]{1,6}\$/i';
+    preg_match($regex_pattern, $hash, $matches);
+
+    if(sizeof($matches) > 0) {
+      list($method) = $matches;
+    } else {
+      $method = null;
+    }
+
+    switch($method) {
+      case self::SHA256:
+      case self::SHA512:
+      case self::PBKDF2:
+        $param = array();
+        list( , , $params) = explode('$', $hash);
+        parse_str($params, $param);
+        $info['options'] = $param;
+      break;
+
+      case self::BCRYPT;
+        list( , , $cost) = explode('$', $hash);
+        $info['options'] = array(
+          'cost' => $cost,
+        );
+      break;
+    }
+    $info['algo'] = $method;
+    return $info;
   }
 
   private static function _phpassHash($password, $setting, $method = 'sha512') {
