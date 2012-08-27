@@ -11,6 +11,7 @@ phpSec changelog
 * Fixed bug in session handler when setting custom encryption settings.
 * [#100] Added support for Drupal and plain hashes in \phpSec\Crypt\Hash.
 * Added \phpSec\Crypt\Hash::getInfo(), returns settings used to generate a hash.
+* New class: \phpSec\String\Base32
 
 0.4.0: August 19. 2012 - xqus
 -----------------------------
