@@ -3,6 +3,7 @@ phpSec changelog
 
 0.5.0
 -----
+* Added \phpSec\Auth\Google, Authenticate using Google Authenticator.
 * Added \phpSec\Common\SplClassLoader, an improved autoloader.
 * [#101] Added \phpSec\Common\Exec, method for executing programs in a PDO like way.
 * Improved \phpSec\Common\Core\genUid().
