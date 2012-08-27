@@ -154,9 +154,8 @@ class Hash {
         $test = strpos(self::_phpassHash($str, $hash), $hash);
         if($test === false || $test !== 0) {
         	return false;
-        } else {
-        	return true;
         }
+        return true;
       break;
 
       case self::BCRYPT;

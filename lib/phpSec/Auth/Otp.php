@@ -58,9 +58,8 @@ class Otp {
 
     if(Core::$store->write('otp', self::storeId($uid, $action), $otp)) {
       return $pw;
-    } else {
-      return false;
     }
+    return false;
   }
 
   /**
