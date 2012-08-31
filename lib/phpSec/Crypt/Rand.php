@@ -120,12 +120,12 @@ class Rand {
     $numKeys = sizeof($keys);
     if($num == 1) {
       return $keys[self::int(0, $numKeys-1)];
-    } else {
-      for($i=0; $i < $num; $i++) {
-        $picked[] = $keys[self::int(0, $numKeys-1)];
-      }
-      return $picked;
     }
+
+    for($i=0; $i < $num; $i++) {
+      $picked[] = $keys[self::int(0, $numKeys-1)];
+    }
+    return $picked;
   }
 
   /**

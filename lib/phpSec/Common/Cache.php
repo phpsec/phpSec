@@ -57,9 +57,8 @@ class Cache {
     if($data ==! false) {
       if($data['ttl'] > time()) {
         return unserialize($data['data']);
-      } else {
-        Core::$store->delete('cache', self::cacheId($name));
       }
+      Core::$store->delete('cache', self::cacheId($name));
     }
     return false;
   }

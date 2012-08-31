@@ -70,6 +70,7 @@ class Filter {
         $str = str_replace($name, $safeData, $str);
       }
     }
+
     return $str;
   }
 
