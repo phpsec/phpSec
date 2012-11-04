@@ -140,7 +140,7 @@ class Core {
    * @return string
    *   Return the current phpSec UID.
    */
-  public function getUid() {
+  public static function getUid() {
   	/* Create a random token for each visitor and store it the users session.
        This is for example used to identify owners of cache data. */
     if(!isset($_SESSION['phpSec-uid'])) {
