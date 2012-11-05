@@ -61,7 +61,7 @@ class Exec {
 
     $process = proc_open($cmd, self::$descSpecs, $pipes, self::$_cwd, self::$_env);
 
-    if (is_resource($process)) {
+    if(is_resource($process)) {
 
       /* Write stuff to STDIN, and close it. */
       fwrite($pipes[self::STDIN], $stdin);
@@ -87,7 +87,7 @@ class Exec {
    * Builds a command that is safe to execute.
    *
    * @param string $cmd
-   *   Base command ( with placeholders) to execute.
+   *   Base command (with placeholders) to execute.
    *
    * @param array $args
    *   An associative array containing data to filter.
