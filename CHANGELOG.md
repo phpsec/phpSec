@@ -1,8 +1,8 @@
 phpSec changelog
 ================
 
-0.5.0
------
+0.5.0: November 5. 2012 - xqus
+------------------------------
 * Added \phpSec\Auth\Google, Authenticate using Google Authenticator.
 * Added \phpSec\Common\SplClassLoader, an improved autoloader.
 * [#101] Added \phpSec\Common\Exec, method for executing programs in a PDO like way.
@@ -13,6 +13,7 @@ phpSec changelog
 * [#100] Added support for Drupal and plain hashes in \phpSec\Crypt\Hash.
 * Added \phpSec\Crypt\Hash::getInfo(), returns settings used to generate a hash.
 * New class: \phpSec\String\Base32
+* [#105] Core::getUid() should be static.
 
 0.4.0: August 19. 2012 - xqus
 -----------------------------
