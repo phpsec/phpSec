@@ -20,7 +20,7 @@ class Core {
    * Constant: Version number. Isn't really
    * used for something... yet.
    */
-  const VERSION = '0.4.0';
+  const VERSION = '0.5.0';
 
   /**
    * Storage object.
