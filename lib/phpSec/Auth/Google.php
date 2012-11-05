@@ -13,7 +13,7 @@ use \phpSec\Crypt\Rand;
 use \phpSec\Crypt\Hash;
 use \phpSec\Crypt\Crypto;
 use \phpSec\String\Base32;
-
+use \phpSec\Text\Filter;
 
 /**
  * Implements authentication using Google Authenticator.
@@ -127,9 +127,14 @@ class Google {
    *   An array with URL's that can be used.
    */
   public static function getUrl($account, $key) {
-    /*TODO: Add URL filter. */
-    $url['url'] = 'otpauth://totp/'.$account.'?secret='.$key;
-    $url['qr']  = 'https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl=otpauth://totp/'.$account.'?secret='.$key;
+
+    $url['url'] = Filter::t('otpauth://totp/&account?secret=&key',
+                    array('&account' => $account, '&key' => $key)
+                  );
+
+    $url['qr']  = Filter::t('https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl=otpauth://totp/&account?secret=&key',
+                    array('&account' => $account, '&key' => $key)
+                  );
 
     return $url;
   }
