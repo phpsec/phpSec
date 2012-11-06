@@ -42,14 +42,16 @@ class Exec {
    * This method uses as PDO like syntax to build commands.
    *
    * @param string $cmd
-   *   Command to execute.
+   *   Command to execute. If you need to pass arguments to a command. A PDO like syntax can be used.
+   *   For example: "ls -lsa %path".
    *
    * @param array $args
-   *   An associative array containing data to filter.
+   *   An associative array containing the arguments to pass to $cmd.
+   *   For example: array('%path' => '/home');
    *
    * @param string $stdin
    *   If the command requests input (e.g. a passphrase) this can be
-   *   passed here. Note that if a command requires multiple feddbacks
+   *   passed here. Note that if a command requires multiple feedbacks
    *   from a user this method can not be used.
    *
    * @return array
