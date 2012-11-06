@@ -9,7 +9,8 @@
         "session",
         "yubikey",
         "authy",
-        "otp"
+        "otp",
+        "google auth"
         ],
     "homepage": "https://phpseclib.com/",
     "license": "MIT",
