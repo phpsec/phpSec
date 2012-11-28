@@ -109,7 +109,7 @@ class Exec {
           $safeData = escapeshellcmd($data);
           break;
         default:
-          Core::error('Unknown variable type', E_USER_NOTICE);
+          throw new \phpSec\Exception\InvalidArgumentException('Unknown variable type');
           break;
       }
       if($safeData !== false) {

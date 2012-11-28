@@ -40,9 +40,6 @@ class Rand {
       return $rnd;
     }
 
-    /* We don't have OpenSSL available. */
-    Core::error('OpenSSL not available: Using less secure method to generate random data',E_USER_NOTICE);
-
     /* Either we dont have the MCrypt library and OpenSSL library or the data returned was not
      * considered secure. Fall back on this less secure code. */
     $rnd = '';

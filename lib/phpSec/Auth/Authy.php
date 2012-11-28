@@ -191,7 +191,7 @@ class Authy {
     $result  = @file_get_contents($url, false, $context);
 
     if($result === false) {
-    	Core::error('Error communicating with Authy servers');
+      throw new \phpSec\Exception\IOException('Could not communicate with Authy servers');
     	return false;
     }
 

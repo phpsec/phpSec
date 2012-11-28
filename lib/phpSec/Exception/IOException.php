@@ -1,6 +1,6 @@
 <?php
 namespace phpSec\Exception;
 
-class IOException extends \Exception implements Exception {
+class IOException extends \Exception implements \phpSec\Exception {
 
 }

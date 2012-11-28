@@ -1,5 +1,5 @@
 <?php
-namespace phpSec\Exception;
+namespace phpSec;
 
 interface Exception {
 

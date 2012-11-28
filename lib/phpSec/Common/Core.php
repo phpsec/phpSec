@@ -80,7 +80,7 @@ class Core {
     $success = true;
     /* First compare the size of the two arrays. Return error if strict is enabled. */
     if(sizeof($array) != sizeof($structure) && $strict === true) {
-      self::error('Array does not match defined structure');
+      //self::error('Array does not match defined structure');
       return false;
     }
 
@@ -97,12 +97,12 @@ class Core {
 
           if(call_user_func_array($callbackArray['callback'], $callbackArray['params']) !== $callbackArray['match']) {
             /* Call the *duh* callback. If this returns false throw error, or an axe. */
-            self::error('Array does not match defined structure. The '.$key.' key did not pass the '.$callbackArray['callback'].' callback');
+            //self::error('Array does not match defined structure. The '.$key.' key did not pass the '.$callbackArray['callback'].' callback');
             $success = false;
           }
         } elseif($callbackArray === false) {
           /* We don't have a callback, but we have found a disallowed key. */
-          self::error('Array does not match defined structure. '.$key.' is not allowed');
+          //self::error('Array does not match defined structure. '.$key.' is not allowed');
           $success = false;
         }
       } else {
@@ -110,7 +110,7 @@ class Core {
 
         if($callbackArray !== false) {
           /* As long as this is not a disallowed key, sound the general alarm. */
-          self::error('Array does not match defined structure. '.$key.' not defined');
+          //self::error('Array does not match defined structure. '.$key.' not defined');
           $success = false;
         }
       }
@@ -170,7 +170,7 @@ class Core {
         self::$store = new Store\Pdo($storeDest);
       break;
       default:
-      self::error('Store type('.$storeType.') invalid', E_USER_ERROR);
+        throw new \phpSec\Exception\InvalidArgumentException('Store type('.$storeType.') invalid');
     }
   }
 }

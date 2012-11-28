@@ -24,7 +24,7 @@ class File extends Store {
    */
   public function __construct($loc) {
     if(!is_writeable($loc)) {
-      \phpSec\Common\Core::error('Storage directory('.$loc.') not writeable', E_USER_ERROR);
+      throw new \phpSec\Exception\IOException('Storage directory('.$loc.') not writeable');
       return false;
     }
     $this->_dataDir = $loc;
@@ -46,7 +46,7 @@ class File extends Store {
     $mac = \phpSec\Crypt\Crypto::pbkdf2($data, $id, 1000, 32);
 
     if($mac != base64_decode($jsonData->mac)) {
-      \phpSec\Common\Core::error('Message authentication code invalid while reading store');
+      throw new \phpSec\Exception\GeneralSecurityException('Message authentication code invalid while reading store');
       return false;
     }
     return unserialize($data);
@@ -73,7 +73,7 @@ class File extends Store {
         fclose($fp);
         return true;
       } else {
-        \phpSec\Common\Core::error('Could not lock file while writing to store');
+        throw new \phpSec\Exception\IOException('Could not lock file while writing to store');
       }
     }
     return false;

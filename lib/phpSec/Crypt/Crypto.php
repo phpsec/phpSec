@@ -51,7 +51,7 @@ class Crypto {
     $isBlockCipher = mcrypt_module_is_block_algorithm(self::$_algo);
     $isBlockMode   = mcrypt_module_is_block_algorithm_mode(self::$_mode);
     if($isBlockCipher !== $isBlockMode) {
-    	Core::error('You can not mix block and non-block ciphers and modes');
+    	throw new \phpSec\Exception\InvalidAlgorithmParameterException('You can not mix block and non-block ciphers and modes');
     	return false;
     }
 
@@ -63,13 +63,13 @@ class Crypto {
     if(count($keySizes) > 0) {
       /* Encryption method requires a specific key size. */
       if(!in_array($keySize, $keySizes)) {
-        Core::error('Key is out of range. Should be one of: '. implode(', ', $keySizes));
+        throw new \phpSec\Exception\InvalidKeySpecException('Key is out of range. Should be one of: '. implode(', ', $keySizes));
         return false;
       }
     } else {
       /* No spsecific size is needed. */
       if($keySize == 0 || $keySize > mcrypt_enc_get_key_size($td)) {
-        Core::error('Key is out of range. Should be between  1 and ' . mcrypt_enc_get_key_size($td).' bytes.');
+        throw new \phpSec\Exception\InvalidKeySpecException('Key is out of range. Should be between  1 and ' . mcrypt_enc_get_key_size($td).' bytes.');
         return false;
       }
     }
@@ -130,7 +130,7 @@ class Crypto {
     );
 
     if($data === NULL || Core::arrayCheck($data, $dataStructure, false) !== true) {
-      Core::error('Invalid data passed to decrypt()');
+      throw new \phpSec\Exception\GeneralSecurityException('Invalid data passed to decrypt()');
       return false;
     }
     /* Everything looks good so far. Let's continue.*/
@@ -139,7 +139,7 @@ class Crypto {
 
     /* Check MAC. */
     if(base64_decode($data['mac']) != self::pbkdf2($data['cdata'], $key, 1000, 32)) {
-      Core::error('Message authentication code invalid');
+      throw new \phpSec\Exception\GeneralSecurityException('Message authentication code invalid');
       return false;
     }
 
@@ -185,7 +185,7 @@ class Crypto {
 
     /* Step 1. Check dkLen. */
     if($dkLen > (2^32-1) * $hLen) {
-      Core::error('Derived key too long');
+      throw new \phpSec\Exception\GeneralSecurityException('Derived key too long');
       return false;
     }
 

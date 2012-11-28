@@ -32,7 +32,7 @@ class Pdo extends Store {
     try {
       $this->dbh = new \PDO($loc, $parts['username'], $parts['password']);
     } catch(\PDOException $e) {
-      \phpSec\Common\Core::error('Database connection failed: ' . $e->getMessage(), E_USER_ERROR);
+      throw new \phpSec\Exception\IOException('Database connection failed: ' . $e->getMessage());
       return false;
     }
 
@@ -101,9 +101,9 @@ class Pdo extends Store {
 
     /* First we just match number of columns to make sure everything looks good, and to avoid
      * total disaster in the next part. Oh.. I almost forgot. If this fails everything explodes
-     * in a nice old USER_ERROR! */
+     * in a nice old USER_ERROR! NOT! */
     if(sizeof($currentStructure) !== sizeof($storeTable)) {
-      \phpSec\Common\Core::error('Invalid table ('.$parts['dbname'].'.'.$this->table.') structure', E_USER_ERROR);
+      throw new \phpSec\Exception\IOException('Invalid table ('.$parts['dbname'].'.'.$this->table.') structure');
       return false;
     }
 
@@ -111,7 +111,7 @@ class Pdo extends Store {
     for($i=0; $i < sizeof($storeTable); $i++) {
       $diff = array_diff_assoc($currentStructure[$i], $storeTable[$i]);
       if(sizeof($diff) > 0) {
-        \phpSec\Common\Core::error('Invalid table ('.$parts['dbname'].'.'.$this->table.') structure. '.var_export($diff, true), E_USER_ERROR);
+        throw new \phpSec\Exception\IOException('Invalid table ('.$parts['dbname'].'.'.$this->table.') structure. '.var_export($diff, true));
         return false;
       }
     }
@@ -146,7 +146,7 @@ class Pdo extends Store {
 
     /* Compare MAC */
     if($mac != $data['mac']) {
-      \phpSec\Common\Core::error('Message authentication code invalid while reading store');
+      throw new \phpSec\Exception\GeneralSecurityException('Message authentication code invalid while reading store');
       return false;
     }
 
