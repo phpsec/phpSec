@@ -47,30 +47,34 @@ class Google {
   public static function verify($otp, $secret) {
     $timeTick = self::getTimestamp();
     $storeId = self::getStoreId($secret);
-    $store = Core::$store->read('google-auth', $storeId);
+    try {
+      $store = Core::$store->read('google-auth', $storeId);
 
-    for($tick = $timeTick - self::$_deviate ; $tick <= $timeTick + self::$_deviate; $tick++) {
-      $tickOtp = self::getToken($secret, $tick);
-      if($store !== false) {
-        /**
-         * This secret has been used before, so we have to make sure that:
-         * 1. This token has not been used before.
-         * 2. This token is not older than the last one.
-         * 3. We keep the Sith from world domination.
-         */
-        if($otp === $store['lastOtp'] || $store['lastTick'] > $tick) {
-          continue;
+      for($tick = $timeTick - self::$_deviate ; $tick <= $timeTick + self::$_deviate; $tick++) {
+        $tickOtp = self::getToken($secret, $tick);
+        if($store !== false) {
+          /**
+           * This secret has been used before, so we have to make sure that:
+           * 1. This token has not been used before.
+           * 2. This token is not older than the last one.
+           * 3. We keep the Sith from world domination.
+           */
+          if($otp === $store['lastOtp'] || $store['lastTick'] > $tick) {
+            continue;
+          }
+        }
+
+        if($tickOtp === $otp) {
+          $store['lastTick'] = $tick;
+          $store['lastOtp']  = $otp;
+          Core::$store->write('google-auth', $storeId, $store);
+          return true;
         }
       }
-
-      if($tickOtp === $otp) {
-        $store['lastTick'] = $tick;
-        $store['lastOtp']  = $otp;
-        Core::$store->write('google-auth', $storeId, $store);
-        return true;
-      }
+      return false;
+    } catch (\phpSec\Exception $e) {
+      return false;
     }
-    return false;
   }
 
   /**

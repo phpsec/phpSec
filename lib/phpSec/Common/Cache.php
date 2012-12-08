@@ -36,8 +36,12 @@ class Cache {
     $saveData['data'] = serialize($data);
     $saveData['ttl']  = time() + $ttl;
 
-    return Core::$store->write('cache', self::cacheId($name), $saveData);
-
+    try {
+      Core::$store->write('cache', self::cacheId($name), $saveData);
+    } catch (\phpSec\Exception $e) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -53,7 +57,11 @@ class Cache {
     /* Do cache garbage collection. */
     self::cacheGc();
 
-    $data = Core::$store->read('cache', self::cacheId($name));
+    try {
+      $data = Core::$store->read('cache', self::cacheId($name));
+    } catch (\phpSec\Exception $e) {
+      return false;
+    }
     if($data ==! false) {
       if($data['ttl'] > time()) {
         return unserialize($data['data']);
@@ -88,7 +96,13 @@ class Cache {
     }
     $cahceIds = Core::$store->listIds('cache');
     foreach($cahceIds as $cahceId) {
-      $data = Core::$store->read('cache', $cahceId);
+      try {
+        $data = Core::$store->read('cache', $cahceId);
+      } catch (\phpSec\Exception $e) {
+        /* Skip this. */
+        continue;
+      }
+
       if($data['ttl'] < time()) {
         Core::$store->delete('cache', $cahceId);
       }

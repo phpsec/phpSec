@@ -136,13 +136,18 @@ class Session {
     }
 
     /* Read from store and decrypt. */
-    $sessData = Core::$store->read('session', $_COOKIE[self::$_name]);
-    if($sessData !== false ) {
-      $return = Crypto::decrypt($sessData, self::$_secret);
-    } else {
-      $return = false;
+    try {
+      $sessData = Core::$store->read('session', $_COOKIE[self::$_name]);
+
+      if($sessData !== false ) {
+        $return = Crypto::decrypt($sessData, self::$_secret);
+      } else {
+        $return = false;
+      }
+      return $return;
+    }  catch (\phpSec\Exception $e) {
+      return false;
     }
-    return $return;
   }
 
   /**
@@ -154,18 +159,21 @@ class Session {
    */
   public static function write($id, $data) {
     /* Encrypt session. */
-    Crypto::$_algo = self::$_cryptAlgo;
-    Crypto::$_mode = self::$_cryptMode;
-    $encrypted = Crypto::encrypt($data, self::$_secret);
+    try {
+      Crypto::$_algo = self::$_cryptAlgo;
+      Crypto::$_mode = self::$_cryptMode;
+      $encrypted = Crypto::encrypt($data, self::$_secret);
 
-    /* Destroy old session. */
-    if(self::$_newID != self::$_currID) {
-    	self::destroy(self::$_currID);
+      /* Destroy old session. */
+      if(self::$_newID != self::$_currID) {
+      	self::destroy(self::$_currID);
+      }
+
+      /* Write new session, with new ID. */
+      return Core::$store->write('session', self::$_newID, $encrypted);
+    } catch (\phpSec\Exception $e) {
+      return false;
     }
-
-    /* Write new session, with new ID. */
-    return Core::$store->write('session', self::$_newID, $encrypted);
-
   }
   /**
    * Destroy/remove a session.
