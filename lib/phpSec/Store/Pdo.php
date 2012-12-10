@@ -1,18 +1,21 @@
-<?php namespace phpSec\Store;
+<?php
 /**
-  phpSec - A PHP security library
-
-  @author    Audun Larsen <larsen@xqus.com>
-  @copyright Copyright (c) Audun Larsen, 2011, 2012
-  @link      https://github.com/phpsec/phpSec
-  @license   http://opensource.org/licenses/mit-license.php The MIT License
-  @package   phpSec
+ * phpSec - A PHP security library
+ *
+ * @author    Audun Larsen <larsen@xqus.com>
+ * @copyright Copyright (c) Audun Larsen, 2011, 2012
+ * @link      https://github.com/phpsec/phpSec
+ * @license   http://opensource.org/licenses/mit-license.php The MIT License
+ * @package   phpSec
  */
+namespace phpSec\Store;
+
 use \phpSec\Crypt\Crypto;
 use \phpSec\Common\Core;
 
 /**
- *  Class for handling database storage.
+ * Class for handling database storage.
+ * @package phpSec
  */
 class Pdo extends Store {
 
@@ -21,7 +24,7 @@ class Pdo extends Store {
   private $table     = null;
 
   /**
-   * @see phpsecStore::__construct()
+   * @see \phpSec\Store\Store::__construct()
    */
   public function __construct($loc) {
     /* Separate username and password from DSN */

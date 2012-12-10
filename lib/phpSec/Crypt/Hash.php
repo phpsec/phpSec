@@ -14,6 +14,7 @@ use phpSec\Crypt\Crypto;
 
 /**
  * Implements password hashing using crypt() with PBKDF2 support.
+ * @package phpSec
  */
 class Hash {
 

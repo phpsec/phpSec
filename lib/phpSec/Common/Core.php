@@ -14,6 +14,7 @@ use \phpSec\Crypt\Rand;
 
 /**
  * phpSec core functionality.
+ * @package phpSec
  */
 class Core {
   /**

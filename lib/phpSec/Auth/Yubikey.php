@@ -12,6 +12,7 @@ use phpSec\Crypt\Rand;
 
 /**
  * Implements validation of Yubikey against Yubico servers.
+ * @package phpSec
  */
 class Yubikey {
   /**

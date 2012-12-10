@@ -12,6 +12,7 @@ use \phpSec\Common\Core;
 
 /**
  * Execute external programs in a safe(er) way.
+ * @package phpSec
  */
 class Exec {
 

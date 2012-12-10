@@ -1,9 +1,8 @@
 <?php namespace phpSec\Common;
 /**
- * SplClassLoader implementation that implements the technical interoperability
- * standards for PHP 5.3 namespaces and class names.
+ * phpSec - A PHP security library
  *
- * @see https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md
+ * @see http://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md
  *
  * @author Jonathan H. Wage <jonwage@gmail.com>
  * @author Roman S. Borschel <roman@code-factory.org>
@@ -11,6 +10,12 @@
  * @author Kris Wallsmith <kris.wallsmith@gmail.com>
  * @author Fabien Potencier <fabien.potencier@symfony-project.org>
  * @author Audun Larsen <larsen@xqus.com>
+ */
+
+/**
+ * SplClassLoader implementation that implements the technical interoperability
+ * standards for PHP 5.3 namespaces and class names.
+ * @package phpSec
  */
 class SplClassLoader {
   private $_fileExtension = '.php';

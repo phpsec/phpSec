@@ -6,13 +6,13 @@
   @copyright Copyright (c) Audun Larsen, 2012
   @link      https://github.com/phpsec/phpSec
   @license   http://opensource.org/licenses/mit-license.php The MIT License
-  @package   phpSec
  */
 use phpSec\Common\Core;
 
 /**
  * Implements Authy authentication. It's like magic, except it's math.
- * @link https://www.authy.com
+ *
+ * @package phpSec
  */
 class Authy {
 

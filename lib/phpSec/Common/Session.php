@@ -14,6 +14,7 @@ use \phpSec\Crypt\Rand;
 
 /**
  * Implements a session handler to save session data encrypted.
+ * @package phpSec
  */
 class Session {
   private static $_sessIdRegen;

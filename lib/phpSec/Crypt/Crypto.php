@@ -13,8 +13,7 @@ use \phpSec\Crypt\Rand;
 
 /**
  * Provides methods for encrypting data.
- *
- * @namespace phpSec\Crypt
+ * @package phpSec
  */
 class Crypto {
   public static $_algo    = 'rijndael-256';

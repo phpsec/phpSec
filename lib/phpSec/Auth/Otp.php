@@ -14,6 +14,7 @@ use phpSec\Crypt\Rand;
 
 /**
  * Provides one time password functionality.
+ * @package phpSec
  */
 class Otp {
   public static $_charset = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';

@@ -12,6 +12,7 @@ use phpSec\Common\Core;
 
 /**
  * Provides methods for XSS filtering.
+ * @package phpSec
  */
 class Filter {
 

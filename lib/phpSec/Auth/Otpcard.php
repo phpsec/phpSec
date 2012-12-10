@@ -6,13 +6,14 @@
   @copyright Copyright (c) Audun Larsen, 2011, 2012
   @link      https://github.com/phpsec/phpSec
   @license   http://opensource.org/licenses/mit-license.php The MIT License
-  @package   phpSec
+  @package   phpSec_Experimental
  */
 use phpSec\Crypt\Rand;
 use phpSec\Common\Core;
 
 /**
  * Providees pre shared one-time-password functionality. Experimental.
+ * @package phpSec_Experimental
  */
 class Otpcard {
   const HASH_TYPE = 'sha256';

@@ -13,8 +13,9 @@ use \phpSec\Common\Core;
 
 /**
  * Provides us with a simple cahce engine.
- * Only intended for use by phpSec, but feel free to use
- * it if you want.
+ *
+ * Only intended for use by phpSec, but feel free to use it if you want.
+ * @package phpSec
  */
 class Cache {
   const GC_PROB   = 0.2;

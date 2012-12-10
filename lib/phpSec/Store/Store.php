@@ -11,6 +11,7 @@
 
 /**
  * Abstract class describing the phpSec storage interface class.
+ * @package phpSec
  */
 abstract class Store {
 

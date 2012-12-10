@@ -11,6 +11,7 @@
 
 /**
  * Class to prevent URL manipulation.
+ * @package phpSec
  */
 class Url {
 

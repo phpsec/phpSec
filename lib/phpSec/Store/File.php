@@ -12,7 +12,8 @@ use \phpSec\Crypt\Crypto;
 use \phpSec\Common\Core;
 
 /**
- *  Class for handling flat file storage.
+ * Class for handling flat file storage.
+ * @package phpSec
  */
 class File extends Store {
 

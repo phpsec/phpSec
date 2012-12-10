@@ -12,6 +12,7 @@ use \phpSec\Common\Core;
 
 /**
  * Provides methods for generating random data.
+ * @package phpSec
  */
 class Rand {
   public static $_charset = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';

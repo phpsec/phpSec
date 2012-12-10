@@ -19,6 +19,7 @@ use \phpSec\Text\Filter;
  * Implements authentication using Google Authenticator.
  *
  * @see http://www.ietf.org/rfc/rfc4226.txt
+ * @package phpSec
  */
 class Google {
 

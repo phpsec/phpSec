@@ -11,6 +11,7 @@
 
 /**
  * Implements HTTP Strict Transport Security (HSTS), RFC 6797
+ * @package phpSec
  */
 class Hsts {
 

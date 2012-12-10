@@ -13,6 +13,7 @@ use phpSec\Crypt\Rand;
 
 /**
  * Provides CSRF protection methods.
+ * @package phpSec
  */
 class Token {
   public static $_charset = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';

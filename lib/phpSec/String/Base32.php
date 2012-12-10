@@ -11,6 +11,7 @@
 
 /**
  * Base 32 decoding of string.
+ * @package phpSec
  */
 class Base32 {
 
