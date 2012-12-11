@@ -144,6 +144,8 @@ class Authy {
    * @param array $data
    *   Data to perform the action with.
    *
+   * @throws \phpSec\Exception\IOException If the Auty API server is unreachable.
+   *
    * @return object
    *   Decoded JSON results from Authy server.
    */
