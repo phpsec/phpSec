@@ -16,6 +16,9 @@ use phpSec\Common\Core;
  */
 class Filter {
 
+  /* Charset to use for filter functions. */
+  public static $_charset;
+
   /**
    * XSS text filter. Returns a string that is safe to use on the page.
    *
@@ -64,7 +67,7 @@ class Filter {
           $safeData = self::f($data, 'url');
           break;
         default:
-          Core::error('Unknown variable type', E_USER_NOTICE);
+          throw new \phpSec\Exception\InvalidArgumentException('Unknown variable type');
           break;
       }
       if($safeData !== false) {
@@ -106,11 +109,11 @@ class Filter {
       case 'escapeAll':
         /* HTML and special characters are escaped from the string
            before it is used. */
-        return htmlentities($str, ENT_QUOTES, phpSec::$_charset);
+        return htmlentities($str, ENT_QUOTES, self::$_charset);
       case 'escape':
         /* Only HTML tags are escaped from the string. Special characters
            is kept as is. */
-        return htmlspecialchars($str, ENT_NOQUOTES, phpSec::$_charset);
+        return htmlspecialchars($str, ENT_NOQUOTES, self::$_charset);
       case 'url':
         /* Encode a string according to RFC 3986 for use in a URL. */
         return rawurlencode($str);
@@ -118,7 +121,7 @@ class Filter {
         /* Escape a string so it's safe to be used as filename. */
         return str_replace('/', '_', $str);
       default:
-        Core::error('Unknown variable type', E_USER_NOTICE);
+        throw new \phpSec\Exception\InvalidArgumentException('Unknown variable type');
     }
   }
 }
