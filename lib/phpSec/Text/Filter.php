@@ -17,7 +17,7 @@ use phpSec\Common\Core;
 class Filter {
 
   /* Charset to use for filter functions. */
-  public static $_charset;
+  public static $_charset = 'UTF-8';
 
   /**
    * XSS text filter. Returns a string that is safe to use on the page.
