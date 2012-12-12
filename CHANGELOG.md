@@ -1,5 +1,7 @@
 phpSec changelog
 ================
+0.5.1: December 12. 2012 - xqus
+* Fixes \phpSec\Text\Filter.
 
 0.5.0: November 5. 2012 - xqus
 ------------------------------
