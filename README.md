@@ -59,9 +59,8 @@ For documentation on how to use the various phpSec functionality, take alook at 
 
 System requirements
 -------------------
-PHP 5.3.0 or greater with the following extensions is required to use phpSec:
-
-* [Mcrypt](http://no.php.net/manual/en/mcrypt.installation.php)
+* PHP >= 5.3.0 
+* [Mcrypt](http://no.php.net/manual/en/mcrypt.installation.php), if you want to encrypt stuff.
 
 Getting help / Contact
 ----------------------
