@@ -110,6 +110,7 @@ class Authy {
       'authy_id' => $authyId,
     );
 
+
     $result = self::apiCall('verify', $data);
 
     if($result === false) {
@@ -193,7 +194,6 @@ class Authy {
     $result  = @file_get_contents($url, false, $context);
 
     if($result === false) {
-      throw new \phpSec\Exception\IOException('Could not communicate with Authy servers');
     	return false;
     }
 
