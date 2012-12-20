@@ -1,6 +1,17 @@
 phpSec changelog
 ================
 
+0.6.0
+-----
+* Adds \phpSec\Http\Hsts, Implements HTTP Strict Transport Security
+* Adds \phpSec\Http\Url, Impements URL manipulation prevention
+* [#107] phpSec throws exceptions instead of triggering errors.
+* Various minor fixes.
+
+0.5.1: December 12. 2012 - xqus
+-------------------------------
+* Fixes \phpSec\Text\Filter.
+
 0.5.0: November 5. 2012 - xqus
 ------------------------------
 * Added \phpSec\Auth\Google, Authenticate using Google Authenticator.
