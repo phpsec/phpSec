@@ -23,14 +23,20 @@ use \phpSec\Text\Filter;
  */
 class Google {
 
-  public static $_otpLen  = 6;
-  public static $_deviate = 2;
+  public $_otpLen  = 6;
+  public $_deviate = 2;
+
+  private $psl = null;
+
+  public function __construct($psl) {
+    $this->psl = $psl;
+  }
 
   /**
    * Generate a new secret key.
    */
-  public static function newKey() {
-    return Rand::str(16, '234567QWERTYUIOPASDFGHJKLZXCVBNM');
+  public function newKey() {
+    return $this->psl['crypt/rand']->str(16, '234567QWERTYUIOPASDFGHJKLZXCVBNM');
   }
 
   /**
@@ -45,14 +51,13 @@ class Google {
    * @return boolean
    *   Returns true if the OTP is valid.
    */
-  public static function verify($otp, $secret) {
-    $timeTick = self::getTimestamp();
-    $storeId = self::getStoreId($secret);
+  public function verify($otp, $secret) {
+    $timeTick = $this->getTimestamp();
+    $storeId  = $this->getStoreId($secret);
     try {
-      $store = Core::$store->read('google-auth', $storeId);
-
-      for($tick = $timeTick - self::$_deviate ; $tick <= $timeTick + self::$_deviate; $tick++) {
-        $tickOtp = self::getToken($secret, $tick);
+      $store = $this->psl['store']->read('google-auth', $storeId);
+      for($tick = $timeTick - $this->_deviate ; $tick <= $timeTick + $this->_deviate; $tick++) {
+        $tickOtp = $this->getToken($secret, $tick);
         if($store !== false) {
           /**
            * This secret has been used before, so we have to make sure that:
@@ -68,12 +73,12 @@ class Google {
         if($tickOtp === $otp) {
           $store['lastTick'] = $tick;
           $store['lastOtp']  = $otp;
-          Core::$store->write('google-auth', $storeId, $store);
+          $this->psl['store']->write('google-auth', $storeId, $store);
           return true;
         }
       }
       return false;
-    } catch (\phpSec\Exception $e) {
+    } catch (\phpSec\Exception $e) { /* Say what? */
       return false;
     }
   }
@@ -87,11 +92,11 @@ class Google {
    *
    * @return string
    */
-  private static function getToken($secret, $timeTick = null) {
+  public function getToken($secret, $timeTick = null) {
     $secret = Base32::decode($secret);
 
     if($timeTick === null) {
-      $timeTick = self::getTimestamp();
+      $timeTick = $this->getTimestamp();
     }
 
     $timestamp = pack('N*', 0) . pack('N*', $timeTick);
@@ -105,9 +110,9 @@ class Google {
         ((ord($hash[$offset+1]) & 0xff) << 16 ) |
         ((ord($hash[$offset+2]) & 0xff) << 8 ) |
         (ord($hash[$offset+3]) & 0xff)
-    ) % pow(10, self::$_otpLen);
+    ) % pow(10, $this->_otpLen);
 
-    return str_pad($otp, self::$_otpLen, '0', STR_PAD_LEFT);
+    return str_pad($otp, $this->_otpLen, '0', STR_PAD_LEFT);
   }
 
   /**
@@ -115,7 +120,7 @@ class Google {
    *
    * @return integer
    */
-  private static function getTimestamp() {
+  private function getTimestamp() {
     return floor(time()/30);
   }
 
@@ -131,7 +136,7 @@ class Google {
    * @return array
    *   An array with URL's that can be used.
    */
-  public static function getUrl($account, $key) {
+  public function getUrl($account, $key) {
 
     $url['url'] = Filter::t('otpauth://totp/&account?secret=&key',
                     array('&account' => $account, '&key' => $key)
@@ -151,7 +156,7 @@ class Google {
    *
    * @return string
    */
-  private static function getStoreId($secret) {
+  private function getStoreId($secret) {
     return base64_encode(Crypto::pbkdf2('google-auth', $secret, 500, 32));
   }
 

@@ -19,27 +19,27 @@ class Authy {
   /**
    * Authy API key.
    */
-  public static $_apiKey  = null;
+  public$_apiKey  = null;
 
   /**
    * Connect to sandbox?
    */
-  public static $_sandbox = false;
+  public $_sandbox = false;
 
   /**
    * Server timeout. In seconds.
    */
-  public static $_serverTimeout = 3;
+  public $_serverTimeout = 3;
 
   /**
    * Last error returned by Authy API.
    */
-  public static $lastError = null;
+  public $lastError = null;
 
   /**
    * Server URLs.
    */
-  private static $_servers = array(
+  private $_servers = array(
     'production' => 'https://api.authy.com',
     'sandbox'    => 'http://sandbox-api.authy.com',
   );
@@ -60,7 +60,7 @@ class Authy {
    *   Returns the users Authy ID on success or false on errors.
    *   @see \phpSec\Auth\Authy::$lastError.
    */
-  public static function userNew($email, $cellphone, $countrycode = 1) {
+  public function userNew($email, $cellphone, $countrycode = 1) {
 
     $data = array(
       'user[email]'        => $email,
@@ -68,18 +68,18 @@ class Authy {
       'user[country_code]' => $countrycode,
     );
 
-    $result = self::apiCall('new', $data);
+    $result = $this->apiCall('new', $data);
 
     if($result === false) {
-    	self::$lastError = 'AUTHY_SERVER_ERROR';
+    	$this->lastError = 'AUTHY_SERVER_ERROR';
     	return false;
     }
 
     if(isset($result->errors)) {
       if(isset($result->errors->api_key)) {
-        self::$lastError = 'AUTHY_SERVER_INVALID_API_KEY';
+        $this->lastError = 'AUTHY_SERVER_INVALID_API_KEY';
       } else {
-        self::$lastError = 'AUTHY_SERVER_INVALID_DATA';
+        $this->lastError = 'AUTHY_SERVER_INVALID_DATA';
       }
       return false;
     }
@@ -87,7 +87,7 @@ class Authy {
     if(isset($result->user->id)) {
     	return $result->user->id;
     }
-    self::$lastError = 'AUTHY_SERVER_SAYS_NO';
+    $this->lastError = 'AUTHY_SERVER_SAYS_NO';
     return false;
   }
 
@@ -104,27 +104,27 @@ class Authy {
    *   Return true if a valid Authy token is supplied, false on any errors.
    *   @see \phpSec\Auth\Authy::$lastError.
    */
-  public static function verify($authyId, $token) {
+  public function verify($authyId, $token) {
     $data = array(
       'token'    => $token,
       'authy_id' => $authyId,
     );
 
 
-    $result = self::apiCall('verify', $data);
+    $result = $this->apiCall('verify', $data);
 
     if($result === false) {
-    	self::$lastError = 'AUTHY_SERVER_ERROR';
+    	$this->lastError = 'AUTHY_SERVER_ERROR';
     	return false;
     }
 
     if(isset($result->errors)) {
     	if(isset($result->errors->token))   {
-    		self::$lastError = 'AUTHY_SERVER_BAD_OTP';
+    		$this->lastError = 'AUTHY_SERVER_BAD_OTP';
     	} elseif(isset($result->errors->api_key)) {
-        self::$lastError = 'AUTHY_SERVER_INVALID_API_KEY';
+        $this->lastError = 'AUTHY_SERVER_INVALID_API_KEY';
       } else {
-    		self::$lastError = 'AUTHY_SERVER_INVALID_DATA';
+    		$this->lastError = 'AUTHY_SERVER_INVALID_DATA';
     	}
     	return false;
     }
@@ -150,23 +150,23 @@ class Authy {
    * @return object
    *   Decoded JSON results from Authy server.
    */
-  private static function apiCall($action, $data) {
-    switch(self::$_sandbox) {
+  private function apiCall($action, $data) {
+    switch($this->_sandbox) {
       case true:
-     	  $url = self::$_servers['sandbox'];
+     	  $url = $this->_servers['sandbox'];
      	  break;
      	default:
-     	  $url = self::$_servers['production'];
+     	  $url = $this->_servers['production'];
     }
 
     switch($action) {
     	case 'new':
-        $url = $url.'/protected/json/users/new?api_key='.self::$_apiKey;
+        $url = $url.'/protected/json/users/new?api_key='.$this->_apiKey;
         $postData = http_build_query($data);
         $opts = array(
           'http' => array(
           'method'  => 'POST',
-          'timeout' => self::$_serverTimeout,
+          'timeout' => $this->_serverTimeout,
           'header'  => "Content-Type: application/x-www-form-urlencoded\r\n" .
                        "Content-Length: ".strlen($postData) ."\r\n".
                        "User-Agent: phpSec (http://phpseclib.com)\r\n",
@@ -176,12 +176,12 @@ class Authy {
 
     	  break;
     	case 'verify':
-        $url = $url.'/protected/json/verify/'.$data['token'].'/'.$data['authy_id'].'?api_key='.self::$_apiKey;
+        $url = $url.'/protected/json/verify/'.$data['token'].'/'.$data['authy_id'].'?api_key='.$this->_apiKey;
 
         $opts = array(
           'http' => array(
           'method'  => 'GET',
-          'timeout' => self::$_serverTimeout,
+          'timeout' => $this->_serverTimeout,
           'header'  => "User-Agent: phpSec (http://phpseclib.com)",
           'ignore_errors' => true,
         ));

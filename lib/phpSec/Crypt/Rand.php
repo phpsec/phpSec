@@ -8,14 +8,13 @@
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
-use \phpSec\Common\Core;
 
 /**
  * Provides methods for generating random data.
  * @package phpSec
  */
 class Rand {
-  public static $_charset = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  public $_charset = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
   /**
    * Generate pseudorandom bytes.
@@ -23,7 +22,7 @@ class Rand {
    * @param integer $len
    * @return binary
    */
-  public static function bytes($len) {
+  public function bytes($len) {
     /* Code inspired by this blogpost by Enrico Zimuel
      * http://www.zimuel.it/en/strong-cryptography-in-php/ */
     $strong = false;
@@ -59,10 +58,10 @@ class Rand {
    * @param integer $max
    * @return integer
    */
-  public static function int($min, $max) {
+  public function int($min, $max) {
     $delta = $max-$min;
     $bytes = ceil($delta/256);
-    $rnd = self::bytes($bytes);
+    $rnd = $this->bytes($bytes);
     $add = 0;
     for ($i = 0; $i < $bytes; $i++) {
       $add += ord($rnd[$i]);
@@ -78,14 +77,14 @@ class Rand {
    * @param string $_charset
    * @return string
    */
-  public static function str($len, $_charset = null) {
+  public function str($len, $_charset = null) {
     if($_charset == null) {
-      $_charset = self::$_charset;
+      $_charset = $this->_charset;
     }
 
     $str = '';
     for ($i = 0; $i < $len; $i++) {
-      $pos = self::int(0,strlen($_charset)-1);
+      $pos = $this->int(0,strlen($_charset)-1);
       $str .= $_charset[$pos];
     }
     return $str;
@@ -97,8 +96,8 @@ class Rand {
    * @param integer $len
    * @return string
    */
-  public static function hex($len) {
-    return bin2hex(self::bytes($len));
+  public function hex($len) {
+    return bin2hex($this->bytes($len));
   }
 
   /**
@@ -113,15 +112,15 @@ class Rand {
    * @return mixed
    *   String with the key, or array containing multiple keys.
    */
-  public static function arrayRand($array, $num = 1) {
+  public function arrayRand($array, $num = 1) {
     $keys = array_keys($array);
     $numKeys = sizeof($keys);
     if($num == 1) {
-      return $keys[self::int(0, $numKeys-1)];
+      return $keys[$this->int(0, $numKeys-1)];
     }
 
     for($i=0; $i < $num; $i++) {
-      $picked[] = $keys[self::int(0, $numKeys-1)];
+      $picked[] = $keys[$this->int(0, $numKeys-1)];
     }
     return $picked;
   }
@@ -131,8 +130,8 @@ class Rand {
    *
    * @return boolean
    */
-  public static function bool() {
-  	$byte = self::bytes(1);
+  public function bool() {
+  	$byte = $this->bytes(1);
   	if((ord($byte) + 1) % 2 === 0) {
   		return false;
   	}
