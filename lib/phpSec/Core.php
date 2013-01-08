@@ -147,29 +147,4 @@ class Core extends Pimple {
     return $_SESSION['phpSec-uid'];
   }
 
-  /**
-   * Configure/set the phpSec store.
-   *
-   * @see https://github.com/phpsec/doc/blob/master/01-Getting-Started.md
-   *
-   * @param string
-   *   Store target.
-   */
-  public static function setStore($dsn) {
-
-    /* Open store. */
-    list($storeType, $storeDest) = explode(':', $dsn, 2);
-    switch($storeType) {
-      case 'filesystem':
-        self::$store = new Store\File($storeDest);
-        break;
-      case 'mysql':
-        self::$store = new Store\Pdo($storeDest);
-        break;
-      default:
-        throw new \phpSec\Exception\InvalidArgumentException('Store type('.$storeType.') invalid');
-    }
-  }
-
-
 }
