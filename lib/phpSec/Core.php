@@ -121,7 +121,7 @@ class Core extends Pimple {
    * @return string
    *   Returns a unique identifier.
    */
-  public static function genUid() {
+  public function genUid() {
     $hex = bin2hex(Rand::Bytes(32));
     $str = substr($hex,0,16) . '-' . substr($hex,16,8) . '-' . substr($hex,24,8) . '-' . substr($hex,32,8) . '-' . substr($hex,40,24);
 
@@ -137,11 +137,11 @@ class Core extends Pimple {
    * @return string
    *   Return the current phpSec UID.
    */
-  public static function getUid() {
+  public function getUid() {
     /* Create a random token for each visitor and store it the users session.
      This is for example used to identify owners of cache data. */
     if(!isset($_SESSION['phpSec-uid'])) {
-      $_SESSION['phpSec-uid'] = self::genUid();
+      $_SESSION['phpSec-uid'] = $this->genUid();
     }
 
     return $_SESSION['phpSec-uid'];
