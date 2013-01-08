@@ -3,26 +3,32 @@
   phpSec - A PHP security library
 
   @author    Audun Larsen <larsen@xqus.com>
-  @copyright Copyright (c) Audun Larsen, 2011, 2012
+  @copyright Copyright (c) Audun Larsen, 2011, 2012, 2013
   @link      https://github.com/phpsec/phpSec
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
-use \phpSec\Common\Core;
-use \phpSec\Crypt\Rand;
 
 /**
  * Provides methods for encrypting data.
  * @package phpSec
  */
 class Crypto {
-  public static $_algo    = 'rijndael-256';
-  public static $_mode    = 'ctr';
+  public $_algo = 'rijndael-256';
+  public $_mode = 'ctr';
 
-  protected static $_padding = false;
+  protected $_padding = false;
+
+  private $psl = null;
 
 
   const HASH_TYPE = 'sha256';
+
+  public function __construct($psl = null) {
+    if($psl !== null) {
+      $this->psl = $psl;
+    }
+  }
 
   /**
    * Encrypt data returning a JSON encoded array safe for storage in a database
@@ -44,17 +50,17 @@ class Crypto {
    * @return string
    *   Serialized array containing the encrypted data along with some meta data.
    */
-  public static function encrypt($data, $key) {
+  public function encrypt($data, $key) {
 
     /* Make sure both algorithm and mode are either block or non-block. */
-    $isBlockCipher = mcrypt_module_is_block_algorithm(self::$_algo);
-    $isBlockMode   = mcrypt_module_is_block_algorithm_mode(self::$_mode);
+    $isBlockCipher = mcrypt_module_is_block_algorithm($this->_algo);
+    $isBlockMode   = mcrypt_module_is_block_algorithm_mode($this->_mode);
     if($isBlockCipher !== $isBlockMode) {
     	throw new \phpSec\Exception\InvalidAlgorithmParameterException('You can not mix block and non-block ciphers and modes');
     	return false;
     }
 
-    $td = mcrypt_module_open(self::$_algo, '', self::$_mode, '');
+    $td = mcrypt_module_open($this->_algo, '', $this->_mode, '');
 
     /* Check key size. */
     $keySize = strlen($key);
@@ -74,7 +80,8 @@ class Crypto {
     }
 
     /* Create IV. */
-    $iv = Rand::bytes(mcrypt_enc_get_iv_size($td));
+    $rnd = $this->psl['crypt/rand'];
+    $iv = $rnd->bytes(mcrypt_enc_get_iv_size($td));
 
     /* Init mcrypt. */
     mcrypt_generic_init($td, $key, $iv);
@@ -83,23 +90,23 @@ class Crypto {
     $serializedData = serialize($data);
 
     /* Enable padding of data if block cipher moode. */
-    if (mcrypt_module_is_block_algorithm_mode(self::$_mode) === true)	{
-    	self::$_padding = true;
+    if (mcrypt_module_is_block_algorithm_mode($this->_mode) === true)	{
+    	$this->_padding = true;
     }
 
     /* Add padding if enabled. */
-    if(self::$_padding === true) {
+    if($this->_padding === true) {
       $block = mcrypt_enc_get_block_size($td);
-      $serializedData = self::pad($block, $serializedData);
+      $serializedData = $this->pad($block, $serializedData);
       $encrypted['padding'] = 'PKCS7';
     }
 
-    $encrypted['algo']  = self::$_algo;                                        /* Algorithm used to encrypt. */
-    $encrypted['mode']  = self::$_mode;                                        /* Algorithm mode. */
+    $encrypted['algo']  = $this->_algo;                                        /* Algorithm used to encrypt. */
+    $encrypted['mode']  = $this->_mode;                                        /* Algorithm mode. */
     $encrypted['iv']    = base64_encode($iv);                                  /* Initialization vector, just a bunch of randomness. */
     $encrypted['cdata'] = base64_encode(mcrypt_generic($td, $serializedData)); /* The encrypted data. */
     $encrypted['mac']   = base64_encode(                                       /* The message authentication code. Used to make sure the */
-                            self::pbkdf2($encrypted['cdata'], $key, 1000, 32)  /* message is valid when decrypted. */
+                            $this->pbkdf2($encrypted['cdata'], $key, 1000, 32)  /* message is valid when decrypted. */
                           );
     return json_encode($encrypted);
   }
@@ -115,7 +122,7 @@ class Crypto {
    * @return mixed
    *   Decrypted data in it's original form.
    */
-  public static function decrypt($data, $key) {
+  public function decrypt($data, $key) {
 
     /* Decode the JSON string */
     $data = json_decode($data, true);
@@ -128,7 +135,7 @@ class Crypto {
       'mac'   => true,
     );
 
-    if($data === NULL || Core::arrayCheck($data, $dataStructure, false) !== true) {
+    if($data === NULL || $this->psl->arrayCheck($data, $dataStructure, false) !== true) {
       throw new \phpSec\Exception\GeneralSecurityException('Invalid data passed to decrypt()');
       return false;
     }
@@ -137,7 +144,7 @@ class Crypto {
     $block = mcrypt_enc_get_block_size($td);
 
     /* Check MAC. */
-    if(base64_decode($data['mac']) != self::pbkdf2($data['cdata'], $key, 1000, 32)) {
+    if(base64_decode($data['mac']) != $this->pbkdf2($data['cdata'], $key, 1000, 32)) {
       throw new \phpSec\Exception\GeneralSecurityException('Message authentication code invalid');
       return false;
     }
@@ -145,7 +152,7 @@ class Crypto {
     /* Init mcrypt. */
     mcrypt_generic_init($td, $key, base64_decode($data['iv']));
 
-    $decrypted = rtrim(mdecrypt_generic($td, base64_decode(self::stripPadding($block, $data['cdata']))));
+    $decrypted = rtrim(mdecrypt_generic($td, base64_decode($this->stripPadding($block, $data['cdata']))));
 
     /* Close up. */
     mcrypt_generic_deinit($td);
@@ -177,7 +184,7 @@ class Crypto {
    * @return binary
    *   Derived key.
    */
-  public static function pbkdf2($p, $s, $c, $dkLen, $a = 'sha256') {
+  public function pbkdf2($p, $s, $c, $dkLen, $a = 'sha256') {
     $hLen = strlen(hash($a, null, true)); /* Hash length. */
     $l    = ceil($dkLen / $hLen);         /* Length in blocks of derived key. */
     $dk   = '';                           /* Derived key. */
@@ -218,7 +225,7 @@ class Crypto {
    * @return string
    *   Padded data.
    */
-  public static function pad($block, $data) {
+  public function pad($block, $data) {
     $pad = $block - (strlen($data) % $block);
     $data .= str_repeat(chr($pad), $pad);
 
@@ -237,7 +244,7 @@ class Crypto {
    * @return string
    *   Original data.
    */
-  public static function stripPadding($block, $data) {
+  public function stripPadding($block, $data) {
     $pad = ord($data[($len = strlen($data)) - 1]);
 
     /* Check that what we have at the end of the string really is padding, and if it is remove it. */
