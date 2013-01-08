@@ -17,7 +17,7 @@ use phpSec\Common\Core;
 class Filter {
 
   /* Charset to use for filter functions. */
-  public static $_charset = 'UTF-8';
+  public $_charset = 'UTF-8';
 
   /**
    * XSS text filter. Returns a string that is safe to use on the page.
@@ -41,7 +41,7 @@ class Filter {
    *   The array keys should be preceeded with %, ! or @ defining what filter
    *   to apply.
    */
-  public static function t($str, $args) {
+  public function t($str, $args) {
     /* Loop trough the args and apply the filters. */
     while(list($name, $data) = each($args)) {
       $safeData = false;
@@ -50,21 +50,21 @@ class Filter {
         case '%':
           /* %variables: HTML tags are stripped of from the string
              before it is in inserted. */
-          $safeData = self::f($data, 'strip');
+          $safeData = $this->f($data, 'strip');
           break;
         case '!':
           /* !variables: HTML and special characters are escaped from the string
              before it is used. */
-          $safeData = self::f($data, 'escapeAll');
+          $safeData = $this->f($data, 'escapeAll');
           break;
         case '@':
           /* @variables: Only HTML is escaped from the string. Special characters
              is kept as it is. */
-          $safeData = self::f($data, 'escape');
+          $safeData = $this->f($data, 'escape');
           break;
         case '&':
           /* Encode a string according to RFC 3986 for use in a URL. */
-          $safeData = self::f($data, 'url');
+          $safeData = $this->f($data, 'url');
           break;
         default:
           throw new \phpSec\Exception\InvalidArgumentException('Unknown variable type');
@@ -100,7 +100,7 @@ class Filter {
    * @param string $mode
    *   String defining what filter to apply.
    */
-  public static function f($str, $mode = 'escape') {
+  public function f($str, $mode = 'escape') {
     switch($mode) {
       case 'strip':
         /* HTML tags are stripped from the string
@@ -109,11 +109,11 @@ class Filter {
       case 'escapeAll':
         /* HTML and special characters are escaped from the string
            before it is used. */
-        return htmlentities($str, ENT_QUOTES, self::$_charset);
+        return htmlentities($str, ENT_QUOTES, $this->$_charset);
       case 'escape':
         /* Only HTML tags are escaped from the string. Special characters
            is kept as is. */
-        return htmlspecialchars($str, ENT_NOQUOTES, self::$_charset);
+        return htmlspecialchars($str, ENT_NOQUOTES, $this->_charset);
       case 'url':
         /* Encode a string according to RFC 3986 for use in a URL. */
         return rawurlencode($str);

@@ -44,6 +44,10 @@ class Core extends Pimple {
       return new Http\Hsts($psl);
     });
 
+    $this['text/filter'] = $this->share(function($psl) {
+      return new Http\Hsts($psl);
+    });
+
 
   }
 
