@@ -8,9 +8,6 @@
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
-use phpSec\Crypt\Rand;
-use phpSec\Crypt\Crypto;
-
 
 /**
  * Implements password hashing using crypt() with PBKDF2 support.
@@ -27,42 +24,42 @@ class Hash {
   /**
    * Default hashing method.
    */
-  public static $_method = self::PBKDF2;
+  public $method = self::PBKDF2;
 
   /**
    * PBKDF2: Iteration count.
    */
-  public static $_pbkdf2_c = 8192;
+  public $pbkdf2_c = 8192;
 
   /**
    * PBKDF2: Derived key length.
    */
-  public static $_pbkdf2_dkLen = 128;
+  public $pbkdf2_dkLen = 128;
 
   /**
    * PBKDF2: Underlying hash method.
    */
-  public static $_pbkdf2_prf = 'sha256';
+  public $pbkdf2_prf = 'sha256';
 
   /**
    * Bcrypt: Work factor.
    */
-  public static $_bcrypt_cost = 12;
+  public $bcrypt_cost = 12;
 
   /**
    * SHA2: Number of rounds.
    */
-  public static $_sha2_c = 6000;
+  public $sha2_c = 6000;
 
   /**
    * Drupal: Hash length.
    */
-  public static $_drupal_hashLen = 55;
+  public $drupal_hashLen = 55;
 
   /**
    * Drupal: Iteration count (log 2).
    */
-  public static $_drupal_count = 15;
+  public $drupal_count = 15;
 
   /**
    * Salt charsets.
@@ -70,6 +67,14 @@ class Hash {
   public static $charsets = array(
     'itoa64' => './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
   );
+
+  private $psl = null;
+
+  public function __construct($psl = null) {
+    if($psl !== null) {
+      $this->psl = $psl;
+    }
+  }
 
   /**
    * Creates a salted hash from a string.
@@ -80,23 +85,26 @@ class Hash {
    *   @return string
    *     Returns hashed string, or false on error.
    */
-  public static function create($str) {
+  public function create($str) {
 
-    switch(self::$_method) {
+    $rnd = $this->psl['crypt/rand'];
+    $crypto = $this->psl['crypt/crypto'];
+
+    switch($this->method) {
       case self::BCRYPT:
-        $saltRnd = Rand::str(22, self::$charsets['itoa64']);
-        $salt = sprintf('$2a$%s$%s', self::$_bcrypt_cost, $saltRnd);
+        $saltRnd = $rnd->str(22, $this->charsets['itoa64']);
+        $salt = sprintf('$2a$%s$%s', $this->bcrypt_cost, $saltRnd);
         $hash = crypt($str, $salt);
       break;
 
       case self::PBKDF2:
-        $salt = Rand::bytes(64);
-        $hash = Crypto::pbkdf2($str, $salt, self::$_pbkdf2_c, self::$_pbkdf2_dkLen, self::$_pbkdf2_prf);
+        $salt = $rnd->bytes(64);
+        $hash = $crypto->pbkdf2($str, $salt, $this->pbkdf2_c, $this->pbkdf2_dkLen, $this->pbkdf2_prf);
 
         $hash = sprintf('$pbkdf2$c=%s&dk=%s&f=%s$%s$%s',
-                       self::$_pbkdf2_c,
-                       self::$_pbkdf2_dkLen,
-                       self::$_pbkdf2_prf,
+                       $this->pbkdf2_c,
+                       $this->pbkdf2_dkLen,
+                       $this->pbkdf2_prf,
                        base64_encode($hash),
                        base64_encode($salt)
                        );
@@ -104,16 +112,16 @@ class Hash {
 
       case self::DRUPAL;
         $setting  = '$S$';
-        $setting .= self::$charsets['itoa64'][self::$_drupal_count];
-        $setting .= self::_b64Encode(\phpSec\Crypt\Rand::bytes(6), 6);
+        $setting .= $this->charsets['itoa64'][$this->drupal_count];
+        $setting .= $this->b64Encode($rand->bytes(6), 6);
 
-        return substr(self::_phpassHash($str, $setting), 0, self::$_drupal_hashLen);
+        return substr($this->phpassHash($str, $setting), 0, $this->drupal_hashLen);
       break;
 
       case self::SHA256:
       case self::SHA512:
-        $saltRnd = Rand::str(16, self::$charsets['itoa64']);
-        $salt = sprintf('%srounds=%s$%s', self::$_method, self::$_sha2_c, $saltRnd);
+        $saltRnd = $rand->str(16, $this->charsets['itoa64']);
+        $salt = sprintf('%srounds=%s$%s', $this->method, $this->sha2_c, $saltRnd);
         $hash = crypt($str, $salt);
       break;
     }
@@ -136,8 +144,10 @@ class Hash {
    * @return bool
    *   Returns true on match.
    */
-  public static function check($str, $hash) {
-    $hashInfo = self::getInfo($hash);
+  public function check($str, $hash) {
+    $crypto = $this->psl['crypt/crypto'];
+
+    $hashInfo = $this->getInfo($hash);
 
     switch($hashInfo['algo']) {
       case self::PBKDF2:
@@ -145,14 +155,14 @@ class Hash {
         list( , , $params, $hash, $salt) = explode('$', $hash);
         parse_str($params, $param);
 
-        if(base64_decode($hash) === Crypto::pbkdf2($str, base64_decode($salt), $param['c'], $param['dk'], $param['f'])) {
+        if(base64_decode($hash) === $crypto->pbkdf2($str, base64_decode($salt), $param['c'], $param['dk'], $param['f'])) {
           return true;
         }
         return false;
       break;
 
       case self::DRUPAL:
-        $test = strpos(self::_phpassHash($str, $hash), $hash);
+        $test = strpos($this->phpassHash($str, $hash), $hash);
         if($test === false || $test !== 0) {
         	return false;
         }
@@ -201,7 +211,7 @@ class Hash {
    * @return array
    *   Returns an array with settings used to create $hash.
    */
-  public static function getInfo($hash) {
+  public function getInfo($hash) {
     $regex_pattern = '/^\$[a-z, 1-6]{1,6}\$/i';
     preg_match($regex_pattern, $hash, $matches);
 
@@ -232,11 +242,11 @@ class Hash {
     return $info;
   }
 
-  private static function _phpassHash($password, $setting, $method = 'sha512') {
+  private function phpassHash($password, $setting, $method = 'sha512') {
   	/* First 12 characters are the settings. */
   	$setting = substr($setting, 0 , 12);
   	$salt    = substr($setting, 4, 8);
-  	$count   = 1 << strpos(self::$charsets['itoa64'], $setting[3]);
+  	$count   = 1 << strpos($this->charsets['itoa64'], $setting[3]);
 
   	$hash = hash($method, $salt . $password, TRUE);
   	do {
@@ -250,8 +260,8 @@ class Hash {
   	return substr($output, 0, $expected);
   }
 
-  private static function _b64Encode($input, $count) {
-  	$itoa64 = self::$charsets['itoa64'];
+  private function b64Encode($input, $count) {
+  	$itoa64 = $this->charsets['itoa64'];
 
   	$output = '';
   	$i = 0;

@@ -3,7 +3,7 @@
  phpSec - A PHP security library
 
  @author    Audun Larsen <larsen@xqus.com>
- @copyright Copyright (c) Audun Larsen, 2012
+ @copyright Copyright (c) Audun Larsen, 2012, 2013
  @link      https://github.com/phpsec/phpSec
  @license   http://opensource.org/licenses/mit-license.php The MIT License
  @package   phpSec
@@ -34,6 +34,10 @@ class Core extends Pimple {
 
     $this['crypt/crypto'] = $this->share(function($psl) {
       return new Crypt\Crypto($psl);
+    });
+
+    $this['crypt/hash'] = $this->share(function($psl) {
+      return new Crypt\Hash($psl);
     });
 
 
