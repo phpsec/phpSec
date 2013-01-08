@@ -6,7 +6,7 @@ class GoogleTest extends PHPUnit_Framework_TestCase {
     $psl = new \phpSec\Core();
 
     $psl['store'] = $psl->share(function($psl) {
-      return new \phpSec\Store\File(sys_get_temp_dir());
+      return new \phpSec\Store\File(sys_get_temp_dir(), $psl);
     });
 
     $google = $psl['auth/google'];
@@ -19,7 +19,7 @@ class GoogleTest extends PHPUnit_Framework_TestCase {
     $psl = new \phpSec\Core();
 
     $psl['store'] = $psl->share(function($psl) {
-      return new \phpSec\Store\File(sys_get_temp_dir());
+      return new \phpSec\Store\File(sys_get_temp_dir(), $psl);
     });
 
     $google = $psl['auth/google'];

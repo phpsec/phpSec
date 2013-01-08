@@ -20,10 +20,14 @@ class File extends Store {
   private $_dataDir  = null;
   public  $_hashType = 'sha256';
 
+  private $psl = null;
+
   /**
    * @see phpsecStore::__construct()
    */
-  public function __construct($loc) {
+  public function __construct($loc, $psl) {
+    $this->psl = $psl;
+
     if(!is_writeable($loc)) {
       throw new \phpSec\Exception\IOException('Storage directory('.$loc.') not writeable');
       return false;
@@ -36,6 +40,8 @@ class File extends Store {
    * @see phpsecStore::read()
    */
   public function read($type, $id) {
+    $crypto = $this->psl['crypt/crypto'];
+
     $fileName = $this->fileName($type, $id);
     if(!file_exists($fileName)) {
       return false;
@@ -44,7 +50,7 @@ class File extends Store {
     list($meta, $data) = explode("\n\n", $data, 2);
     $jsonData = json_decode($meta);
 
-    $mac = \phpSec\Crypt\Crypto::pbkdf2($data, $id, 1000, 32);
+    $mac = $crypto->pbkdf2($data, $id, 1000, 32);
 
     if($mac != base64_decode($jsonData->mac)) {
       throw new \phpSec\Exception\GeneralSecurityException('Message authentication code invalid while reading store');
@@ -57,11 +63,13 @@ class File extends Store {
    * @see phpsecStore::write()
    */
   public function write($type, $id, $data) {
+    $crypto = $this->psl['crypt/crypto'];
+
     $fileName =  $this->fileName($type, $id);
 
     $data = serialize($data);
     $saveData['id']   = base64_encode($id);
-    $saveData['mac']  = base64_encode(\phpSec\Crypt\Crypto::pbkdf2($data, $id, 1000, 32));
+    $saveData['mac']  = base64_encode($crypto->pbkdf2($data, $id, 1000, 32));
     $saveData['time'] = time();
 
     $jsonData = json_encode($saveData);
