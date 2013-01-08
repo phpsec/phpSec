@@ -40,6 +40,10 @@ class Core extends Pimple {
       return new Crypt\Hash($psl);
     });
 
+    $this['http/hsts'] = $this->share(function($psl) {
+      return new Http\Hsts($psl);
+    });
+
 
   }
 
