@@ -2,7 +2,9 @@
 =======================================================
 * phpSec is a open-source [PHP](http://php.net) security library that takes care
   of the common security tasks a web developer faces.
-  
+
+[![Build Status](https://travis-ci.org/phpsec/phpSec.png)](https://travis-ci.org/phpsec/phpSec)
+
 [Official Website](https://phpseclib.com/) and [Documentation](https://github.com/phpsec/doc/)
 
 Features
