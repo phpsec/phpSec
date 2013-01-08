@@ -157,7 +157,9 @@ class Google {
    * @return string
    */
   private function getStoreId($secret) {
-    return base64_encode(Crypto::pbkdf2('google-auth', $secret, 500, 32));
+    $crypto = $this->psl['crypt/crypto'];
+
+    return base64_encode($crypto->pbkdf2('google-auth', $secret, 500, 32));
   }
 
 }
