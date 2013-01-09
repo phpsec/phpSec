@@ -20,12 +20,16 @@ class Core extends Pimple {
     $this['logger'] = null;
     $this['store']  = null;
 
-    $this['auth/google'] = $this->share(function($psl) {
-      return new Auth\Google($psl);
+    $this['cache'] = $this->share(function($psl) {
+      return new Common\Cache($psl);
     });
 
     $this['auth/authy'] = $this->share(function($psl) {
       return new Auth\Authy($psl);
+    });
+
+    $this['auth/google'] = $this->share(function($psl) {
+      return new Auth\Google($psl);
     });
 
     $this['crypt/rand'] = $this->share(function($psl) {
