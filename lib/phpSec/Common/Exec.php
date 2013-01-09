@@ -20,7 +20,7 @@ class Exec {
   const STDOUT = 1;
   const STDERR = 2;
 
-  private static $descSpecs = array(
+  private $descSpecs = array(
       self::STDIN  => array("pipe", "r"),
       self::STDOUT => array("pipe", "w"),
       self::STDERR => array("pipe", "w"),
@@ -29,13 +29,13 @@ class Exec {
   /**
    * Array containing additional ENV variables.
    */
-  public static $_env = array();
+  public $_env = array();
 
   /**
    * Current Working Directory.
    * Defaults to where the script is located.
    */
-  public static $_cwd = null;
+  public $_cwd = null;
 
   /**
    * Execute an external program.
@@ -58,11 +58,11 @@ class Exec {
    * @return array
    *   Returns an array containing return value and results from STDOUT and STDERR.
    */
-  public static function run($cmd, $args = array(), $stdin = null) {
+  public function run($cmd, $args = array(), $stdin = null) {
 
-    $cmd = self::buildCommand($cmd, $args);
+    $cmd = $this->buildCommand($cmd, $args);
 
-    $process = proc_open($cmd, self::$descSpecs, $pipes, self::$_cwd, self::$_env);
+    $process = proc_open($cmd, $this->descSpecs, $pipes, $this->_cwd, $this->_env);
 
     if(is_resource($process)) {
 
@@ -98,7 +98,7 @@ class Exec {
    * @return string
    *   Returns a command that is safe to execute.
    */
-  private static function buildCommand($cmd, $args = array()) {
+  private function buildCommand($cmd, $args = array()) {
     while(list($name, $data) = each($args)) {
     $safeData = false;
       $filterType = mb_substr($name, 0, 1);
