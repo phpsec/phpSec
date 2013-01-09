@@ -10,7 +10,7 @@ class AuthyTest extends PHPUnit_Framework_TestCase {
     $authy->_apiKey = 'bcdfb7ce5e6854dcfe65ce5dd0d568c7';
     $authy->_sandbox = true;
 
-    $authyID = $authy->userNew('larsen@xqus.com', '12345678', '47');
+    $authyID = $authy->userNew('phpsec@example.com', '12345678', '47');
 
     $this->assertTrue(is_int($authyID));
 
