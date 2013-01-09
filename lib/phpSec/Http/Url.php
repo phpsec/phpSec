@@ -1,4 +1,4 @@
-<?php namespace phpSec\Http;
+<?php
 /**
   phpSec - A PHP security library
 
@@ -8,6 +8,7 @@
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
+namespace phpSec\Http;
 
 /**
  * Class to prevent URL manipulation.
@@ -18,7 +19,13 @@ class Url {
   /**
    * Name of GET variable to pass security token trough.
    */
-  public static $_getParam = 'pstkn';
+  public $getParam = 'pstkn';
+
+  private $psl = null;
+
+  public function __construct($psl) {
+    $this->psl = $psl;
+  }
 
   /**
    * Create a security token for a URL.
@@ -29,7 +36,7 @@ class Url {
    * @return string
    *   Return a URL with the security token included.
    */
-  public static function create($url) {
+  public function create($url) {
     $part = parse_url($url);
 
     $appendQuery = false;
@@ -38,13 +45,13 @@ class Url {
       $appendQuery = true;
     }
 
-    $request = self::getRequest($url);
-    $token = self::getToken($request);
+    $request = $this->getRequest($url);
+    $token = $this->getToken($request);
 
     if($appendQuery === true) {
-      return $url.'&'.self::$_getParam.'='.$token;
+      return $url.'&'.$this->getParam.'='.$token;
     } else {
-      return $url.'?'.self::$_getParam.'='.$token;
+      return $url.'?'.$this->getParam.'='.$token;
     }
   }
 
@@ -55,13 +62,23 @@ class Url {
    *   Return true if a security token was included in the request
    *   and the URL was not manipulated.
    */
-  public static function verify() {
-    if(!isset($_GET[self::$_getParam])) {
+  public function verify($url = null) {
+    if($url === null) {
+      $url = $_SERVER['REQUEST_URI'];
+    }
+
+    $part = parse_url($url);
+
+    if(isset($part['query'])) {
+      parse_str($part['query'], $query);
+    }
+
+    if(!isset($query[$this->getParam])) {
       return false;
     }
 
-    $request = self::getRequest($_SERVER['REQUEST_URI']);
-    if(self::gettoken($request) === $_GET[self::$_getParam]) {
+    $request = $this->getRequest($url);
+    if($this->gettoken($request) === $query[$this->getParam]) {
       return true;
     }
     return false;
@@ -76,19 +93,16 @@ class Url {
    * @return string
    *   Request string.
    */
-  private static function getRequest($url) {
+  private function getRequest($url) {
     $part = parse_url($url);
-
-    $apeendQuery = false;
 
     if(isset($part['query'])) {
       parse_str($part['query'], $query);
-      if(isset($query[self::$_getParam])) {
-        unset($query[self::$_getParam]);
+      if(isset($query[$this->getParam])) {
+        unset($query[$this->getParam]);
       }
       if(sizeof($query) > 0) {
         $request = $part['path'].http_build_query($query);
-        $apeendQuery = true;
       } else {
         $request = $part['path'];
       }
@@ -108,8 +122,8 @@ class Url {
    * @return string
    *   Returns a security token.
    */
-  private static function getToken($request) {
-    $hash = hash('sha256', $request.\phpSec\Common\Core::getUid());
+  private function getToken($request) {
+    $hash = hash('sha256', $request.$this->psl->getUid());
 
     return substr($hash, 0, 4).substr($hash, 16, 4).substr($hash, 32, 4).substr($hash, 48, 4);
 

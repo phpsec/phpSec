@@ -44,6 +44,10 @@ class Core extends Pimple {
       return new Http\Hsts($psl);
     });
 
+    $this['http/url'] = $this->share(function($psl) {
+      return new Http\Url($psl);
+    });
+
     $this['text/filter'] = $this->share(function($psl) {
       return new Http\Hsts($psl);
     });
@@ -126,9 +130,10 @@ class Core extends Pimple {
    *   Returns a unique identifier.
    */
   public function genUid() {
-    $hex = bin2hex(Rand::Bytes(32));
-    $str = substr($hex,0,16) . '-' . substr($hex,16,8) . '-' . substr($hex,24,8) . '-' . substr($hex,32,8) . '-' . substr($hex,40,24);
+    $rand = $this['crypt/rand'];
 
+    $hex = bin2hex($rand->Bytes(32));
+    $str = substr($hex,0,16) . '-' . substr($hex,16,8) . '-' . substr($hex,24,8) . '-' . substr($hex,32,8) . '-' . substr($hex,40,24);
     return $str;
   }
 
@@ -147,7 +152,6 @@ class Core extends Pimple {
     if(!isset($_SESSION['phpSec-uid'])) {
       $_SESSION['phpSec-uid'] = $this->genUid();
     }
-
     return $_SESSION['phpSec-uid'];
   }
 
