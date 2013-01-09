@@ -11,11 +11,11 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 
     $cache = $psl['cache'];
 
-    $this->assertTrue($cache->cacheSet('name', 'data', 10));
+    $this->assertTrue($cache->cacheSet('name', 'data', 3));
 
     $data = $cache->cacheGet('name');
     $this->assertEquals('data', $data);
-    sleep(11);
+    sleep(4);
     $this->assertFalse($cache->cacheGet('name'));
 
   }
