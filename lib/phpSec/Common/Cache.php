@@ -90,7 +90,7 @@ class Cache {
    *   True on success, false otherwise.
    */
   public function cacheRem($name) {
-    return Core::$store->delete('cache', $this->cacheId($name));
+    return $this->store->delete('cache', $this->cacheId($name));
   }
 
   /**
