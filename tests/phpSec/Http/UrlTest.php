@@ -3,7 +3,6 @@ class UrlTest extends PHPUnit_Framework_TestCase {
 
 
   public function testUrl() {
-    session_start();
     $psl = new \phpSec\Core();
 
     $url = $psl['http/url'];
