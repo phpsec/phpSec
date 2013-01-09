@@ -1,4 +1,4 @@
-<?php namespace phpSec\Common;
+<?php
 /**
   phpSec - A PHP security library
 
@@ -8,15 +8,20 @@
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
-use phpSec\Common\Cache;
-use phpSec\Crypt\Rand;
+namespace phpSec\Common;
 
 /**
  * Provides CSRF protection methods.
  * @package phpSec
  */
 class Token {
-  public static $_charset = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  public $_charset = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+  private $psl = null;
+
+  public function __construct($psl) {
+    $this->psl = $psl;
+  }
 
   /**
    * Generate and save a one-time-token for a form. Used to protect against
@@ -31,10 +36,13 @@ class Token {
    * @return string
    *   The token to supply with the form data.
    */
-  public static function set($name, $ttl = 3600) {
-    $token = Rand::str(32, self::$_charset);
+  public function set($name, $ttl = 3600) {
+    $rand = $this->psl['crypt/rand'];
+    $cache = $this->psl['cache'];
+
+    $token = $rand->str(32, $this->_charset);
     /* Save the token to the cahce. */
-    Cache::cacheSet('token-'.$name, $token, $ttl);
+    $cache->cacheSet('token-'.$name, $token, $ttl);
     return $token;
   }
 
@@ -49,15 +57,17 @@ class Token {
    * @return boolean
    *   Returns true if the token is valid. Returns false otherwise.
    */
-  public static function validate($name, $token) {
+  public function validate($name, $token) {
+    $cache = $this->psl['cache'];
+
     if(strlen($token) == 0) {
       return false;
     }
-    $cacheToken = Cache::cacheGet('token-'.$name);
+    $cacheToken = $cache->cacheGet('token-'.$name);
     /* Check if the provided token matches the token in the cache. */
     if($cacheToken == $token) {
       /* Remove the token from the cahche so it can't be reused. */
-      Cache::cacheRem('token-'.$name);
+      $cache->cacheRem('token-'.$name);
       return true;
     }
     return false;
