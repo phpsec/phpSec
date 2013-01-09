@@ -8,12 +8,6 @@
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
-use \phpSec\Common\Core;
-use \phpSec\Crypt\Rand;
-use \phpSec\Crypt\Hash;
-use \phpSec\Crypt\Crypto;
-use \phpSec\String\Base32;
-use \phpSec\Text\Filter;
 
 /**
  * Implements authentication using Google Authenticator.
@@ -93,7 +87,9 @@ class Google {
    * @return string
    */
   public function getToken($secret, $timeTick = null) {
-    $secret = Base32::decode($secret);
+    $base32 = new \phpSec\String\Base32();
+
+    $secret = $base32->decode($secret);
 
     if($timeTick === null) {
       $timeTick = $this->getTimestamp();

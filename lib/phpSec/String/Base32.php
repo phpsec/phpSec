@@ -1,4 +1,4 @@
-<?php namespace phpSec\String;
+<?php
 /**
   phpSec - A PHP security library
 
@@ -8,6 +8,7 @@
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
+namespace phpSec\String;
 
 /**
  * Base 32 decoding of string.
@@ -15,7 +16,7 @@
  */
 class Base32 {
 
-  private static $decodeTable = array(
+  private $decodeTable = array(
     'A' => 0,
     'B' => 1,
 		'C' => 2,
@@ -58,7 +59,7 @@ class Base32 {
  *
  * @return string
  */
-public static function decode($str) {
+public function decode($str) {
 
 		$str = strtoupper($str);
 
@@ -70,7 +71,7 @@ public static function decode($str) {
 
 		for ($i = 0; $i < $l; $i++) {
 			$n = $n << 5;
-			$n = $n + self::$decodeTable[$str[$i]];
+			$n = $n + $this->decodeTable[$str[$i]];
 			$b = $b + 5;
 
 			if ($b >= 8) {
