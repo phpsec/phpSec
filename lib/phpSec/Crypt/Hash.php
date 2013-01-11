@@ -16,7 +16,8 @@
 class Hash {
 
   const PBKDF2 = '$pbkdf2$';
-  const BCRYPT = '$2a$';
+  const BCRYPT = '$2y$';
+  const BCRYPT_BC = '$2a$';
   const SHA256 = '$5$';
   const SHA512 = '$6$';
   const DRUPAL = '$S$';
@@ -93,7 +94,8 @@ class Hash {
     switch($this->method) {
       case self::BCRYPT:
         $saltRnd = $rand->str(22, $this->charsets['itoa64']);
-        $salt = sprintf('$2a$%s$%s', $this->bcrypt_cost, $saltRnd);
+        $prefix = (version_compare(PHP_VERSION, '5.3.7') >= 0) ? '$2y$' : '$2a';
+        $salt = sprintf('%s%s$%s', $prefix, $this->bcrypt_cost, $saltRnd);
         $hash = crypt($str, $salt);
       break;
 
@@ -170,6 +172,7 @@ class Hash {
       break;
 
       case self::BCRYPT;
+      case self::BCRYPT_BC;
       case self::SHA256:
       case self::SHA512:
         if(crypt($str, $hash) === $hash) {
