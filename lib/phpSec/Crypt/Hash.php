@@ -64,7 +64,7 @@ class Hash {
   /**
    * Salt charsets.
    */
-  public static $charsets = array(
+  public $charsets = array(
     'itoa64' => './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
   );
 
@@ -87,18 +87,18 @@ class Hash {
    */
   public function create($str) {
 
-    $rnd = $this->psl['crypt/rand'];
+    $rand = $this->psl['crypt/rand'];
     $crypto = $this->psl['crypt/crypto'];
 
     switch($this->method) {
       case self::BCRYPT:
-        $saltRnd = $rnd->str(22, $this->charsets['itoa64']);
+        $saltRnd = $rand->str(22, $this->charsets['itoa64']);
         $salt = sprintf('$2a$%s$%s', $this->bcrypt_cost, $saltRnd);
         $hash = crypt($str, $salt);
       break;
 
       case self::PBKDF2:
-        $salt = $rnd->bytes(64);
+        $salt = $rand->bytes(64);
         $hash = $crypto->pbkdf2($str, $salt, $this->pbkdf2_c, $this->pbkdf2_dkLen, $this->pbkdf2_prf);
 
         $hash = sprintf('$pbkdf2$c=%s&dk=%s&f=%s$%s$%s',
@@ -254,7 +254,7 @@ class Hash {
   	} while (--$count);
 
   	$len = strlen($hash);
-  	$output = $setting . self::_b64Encode($hash, $len);
+  	$output = $setting . $this->b64Encode($hash, $len);
   	$expected = 12 + ceil((8 * $len) / 6);
 
   	return substr($output, 0, $expected);
