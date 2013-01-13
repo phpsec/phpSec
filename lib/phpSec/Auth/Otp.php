@@ -1,4 +1,4 @@
-<?php namespace phpSec\Auth;
+<?php
 /**
   phpSec - A PHP security library
 
@@ -8,16 +8,20 @@
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
-use phpSec\Common\Core;
-use phpSec\Crypt\Hash;
-use phpSec\Crypt\Rand;
+namespace phpSec\Auth;
 
 /**
  * Provides one time password functionality.
  * @package phpSec
  */
 class Otp {
-  public static $_charset = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  public $_charset = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+  private $psl = null;
+
+  public function __construct($psl) {
+    $this->psl = $psl;
+  }
 
   /**
    * Generate a one-time-password (OTP). The password is only valid for a given time,
@@ -46,18 +50,22 @@ class Otp {
    *   One time password that should be delivered to the user by for example email or SMS.
    *
    */
-  public static function generate($action, $uid = null, $data = null, $length = 6, $ttl = 480) {
+  public function generate($action, $uid = null, $data = null, $length = 6, $ttl = 480) {
+    $rand  = $this->psl['crypt/rand'];
+    $hash  = $this->psl['crypt/hash'];
+    $store = $this->psl['store'];
+
     if($uid === null) {
-	    $uid = Core::getUid();
+	    $uid = $this->psl->getUid();
 	  }
 
-	  $pw = Rand::str($length, self::$_charset);
+	  $pw = $rand->str($length, $this->_charset);
 
-    $otp['pw']   = Hash::create($pw);
-    $otp['data'] = Hash::create(serialize($data));
+    $otp['pw']   = $hash->create($pw);
+    $otp['data'] = $hash->create(serialize($data));
     $otp['ttl']  = time() + $ttl;
 
-    if(Core::$store->write('otp', self::storeId($uid, $action), $otp)) {
+    if($store->write('otp', $this->storeId($uid, $action), $otp)) {
       return $pw;
     }
     return false;
@@ -79,28 +87,31 @@ class Otp {
    *   See phpsecOtp::generate().
    *
    */
-  public static function validate($otp, $action, $uid = null, $data = null) {
+  public function validate($otp, $action, $uid = null, $data = null) {
+    $hash  = $this->psl['crypt/hash'];
+    $store = $this->psl['store'];
+
     if($uid === null) {
-	    $uid = Core::getUid();
+	    $uid = $this->psl->getUid();
 	  }
 
-    $store = Core::$store->read('otp', self::storeId($uid, $action));
+    $storeData = $store->read('otp', $this->storeId($uid, $action));
 
-    if($store !== false) {
-      if($store['ttl'] < time()) {
-        Core::$store->delete('otp', self::storeId($uid, $action));
+    if($storeData !== false) {
+      if($storeData['ttl'] < time()) {
+        $store->delete('otp', $this->storeId($uid, $action));
         return false;
       }
 
-      if(Hash::check($otp, $store['pw']) && Hash::check(serialize($data), $store['data'])) {
-        Core::$store->delete('otp', self::storeId($uid, $action));
+      if($hash->check($otp, $storeData['pw']) && $hash->check(serialize($data), $storeData['data'])) {
+        $store->delete('otp', $this->storeId($uid, $action));
         return true;
       }
     }
     return false;
   }
 
-  private static function storeId($uid, $action) {
+  private function storeId($uid, $action) {
     return hash('sha512', $uid.$action);
   }
 

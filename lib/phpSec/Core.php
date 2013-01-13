@@ -32,6 +32,10 @@ class Core extends Pimple {
       return new Auth\Google($psl);
     });
 
+    $this['auth/otp'] = $this->share(function($psl) {
+      return new Auth\Otp($psl);
+    });
+
     $this['common/exec'] = $this->share(function($psl) {
       return new Common\Exec($psl);
     });
