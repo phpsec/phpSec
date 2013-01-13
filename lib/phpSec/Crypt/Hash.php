@@ -16,7 +16,8 @@
 class Hash {
 
   const PBKDF2 = '$pbkdf2$';
-  const BCRYPT = '$2a$';
+  const BCRYPT = '$2y$';
+  const BCRYPT_BC = '$2a$';
   const SHA256 = '$5$';
   const SHA512 = '$6$';
   const DRUPAL = '$S$';
@@ -64,7 +65,7 @@ class Hash {
   /**
    * Salt charsets.
    */
-  public static $charsets = array(
+  public $charsets = array(
     'itoa64' => './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
   );
 
@@ -87,18 +88,19 @@ class Hash {
    */
   public function create($str) {
 
-    $rnd = $this->psl['crypt/rand'];
+    $rand = $this->psl['crypt/rand'];
     $crypto = $this->psl['crypt/crypto'];
 
     switch($this->method) {
       case self::BCRYPT:
-        $saltRnd = $rnd->str(22, $this->charsets['itoa64']);
-        $salt = sprintf('$2a$%s$%s', $this->bcrypt_cost, $saltRnd);
+        $saltRnd = $rand->str(22, $this->charsets['itoa64']);
+        $prefix = (version_compare(PHP_VERSION, '5.3.7') >= 0) ? '$2y$' : '$2a';
+        $salt = sprintf('%s%s$%s', $prefix, $this->bcrypt_cost, $saltRnd);
         $hash = crypt($str, $salt);
       break;
 
       case self::PBKDF2:
-        $salt = $rnd->bytes(64);
+        $salt = $rand->bytes(64);
         $hash = $crypto->pbkdf2($str, $salt, $this->pbkdf2_c, $this->pbkdf2_dkLen, $this->pbkdf2_prf);
 
         $hash = sprintf('$pbkdf2$c=%s&dk=%s&f=%s$%s$%s',
@@ -170,6 +172,7 @@ class Hash {
       break;
 
       case self::BCRYPT;
+      case self::BCRYPT_BC;
       case self::SHA256:
       case self::SHA512:
         if(crypt($str, $hash) === $hash) {
@@ -254,7 +257,7 @@ class Hash {
   	} while (--$count);
 
   	$len = strlen($hash);
-  	$output = $setting . self::_b64Encode($hash, $len);
+  	$output = $setting . $this->b64Encode($hash, $len);
   	$expected = 12 + ceil((8 * $len) / 6);
 
   	return substr($output, 0, $expected);
