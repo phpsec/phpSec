@@ -19,40 +19,46 @@ class Yubikey {
    * Yubico client Id.
    * @see https://upgrade.yubico.com/getapikey/
    */
-  public static $_clientId = null;
+  public $clientId = null;
 
   /**
    * Yubico client shared secret.
    * @see https://upgrade.yubico.com/getapikey/
    */
-  public static $_clientSecret = null;
+  public $clientSecret = null;
 
   /**
    * Number of servers to try before giving up.
    */
-  public static $_numServers = 3;
+  public $_numServers = 3;
 
   /**
    * Timeout in seconds for each server.
    */
-  public static $_serverTimeout = 3;
+  public $_serverTimeout = 3;
 
   /**
    * Last error produced by phpsecYubikey::verify().
-   * @see http://phpseclib.com/manual/yubikey/errors
+   * @see https://phpseclib.com/manual/09-Yubikey-Authentication.md
    */
-  public static $lastError = null;
+  public $lastError = null;
 
   /**
    * Yubico authentication servers.
    */
-  private static $_servers = array(
+  private $_servers = array(
     'http://api.yubico.com/wsapi/2.0/verify',
     'http://api2.yubico.com/wsapi/2.0/verify',
     'http://api3.yubico.com/wsapi/2.0/verify',
     'http://api4.yubico.com/wsapi/2.0/verify',
     'http://api5.yubico.com/wsapi/2.0/verify',
   );
+
+  private $psl = null;
+
+  public function __construct($psl) {
+    $this->psl = $psl;
+  }
 
   /**
    * Verify Yubikey one time password against the Yubico servers.
@@ -62,31 +68,33 @@ class Yubikey {
    *
    * @return boolean
    *   True on valid OTP, false on invalid. If this method returns false
-   *   phpsecYubikey::$lastError will contain details.
+   *   $lastError will contain details.
    *
-   * @see http://phpseclib.com/manual/yubikey/errors
+   * @see https://phpseclib.com/manual/09-Yubikey-Authentication.md
    */
-  public static function verify($otp) {
-    if(self::$_clientId === null || self::$_clientSecret === null) {
-      self::$lastError = 'YUBIKEY_CLIENT_DATA_NEEDED';
+  public function verify($otp) {
+    $rand = $this->psl['crypt/rand'];
+
+    if($this->clientId === null || $this->clientSecret === null) {
+      $this->$lastError = 'YUBIKEY_CLIENT_DATA_NEEDED';
       return false;
     }
 
     if(!self::validOtp($otp)) {
-      self::$lastError = 'YUBIKEY_INVALID_OTP';
+      $this->lastError = 'YUBIKEY_INVALID_OTP';
       return false;
     }
     /* Setup the data needed to make the request. */
     $data['otp']       = $otp;
-    $data['id']        = self::$_clientId;
-    $data['nonce']     = Rand::str(20);
+    $data['id']        = $this->clientId;
+    $data['nonce']     = $rand->str(20);
     $data['timestamp'] = 1;
-    $data['h']         = self::sign($data);
+    $data['h']         = $this->sign($data);
 
     /* Do the request. */
-    $response = self::getResponse($data);
+    $response = $this->getResponse($data);
     if($response === false) {
-      self::$lastError = 'YUBIKEY_SERVER_ERROR';
+      $this->lastError = 'YUBIKEY_SERVER_ERROR';
       return false;
     }
 
@@ -94,22 +102,22 @@ class Yubikey {
     if($response['status'] != 'OK') {
       switch($response['status']) {
         case 'REPLAYED_OTP':
-          self::$lastError = 'YUBIKEY_SERVER_REPLAYED_OTP';
+          $this->lastError = 'YUBIKEY_SERVER_REPLAYED_OTP';
           break;
         case 'REPLAYED_REQUEST':
-          self::$lastError = 'YUBIKEY_SERVER_REPLAYED_REQUEST';
+          $this->lastError = 'YUBIKEY_SERVER_REPLAYED_REQUEST';
           break;
         case 'BAD_OTP':
-          self::$lastError = 'YUBIKEY_SERVER_BAD_OTP';
+          $this->lastError = 'YUBIKEY_SERVER_BAD_OTP';
           break;
         case 'NO_SUCH_CLIENT':
-          self::$lastError = 'YUBIKEY_SERVER_NO_SUCH_CLIENT';
+          $this->lastError = 'YUBIKEY_SERVER_NO_SUCH_CLIENT';
           break;
         case 'BAD_SIGNATURE':
-          self::$lastError = 'YUBIKEY_SERVER_BAD_SIGNATURE';
+          $this->lastError = 'YUBIKEY_SERVER_BAD_SIGNATURE';
           break;
         default:
-          self::$lastError = 'YUBIKEY_SERVER_SAYS_NO';
+          $this->lastError = 'YUBIKEY_SERVER_SAYS_NO';
           break;
       }
       return false;
@@ -117,14 +125,14 @@ class Yubikey {
 
     /* If tokens don't match return false. */
     if($response['otp'] != $otp) {
-      self::$lastError = 'YUBIKEY_NO_MATCH';
+      $this->$lastError = 'YUBIKEY_NO_MATCH';
       return false;
     }
 
     /* Sign the request to see if it matches signature from server. */
-    $signature = self::sign($response);
+    $signature = $this->sign($response);
     if($signature !== $response['h']) {
-      self::$lastError = 'YUBIKEY_BAD_SERVER_SIGNATURE';
+      $this->lastError = 'YUBIKEY_BAD_SERVER_SIGNATURE';
       return false;
     }
     return true;
@@ -139,7 +147,7 @@ class Yubikey {
    * @return string
    *   Base64 encoded HMAC hash.
    */
-  private static function sign($data) {
+  public function sign($data) {
     /* Remove signature from server. */
     unset($data['h']);
 
@@ -159,7 +167,7 @@ class Yubikey {
     }
 
     /* Sign. */
-    $sign = hash_hmac('sha1', utf8_encode($query), base64_decode(self::$_clientSecret), true);
+    $sign = hash_hmac('sha1', utf8_encode($query), base64_decode($this->clientSecret), true);
     return base64_encode($sign);
   }
 
@@ -172,7 +180,7 @@ class Yubikey {
    * @return array
    *   Array containing key/values from the response.
    */
-  private static function getResponse($data) {
+  private function getResponse($data) {
     /* Convert the array with data to a request string. */
     $query = http_build_query($data);
 
@@ -180,7 +188,7 @@ class Yubikey {
     $opts = array(
       'http'=>array(
         'method'  => 'GET',
-        'timeout' => self::$_serverTimeout,
+        'timeout' => $this->_serverTimeout,
         'header'  => "Accept-language: en\r\n" .
                      "User-Agent: phpSec (http://phpseclib.com)\r\n"
       )
@@ -192,10 +200,10 @@ class Yubikey {
     /* Try to get response from Yubico server. */
     $attempts = 0;
     $response = false;
-    while($response === false && $attempts < self::$_numServers) {
+    while($response === false && $attempts < $this->_numServers) {
       /* select a Yubico API server. */
-      $server = array_rand(self::$_servers);
-      $response = @file_get_contents(self::$_servers[$server].'?'.$query, null, $context);
+      $server = array_rand($this->_servers);
+      $response = @file_get_contents($this->_servers[$server].'?'.$query, null, $context);
       $attempts++;
     }
 
@@ -227,7 +235,7 @@ class Yubikey {
    * @return boolean
    *   True if the OTP is valid, false on error.
    */
-  private static function validOtp($otp) {
+  public function validOtp($otp) {
     $length  = strlen($otp);
 
     /* Check length. */
@@ -252,8 +260,8 @@ class Yubikey {
    * @return string
    *   Returns the Yubikey identity, or false on failure.
    */
-  public static function getYubikeyId($otp) {
-    if(!self::validOtp($otp)) {
+  public function getYubikeyId($otp) {
+    if(!$this->validOtp($otp)) {
       return false;
     }
 

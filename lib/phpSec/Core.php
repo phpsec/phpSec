@@ -36,6 +36,10 @@ class Core extends Pimple {
       return new Auth\Otp($psl);
     });
 
+    $this['auth/yubikey'] = $this->share(function($psl) {
+      return new Auth\Yubikey($psl);
+    });
+
     $this['common/exec'] = $this->share(function($psl) {
       return new Common\Exec($psl);
     });
