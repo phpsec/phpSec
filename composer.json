@@ -23,7 +23,7 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0"
+        "php": ">=5.4"
     },
      "suggest": {
         "ext-mcrypt": "The Mcrypt extension is used to encrypt data.",
