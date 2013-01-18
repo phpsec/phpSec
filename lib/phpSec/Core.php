@@ -44,6 +44,10 @@ class Core extends Pimple {
       return new Common\Exec($psl);
     });
 
+    $this['common/session'] = $this->share(function($psl) {
+      return new Common\Session($psl);
+    });
+
     $this['common/token'] = $this->share(function($psl) {
       return new Common\Token($psl);
     });

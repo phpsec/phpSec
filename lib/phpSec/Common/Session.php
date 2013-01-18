@@ -8,46 +8,25 @@
   @license   http://opensource.org/licenses/mit-license.php The MIT License
   @package   phpSec
  */
-use \phpSec\Crypt\Crypto;
-use \phpSec\Common\Core;
-use \phpSec\Crypt\Rand;
 
-/**
- * Implements a session handler to save session data encrypted.
- * @package phpSec
- */
-class Session {
-  private static $_sessIdRegen;
-  private static $_savePath;
-  private static $_name;
-  private static $_keyCookie;
-  private static $_secret;
-  private static $_currID;
-  private static $_newID;
+class Session implements \SessionHandlerInterface {
 
-  public static $_cryptAlgo = 'rijndael-256';
-  public static $_cryptMode = 'cfb';
+  private $psl = null;
+  private $sessIdRegen;
+  private $savePath;
+  private $name;
+  private $keyCookie;
+  private $secret;
+  private $currID;
+  private $newID;
 
-  /**
-   * Constant: Hash method to use.
-   */
-  const HASH_TYPE = 'sha256';
+  public $cryptAlgo = 'rijndael-256';
+  public $cryptMode = 'cfb';
 
-  /**
-   * Init the phpSec session handler.
-   */
-  public static function init($_sessIdRegen) {
-  	self::$_sessIdRegen = $_sessIdRegen;
-
-  	ini_set('session.save_handler', 'user');
-    session_set_save_handler(
-      '\phpSec\Common\Session::open',
-      '\phpSec\Common\Session::close',
-      '\phpSec\Common\Session::read',
-      '\phpSec\Common\Session::write',
-      '\phpSec\Common\Session::destroy',
-      '\phpSec\Common\Session::gc'
-    );
+  public function __construct($psl) {
+    $this->psl = $psl;
+    ini_set('session.save_handler', 'user');
+    session_set_save_handler($this);
 
     /* Since we set a session cookie on our session handler, disable the built-in cookies. */
     ini_set('session.use_cookies', 0);
@@ -55,93 +34,89 @@ class Session {
     /* Start a new session. */
     session_start();
 
-    /* Check the fingerprint to see if it matches, if not clear session data. */
-    $fingerprint = hash(self::HASH_TYPE, 'phpSec-fingerprint'.$_SERVER['HTTP_USER_AGENT']);
-    if(!isset($_SESSION['phpSec-fingerprint'])) {
-      $_SESSION['phpSec-fingerprint'] = $fingerprint;
-    }
-    if($fingerprint != $_SESSION['phpSec-fingerprint']) {
-      $_SESSION = array();
-    }
-
-    Core::getUid();
+    $psl->getUid();
   }
 
+  public function close() {
+    return true;
+  }
 
-  /**
-   * Open a session.
-   *
-   * @param string $path
-   * @param string $name
-   * @return bool
-   */
-  public static function open($path, $name) {
+  public function destroy($id) {
+    $store  = $this->psl['store'];
+    return $store->delete('session', $id);
+
+  }
+
+  public function gc($ttl) {
+    $store  = $this->psl['store'];
+
+    $Ids = $store->listIds('session');
+    foreach($Ids as $Id) {
+      $data = $store->meta('session', $Id);
+      if($data->time + $ttl < time()) {
+        $store->delete('session', $Id);
+      }
+    }
+    return true;
+  }
+
+  public function open($path, $name) {
+    $rand = $this->psl['crypt/rand'];
+
     /* Set some variables we need later. */
-    self::$_savePath  = $path;
-    self::$_name      = $name;
-    self::$_keyCookie = $name.'_secret';
+    $this->savePath  = $path;
+    $this->name      = $name;
+    $this->keyCookie = $name.'_secret';
 
     /* Set current and new ID. */
     if(isset($_COOKIE[$name])) {
-      self::$_currID = $_COOKIE[$name];
+      $this->currID = $_COOKIE[$name];
     } else {
-      self::$_currID = null;
+      $this->currID = null;
     }
-    if(self::$_sessIdRegen === true || self::$_currID === null) {
-    	self::$_newID = Rand::str(128, 'abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ-_.!*#=%');
+    if($this->sessIdRegen === true || $this->currID === null) {
+      $this->newID = $rand->str(128, 'abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ-_.!*#=%');
     } else {
-    	self::$_newID = self::$_currID;
+      $this->newID = $this->currID;
     }
 
     /* Set cookie with new session ID. */
     $cookieParam = session_get_cookie_params();
     setcookie(
-      $name,
-      self::$_newID,
-      $cookieParam['lifetime'],
-      $cookieParam['path'],
-      $cookieParam['domain'],
-      $cookieParam['secure'],
-      $cookieParam['httponly']
+        $name,
+        $this->newID,
+        $cookieParam['lifetime'],
+        $cookieParam['path'],
+        $cookieParam['domain'],
+        $cookieParam['secure'],
+        $cookieParam['httponly']
     );
 
     /* If we don't have a encryption key, create one. */
-    if(!isset($_COOKIE[self::$_keyCookie])) {
+    if(!isset($_COOKIE[$this->keyCookie])) {
       /* Create a secret used for encryption of session. */
-      self::setSecret();
+      $this->setSecret();
     } else {
-      self::$_secret = base64_decode($_COOKIE[self::$_keyCookie]);
+      $this->secret = base64_decode($_COOKIE[$this->keyCookie]);
     }
     return true;
   }
 
-  /**
-   * Close a session.
-   *
-   * @return bool
-   */
-  public static function close() {
-    return true;
-  }
+  public function read($id) {
+    $crypto = $this->psl['crypt/crypto'];
+    $store  = $this->psl['store'];
 
-  /**
-   * Read and decrypt a session.
-   *
-   * @param string $id
-   * @return mixed
-   */
-  public static function read($id) {
-    /* If no cookie is set, just dropi it! */
-    if(!isset($_COOKIE[self::$_name])) {
+    /* If no cookie is set, just drop it! */
+    if(!isset($_COOKIE[$this->name])) {
       return false;
     }
 
     /* Read from store and decrypt. */
     try {
-      $sessData = Core::$store->read('session', $_COOKIE[self::$_name]);
+      $sessData = $store->read('session', $_COOKIE[$this->name]);
 
       if($sessData !== false ) {
-        $return = Crypto::decrypt($sessData, self::$_secret);
+        $return = $crypto->decrypt($sessData, $this->secret);
       } else {
         $return = false;
       }
@@ -151,73 +126,41 @@ class Session {
     }
   }
 
-  /**
-   * Encrypt and save a session.
-   *
-   * @param string $id
-   * @param string $data
-   * @return bool
-   */
-  public static function write($id, $data) {
+  public function write($id , $data) {
+    $crypto = $this->psl['crypt/crypto'];
+    $store  = $this->psl['store'];
+
     /* Encrypt session. */
     try {
-      Crypto::$_algo = self::$_cryptAlgo;
-      Crypto::$_mode = self::$_cryptMode;
-      $encrypted = Crypto::encrypt($data, self::$_secret);
+      $crypto->_algo = $this->cryptAlgo;
+      $crypto->_mode = $this->cryptMode;
+      $encrypted = $crypto->encrypt($data, $this->secret);
 
       /* Destroy old session. */
-      if(self::$_newID != self::$_currID) {
-      	self::destroy(self::$_currID);
+      if($this->newID != $this->currID) {
+        $this->destroy($this->currID);
       }
 
       /* Write new session, with new ID. */
-      return Core::$store->write('session', self::$_newID, $encrypted);
+      return $store->write('session', $this->newID, $encrypted);
     } catch (\phpSec\Exception $e) {
       return false;
     }
   }
-  /**
-   * Destroy/remove a session.
-   *
-   * @param string $id
-   * @return bool
-   */
-  public static function destroy($id) {
-    return Core::$store->delete('session', $id);
-  }
-  /**
-   * Do garbage collection.
-   *
-   * @param integer $ttl
-   * @return bool
-   */
-  public static function gc($ttl) {
-    $Ids = Core::$store->listIds('session');
-    foreach($Ids as $Id) {
-      $data = Core::$store->meta('session', $Id);
-      if($data->time + $ttl < time()) {
-        Core::$store->delete('session', $Id);
-      }
-    }
-    return true;
-  }
 
-  /**
-   * Set the cookie with the secret.
-   *
-   * @return true
-   */
-  private static function setSecret() {
-    self::$_secret = Rand::bytes(32);
+  public function setSecret() {
+    $rand = $this->psl['crypt/rand'];
+
+    $this->secret = $rand->bytes(32);
     $cookieParam = session_get_cookie_params();
     setcookie(
-      self::$_keyCookie,
-      base64_encode(self::$_secret),
-      $cookieParam['lifetime'],
-      $cookieParam['path'],
-      $cookieParam['domain'],
-      $cookieParam['secure'],
-      $cookieParam['httponly']
+        $this->keyCookie,
+        base64_encode($this->secret),
+        $cookieParam['lifetime'],
+        $cookieParam['path'],
+        $cookieParam['domain'],
+        $cookieParam['secure'],
+        $cookieParam['httponly']
     );
     return true;
   }
