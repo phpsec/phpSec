@@ -10,9 +10,6 @@
  */
 namespace phpSec\Store;
 
-use \phpSec\Crypt\Crypto;
-use \phpSec\Common\Core;
-
 /**
  * Class for handling database storage.
  * @package phpSec
@@ -24,9 +21,16 @@ class Pdo extends Store {
   private $table     = null;
 
   /**
-   * @see \phpSec\Store\Store::__construct()
+   * phpSec core Pimple container.
+   */
+  private $psl = null;
+
+  /**
+   * {@inheritdoc}
    */
   public function __construct($loc, \phpSec\Core $psl) {
+    $this->psl = $psl;
+
     /* Separate username and password from DSN */
     $parts = self::parseDsn($loc);
     $loc   = 'mysql:dbname='.$parts['dbname'].';host='.$parts['host'];
@@ -127,6 +131,7 @@ class Pdo extends Store {
    * @see phpsecStore::read()
    */
   public function read($type, $id) {
+    $crypto = $this->psl['crypt/crypto'];
 
     /* The first part is prettu basic. Get stuff from databse. */
     $sth = $this->dbh->prepare(
@@ -145,7 +150,7 @@ class Pdo extends Store {
     }
 
     /* Calculate expected MAC. */
-    $mac = \phpSec\Crypt\Crypto::pbkdf2($data['data'], $id, 1000, 32);
+    $mac = $crypto->pbkdf2($data['data'], $id, 1000, 32);
 
     /* Compare MAC */
     if($mac != $data['mac']) {
@@ -161,6 +166,8 @@ class Pdo extends Store {
    * @see phpsecStore::write()
    */
   public function write($type, $id, $data) {
+    $crypto = $this->psl['crypt/crypto'];
+
     /* Delete existing data first, to prevent a huge database. */
     $this->delete($type, $id);
 
@@ -172,7 +179,7 @@ class Pdo extends Store {
 
     /* Serialize data, and create a MAC. */
     $data = serialize($data);
-    $mac  = \phpSec\Crypt\Crypto::pbkdf2($data, $id, 1000, 32);
+    $mac  = $crypto->pbkdf2($data, $id, 1000, 32);
 
     /* We use this array to say what data goes where in the query. */
     $data = array(
@@ -246,6 +253,8 @@ class Pdo extends Store {
       return false;
     }
 
+    $obj = new \StdClass;
+
     $obj->id   = $meta['id'];
     $obj->mac  = $meta['mac'];
     $obj->time = $meta['time'];
@@ -262,10 +271,16 @@ class Pdo extends Store {
    * @return array
    *   Returns an array with variable names as keys with corresponding values.
    */
-  private static function parseDsn($dsn) {
+  private function parseDsn($dsn) {
     $parsed = array();
-    $parts = explode(';', $dsn);
 
+    $typeEnd = strpos($dsn, ':');
+    $dbType = substr($dsn, 0, $typeEnd);
+    $parsed['dbtype'] = $dbType;
+
+    $dsn = substr($dsn, $typeEnd+1);
+
+    $parts = explode(';', $dsn);
     foreach($parts as $part) {
       list($key, $val) = explode('=', $part);
       $parsed[$key] = $val;
