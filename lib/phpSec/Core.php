@@ -13,68 +13,84 @@ namespace phpSec;
 
 class Core extends Pimple {
 
+  /**
+   * phpSec version consant.
+   */
   const VERSION = '0.6.0-dev';
 
+  /**
+   * Constructor.
+   * Set up the default objects for phpSec.
+   */
   public function __construct() {
 
-    $this['logger'] = null;
+    /* Store object. Must be defined by the developer. */
     $this['store']  = null;
 
+    /* Cache object. Shared object that handles the cache. */
     $this['cache'] = $this->share(function($psl) {
       return new Common\Cache($psl);
     });
 
-    $this['auth/authy'] = $this->share(function() {
-      return new Auth\Authy();
-    });
-
-    $this['auth/google'] = $this->share(function($psl) {
-      return new Auth\Google($psl);
-    });
-
-    $this['auth/otp'] = $this->share(function($psl) {
-      return new Auth\Otp($psl);
-    });
-
-    $this['auth/yubikey'] = $this->share(function($psl) {
-      return new Auth\Yubikey($psl);
-    });
-
-    $this['common/exec'] = $this->share(function($psl) {
-      return new Common\Exec();
-    });
-
-    $this['common/session'] = $this->share(function($psl) {
+    /* Session object. Shared object that handles sessions. */
+    $this['session'] = $this->share(function($psl) {
       return new Common\Session($psl);
     });
 
-    $this['common/token'] = $this->share(function($psl) {
+    /**
+     * Core phpSec objects.
+     */
+    $this['auth/authy'] = function() {
+      return new Auth\Authy();
+    };
+
+    $this['auth/google'] = function($psl) {
+      return new Auth\Google($psl);
+    };
+
+    $this['auth/otp'] = function($psl) {
+      return new Auth\Otp($psl);
+    };
+
+    $this['auth/yubikey'] = function($psl) {
+      return new Auth\Yubikey($psl);
+    };
+
+    $this['common/exec'] = function($psl) {
+      return new Common\Exec();
+    };
+
+    $this['common/token'] = function($psl) {
       return new Common\Token($psl);
-    });
+    };
 
-    $this['crypt/crypto'] = $this->share(function($psl) {
+    $this['crypt/crypto'] = function($psl) {
       return new Crypt\Crypto($psl);
-    });
+    };
 
-    $this['crypt/hash'] = $this->share(function($psl) {
+    $this['crypt/hash'] = function($psl) {
       return new Crypt\Hash($psl);
-    });
+    };
 
-    $this['crypt/rand'] = $this->share(function($psl) {
+    $this['crypt/rand'] = function($psl) {
       return new Crypt\Rand();
-    });
+    };
 
-    $this['http/hsts'] = $this->share(function($psl) {
+    $this['http/hsts'] = function($psl) {
       return new Http\Hsts();
-    });
+    };
 
-    $this['http/url'] = $this->share(function($psl) {
+    $this['http/url'] = function($psl) {
       return new Http\Url($psl);
-    });
+    };
 
-    $this['text/filter'] = $this->share(function($psl) {
+    $this['string/base32'] = function($psl) {
+      return new String\Base32($psl);
+    };
+
+    $this['text/filter'] = function($psl) {
       return new Http\Hsts($psl);
-    });
+    };
 
 
   }
