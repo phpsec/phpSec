@@ -26,7 +26,7 @@ class Pdo extends Store {
   /**
    * @see \phpSec\Store\Store::__construct()
    */
-  public function __construct($loc, $psl) {
+  public function __construct($loc, \phpSec\Core $psl) {
     /* Separate username and password from DSN */
     $parts = self::parseDsn($loc);
     $loc   = 'mysql:dbname='.$parts['dbname'].';host='.$parts['host'];

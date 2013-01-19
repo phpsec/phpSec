@@ -24,7 +24,7 @@ abstract class Store {
    * @return bool
    *   Returns true on success and false on error.
    */
-  abstract public function __construct($loc, $psl);
+  abstract public function __construct($loc, \phpSec\Core $psl);
 
   /**
    * Read object from storage.

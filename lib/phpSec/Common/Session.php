@@ -11,7 +11,11 @@
 
 class Session implements \SessionHandlerInterface {
 
+  /**
+   * phpSec core Pimple container.
+   */
   private $psl = null;
+
   private $sessIdRegen;
   private $savePath;
   private $name;
@@ -23,6 +27,12 @@ class Session implements \SessionHandlerInterface {
   public $cryptAlgo = 'rijndael-256';
   public $cryptMode = 'cfb';
 
+  /**
+   * Constructor.
+   *
+   * @param \phpSec\Core $psl
+   *   phpSec core Pimple container.
+   */
   public function __construct($psl) {
     $this->psl = $psl;
     ini_set('session.save_handler', 'user');
@@ -37,16 +47,33 @@ class Session implements \SessionHandlerInterface {
     $psl->getUid();
   }
 
+  /**
+   * Close a session.
+   *
+   * @return bool
+   */
   public function close() {
     return true;
   }
 
+  /**
+   * Destroy/remove a session.
+   *
+   * @param string $id
+   * @return bool
+   */
   public function destroy($id) {
     $store  = $this->psl['store'];
     return $store->delete('session', $id);
 
   }
 
+  /**
+   * Do garbage collection.
+   *
+   * @param integer $ttl
+   * @return bool
+   */
   public function gc($ttl) {
     $store  = $this->psl['store'];
 
@@ -60,6 +87,13 @@ class Session implements \SessionHandlerInterface {
     return true;
   }
 
+  /**
+   * Open a session.
+   *
+   * @param string $path
+   * @param string $name
+   * @return bool
+   */
   public function open($path, $name) {
     $rand = $this->psl['crypt/rand'];
 
@@ -102,6 +136,12 @@ class Session implements \SessionHandlerInterface {
     return true;
   }
 
+  /**
+   * Read and decrypt a session.
+   *
+   * @param string $id
+   * @return mixed
+   */
   public function read($id) {
     $crypto = $this->psl['crypt/crypto'];
     $store  = $this->psl['store'];
@@ -126,6 +166,13 @@ class Session implements \SessionHandlerInterface {
     }
   }
 
+  /**
+   * Encrypt and save a session.
+   *
+   * @param string $id
+   * @param string $data
+   * @return bool
+   */
   public function write($id , $data) {
     $crypto = $this->psl['crypt/crypto'];
     $store  = $this->psl['store'];
@@ -148,6 +195,11 @@ class Session implements \SessionHandlerInterface {
     }
   }
 
+  /**
+   * Set the cookie with the secret.
+   *
+   * @return true
+   */
   public function setSecret() {
     $rand = $this->psl['crypt/rand'];
 

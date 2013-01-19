@@ -69,12 +69,19 @@ class Hash {
     'itoa64' => './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
   );
 
+  /**
+   * phpSec core Pimple container.
+   */
   private $psl = null;
 
-  public function __construct($psl = null) {
-    if($psl !== null) {
-      $this->psl = $psl;
-    }
+  /**
+   * Constructor.
+   *
+   * @param \phpSec\Core $psl
+   *   phpSec core Pimple container.
+   */
+  public function __construct(\phpSec\Core $psl) {
+    $this->psl = $psl;
   }
 
   /**

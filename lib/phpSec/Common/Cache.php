@@ -21,9 +21,22 @@ class Cache {
   const GC_PROB   = 0.2;
   const HASH_TYPE = 'sha256';
 
+  /**
+   * phpSec core Pimple container.
+   */
   private $psl = null;
+
+  /**
+   * Store object.
+   */
   private $store = null;
 
+  /**
+   * Constructor.
+   *
+   * @param \phpSec\Core $psl
+   *   phpSec core Pimple container.
+   */
   public function __construct($psl) {
     $this->psl = $psl;
     $this->store = $psl['store'];

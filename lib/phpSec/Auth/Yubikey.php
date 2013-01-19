@@ -54,9 +54,18 @@ class Yubikey {
     'http://api5.yubico.com/wsapi/2.0/verify',
   );
 
+  /**
+   * phpSec core Pimple container.
+   */
   private $psl = null;
 
-  public function __construct($psl) {
+  /**
+   * Constructor.
+   *
+   * @param \phpSec\Core $psl
+   *   phpSec core Pimple container.
+   */
+  public function __construct(\phpSec\Core $psl) {
     $this->psl = $psl;
   }
 

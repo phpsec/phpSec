@@ -18,16 +18,21 @@ class Crypto {
   public $_mode = 'ctr';
 
   protected $_padding = false;
-
-  private $psl = null;
-
-
   const HASH_TYPE = 'sha256';
 
-  public function __construct($psl = null) {
-    if($psl !== null) {
-      $this->psl = $psl;
-    }
+  /**
+   * phpSec core Pimple container.
+   */
+  private $psl = null;
+
+  /**
+   * Constructor.
+   *
+   * @param \phpSec\Core $psl
+   *   phpSec core Pimple container.
+   */
+  public function __construct(\phpSec\Core $psl) {
+    $this->psl = $psl;
   }
 
   /**

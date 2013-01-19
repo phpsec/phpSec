@@ -24,8 +24,8 @@ class Core extends Pimple {
       return new Common\Cache($psl);
     });
 
-    $this['auth/authy'] = $this->share(function($psl) {
-      return new Auth\Authy($psl);
+    $this['auth/authy'] = $this->share(function() {
+      return new Auth\Authy();
     });
 
     $this['auth/google'] = $this->share(function($psl) {
@@ -41,7 +41,7 @@ class Core extends Pimple {
     });
 
     $this['common/exec'] = $this->share(function($psl) {
-      return new Common\Exec($psl);
+      return new Common\Exec();
     });
 
     $this['common/session'] = $this->share(function($psl) {
@@ -52,10 +52,6 @@ class Core extends Pimple {
       return new Common\Token($psl);
     });
 
-    $this['crypt/rand'] = $this->share(function($psl) {
-      return new Crypt\Rand();
-    });
-
     $this['crypt/crypto'] = $this->share(function($psl) {
       return new Crypt\Crypto($psl);
     });
@@ -64,8 +60,12 @@ class Core extends Pimple {
       return new Crypt\Hash($psl);
     });
 
+    $this['crypt/rand'] = $this->share(function($psl) {
+      return new Crypt\Rand();
+    });
+
     $this['http/hsts'] = $this->share(function($psl) {
-      return new Http\Hsts($psl);
+      return new Http\Hsts();
     });
 
     $this['http/url'] = $this->share(function($psl) {

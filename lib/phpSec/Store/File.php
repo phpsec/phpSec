@@ -20,12 +20,15 @@ class File extends Store {
   private $_dataDir  = null;
   public  $_hashType = 'sha256';
 
+  /**
+   * phpSec core Pimple container.
+   */
   private $psl = null;
 
   /**
    * @see phpsecStore::__construct()
    */
-  public function __construct($loc, $psl) {
+  public function __construct($loc, \phpSec\Core $psl) {
     $this->psl = $psl;
 
     if(!is_writeable($loc)) {
