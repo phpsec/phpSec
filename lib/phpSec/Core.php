@@ -10,7 +10,13 @@
  */
 namespace phpSec;
 
-
+/**
+ * phpSec core class.
+ * Includes Core phpSec methods, and act as an Pimple DI container.
+ *
+ * @author    Audun Larsen <larsen@xqus.com>
+ * @package   phpSec
+ */
 class Core extends Pimple {
 
   /**
