@@ -18,8 +18,11 @@ abstract class Store {
   /**
    * Open/prepare the storage.
    *
-   * @param string $target
+   * @param string $loc
    *   Storage location.
+   *
+   * @param \phpSec\Core $psl
+   *   The core phpSec Pimple Container.
    *
    * @return bool
    *   Returns true on success and false on error.

@@ -25,9 +25,6 @@ class Pdo extends Store {
    */
   private $psl = null;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct($loc, \phpSec\Core $psl) {
     $this->psl = $psl;
 
@@ -127,9 +124,6 @@ class Pdo extends Store {
     return true;
   }
 
-  /**
-   * @see phpsecStore::read()
-   */
   public function read($type, $id) {
     $crypto = $this->psl['crypt/crypto'];
 
@@ -162,9 +156,6 @@ class Pdo extends Store {
     return unserialize($data['data']);
   }
 
-  /**
-   * @see phpsecStore::write()
-   */
   public function write($type, $id, $data) {
     $crypto = $this->psl['crypt/crypto'];
 
@@ -194,9 +185,6 @@ class Pdo extends Store {
     return $sth->execute($data);
   }
 
-  /**
-   * @see phpsecStore::delete()
-   */
   public function delete($type, $id){
     $sth = $this->dbh->prepare(
       'DELETE FROM '.$this->table.' WHERE type = :type AND id = :id'
@@ -210,9 +198,6 @@ class Pdo extends Store {
     return $sth->execute($data);
   }
 
-  /**
-   * @see phpsecStore::listIds()
-   */
   public function listIds($type) {
     $ids = array();
 
@@ -233,9 +218,6 @@ class Pdo extends Store {
     return $ids;
   }
 
-  /**
-   * @see phpsecStore::meta()
-   */
   public function meta($type, $id) {
     $sth = $this->dbh->prepare(
       'SELECT * FROM '.$this->table.' WHERE type = :type AND id = :id LIMIT 1'

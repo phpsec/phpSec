@@ -25,9 +25,6 @@ class File extends Store {
    */
   private $psl = null;
 
-  /**
-   * @see phpsecStore::__construct()
-   */
   public function __construct($loc, \phpSec\Core $psl) {
     $this->psl = $psl;
 
@@ -39,9 +36,6 @@ class File extends Store {
     return true;
   }
 
-  /**
-   * @see phpsecStore::read()
-   */
   public function read($type, $id) {
     $crypto = $this->psl['crypt/crypto'];
 
@@ -62,9 +56,6 @@ class File extends Store {
     return unserialize($data);
   }
 
-  /**
-   * @see phpsecStore::write()
-   */
   public function write($type, $id, $data) {
     $crypto = $this->psl['crypt/crypto'];
 
@@ -91,16 +82,10 @@ class File extends Store {
     return false;
   }
 
-  /**
-   * @see phpsecStore::delete()
-   */
   public function delete($type, $id) {
     @unlink(self::fileName($type, $id));
   }
 
-  /**
-   * @see phpsecStore::listIds()
-   */
   public function listIds($type) {
     $ids = array();
     $files = glob($this->_dataDir.'/store_'.$type.'_*');
@@ -115,9 +100,6 @@ class File extends Store {
     return $ids;
   }
 
-  /**
-   * @see phpsecStore::meta()
-   */
   public function meta($type, $id) {
     $fileName = $this->fileName($type, $id);
     if(!file_exists($fileName)) {
