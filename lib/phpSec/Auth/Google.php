@@ -96,7 +96,7 @@ class Google {
    * @return string
    */
   public function getToken($secret, $timeTick = null) {
-    $base32 = new \phpSec\String\Base32();
+    $base32 = $this->psl['string/base32'];
 
     $secret = $base32->decode($secret);
 
