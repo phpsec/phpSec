@@ -20,7 +20,7 @@ class Hsts {
   /**
    * Enables HSTS.
    */
-  public static function enable() {
+  public function enable() {
     if ($this->detectHttps() === true) {
       header('Strict-Transport-Security: max-age='.$this->maxAge);
     } else {
