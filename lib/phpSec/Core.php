@@ -90,6 +90,10 @@ class Core extends Pimple {
       return new Http\Url($psl);
     };
 
+    $this['http/xfo'] = function($psl) {
+      return new Http\Xfo();
+    };
+
     $this['string/base32'] = function($psl) {
       return new String\Base32($psl);
     };
