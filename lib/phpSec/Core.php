@@ -50,6 +50,10 @@ class Core extends Pimple {
       return new Auth\Authy();
     };
 
+    $this['auth/mnemonic'] = function($psl) {
+      return new Auth\Mnemonic($psl);
+    };
+
     $this['auth/google'] = function($psl) {
       return new Auth\Google($psl);
     };

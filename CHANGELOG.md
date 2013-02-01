@@ -3,9 +3,14 @@ phpSec changelog
 
 0.6.0
 -----
-* Adds \phpSec\Http\Hsts, Implements HTTP Strict Transport Security
-* Adds \phpSec\Http\Url, Impements URL manipulation prevention
+* [#111] Total rewrite: Now uses Pimple as DI container.
+* [#113] Swap bcrypt prefix. Other small fixes to \phpSec\Crypt\Hash.
+* Adds \phpSec\Http\Xfo, Implements HTTP X-Frame-Options.
+* Adds \phpSec\Http\Hsts, Implements HTTP Strict Transport Security.
+* Adds \phpSec\Http\Url, Impements URL manipulation prevention.
+* Adds \phpSec\Auth\Mnemonic.php, Create easy to remember passphrases.
 * [#107] phpSec throws exceptions instead of triggering errors.
+* Updated tests.
 * Various minor fixes.
 
 0.5.1: December 12. 2012 - xqus
