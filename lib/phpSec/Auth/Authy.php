@@ -7,7 +7,6 @@
   @link      https://github.com/phpsec/phpSec
   @license   http://opensource.org/licenses/mit-license.php The MIT License
  */
-use phpSec\Common\Core;
 
 /**
  * Implements Authy authentication. It's like magic, except it's math.
