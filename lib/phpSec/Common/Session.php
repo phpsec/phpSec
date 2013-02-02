@@ -9,7 +9,7 @@
   @package   phpSec
  */
 
-class Session implements \SessionHandlerInterface {
+class Session {
 
   /**
    * phpSec core Pimple container.
@@ -36,7 +36,15 @@ class Session implements \SessionHandlerInterface {
   public function __construct($psl) {
     $this->psl = $psl;
     ini_set('session.save_handler', 'user');
-    session_set_save_handler($this);
+
+    session_set_save_handler(
+      array($this, 'open'),
+      array($this, 'close'),
+      array($this, 'read'),
+      array($this, 'write'),
+      array($this, 'destroy'),
+      array($this, 'gc')
+    );
 
     /* Since we set a session cookie on our session handler, disable the built-in cookies. */
     ini_set('session.use_cookies', 0);
