@@ -1,7 +1,7 @@
 phpSec changelog
 ================
 
-0.6.0
+0.6.0: February 17. 2013 - xqus
 -----
 * [#111] Total rewrite: Now uses Pimple as DI container.
 * [#113] Swap bcrypt prefix. Other small fixes to \phpSec\Crypt\Hash.
