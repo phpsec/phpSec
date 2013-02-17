@@ -5,7 +5,7 @@
 
 [![Build Status](https://travis-ci.org/phpsec/phpSec.png)](https://travis-ci.org/phpsec/phpSec)
 
-[Official Website](https://phpseclib.com/) and [Documentation](https://github.com/phpsec/doc/)
+[Official Website](https://phpseclib.com/) and [Documentation](http://phpseclib.com/docs)
 
 Features
 --------
