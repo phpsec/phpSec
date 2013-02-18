@@ -15,12 +15,12 @@ class HashTest extends PHPUnit_Framework_TestCase {
 
   }
 
-  public function testBcryptHash()
+  public function testPbkdf2Hash()
   {
     $psl = new \phpSec\Core();
 
     $hash = $psl['crypt/hash'];
-    $hash->method = \phpSec\Crypt\Hash::BCRYPT;
+    $hash->method = \phpSec\Crypt\Hash::PBKDF2;
     $str = 'some string';
     $pwHash = $hash->create($str);
 
