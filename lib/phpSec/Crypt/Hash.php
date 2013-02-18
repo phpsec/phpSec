@@ -25,7 +25,7 @@ class Hash {
   /**
    * Default hashing method.
    */
-  public $method = self::PBKDF2;
+  public $method = self::BCRYPT;
 
   /**
    * PBKDF2: Iteration count.
