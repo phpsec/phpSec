@@ -154,7 +154,8 @@ class Hash {
    *   Returns true on match.
    */
   public function check($str, $hash) {
-    $crypto = $this->psl['crypt/crypto'];
+    $crypto  = $this->psl['crypt/crypto'];
+    $compare = $this->psl['string/compare'];
 
     $hashInfo = $this->getInfo($hash);
 
@@ -164,10 +165,7 @@ class Hash {
         list( , , $params, $hash, $salt) = explode('$', $hash);
         parse_str($params, $param);
 
-        if(base64_decode($hash) === $crypto->pbkdf2($str, base64_decode($salt), $param['c'], $param['dk'], $param['f'])) {
-          return true;
-        }
-        return false;
+        return $compare->timingSafe($crypto->pbkdf2($str, base64_decode($salt), $param['c'], $param['dk'], $param['f']), base64_decode($hash));
       break;
 
       case self::DRUPAL:
@@ -182,10 +180,7 @@ class Hash {
       case self::BCRYPT_BC;
       case self::SHA256:
       case self::SHA512:
-        if(crypt($str, $hash) === $hash) {
-          return true;
-        }
-        return false;
+        return $compare->timingSafe(crypt($str, $hash), $hash);
       break;
 
       default:
@@ -207,7 +202,7 @@ class Hash {
       		default:
       		  return false;
       	}
-      	return ($hash == hash($mode, $str));
+      	return $compare->timingSafe(hash($mode, $str), $hash);
       break;
     }
   }
