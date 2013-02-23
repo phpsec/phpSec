@@ -12,7 +12,7 @@ class HashTest extends PHPUnit_Framework_TestCase {
     $pwHash = $hash->create($str);
 
     $this->assertTrue($hash->check($str, $pwHash));
-
+    $this->assertFalse($hash->check($str.'f00', $pwHash));
   }
 
   public function testPbkdf2Hash()
@@ -25,6 +25,7 @@ class HashTest extends PHPUnit_Framework_TestCase {
     $pwHash = $hash->create($str);
 
     $this->assertTrue($hash->check($str, $pwHash));
+    $this->assertFalse($hash->check($str.'f00', $pwHash));
   }
 
   public function testDrupalHash()
@@ -37,6 +38,7 @@ class HashTest extends PHPUnit_Framework_TestCase {
     $pwHash = $hash->create($str);
 
     $this->assertTrue($hash->check($str, $pwHash));
+    $this->assertFalse($hash->check($str.'f00', $pwHash));
   }
 
   public function testSha256Hash()
@@ -49,6 +51,7 @@ class HashTest extends PHPUnit_Framework_TestCase {
     $pwHash = $hash->create($str);
 
     $this->assertTrue($hash->check($str, $pwHash));
+    $this->assertFalse($hash->check($str.'f00', $pwHash));
   }
 
   public function testSha512Hash()
@@ -61,5 +64,6 @@ class HashTest extends PHPUnit_Framework_TestCase {
     $pwHash = $hash->create($str);
 
     $this->assertTrue($hash->check($str, $pwHash));
+    $this->assertFalse($hash->check($str.'f00', $pwHash));
   }
 }
