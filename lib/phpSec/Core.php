@@ -102,6 +102,10 @@ class Core extends Pimple {
       return new String\Base32($psl);
     };
 
+    $this['string/compare'] = function($psl) {
+      return new String\Compare();
+    };
+
     $this['text/filter'] = function($psl) {
       return new Http\Hsts($psl);
     };
