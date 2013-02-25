@@ -1,8 +1,14 @@
 phpSec changelog
 ================
 
+0.6.1: February 25. 2013 - xqus
+* Clean up the way we start sessions.
+* Add a timing safe comparison function (\phpSec\String\Compare).
+* Use timing safe comparison when comparing hashes.
+* Default password hashing method is now Bcrypt.
+
 0.6.0: February 17. 2013 - xqus
------
+-------------------------------
 * [#111] Total rewrite: Now uses Pimple as DI container.
 * [#113] Swap bcrypt prefix. Other small fixes to \phpSec\Crypt\Hash.
 * Adds \phpSec\Http\Xfo, Implements HTTP X-Frame-Options.
