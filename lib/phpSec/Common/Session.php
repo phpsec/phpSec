@@ -51,7 +51,10 @@ class Session {
   }
 
   /**
-   * Start session
+   * Start session.
+   *
+   * @param bool $regen
+   *   Regenerate session ID or not.
    */
   public function start($regen = true) {
     $this->sessIdRegen = $regen;
