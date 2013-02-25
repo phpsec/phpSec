@@ -48,11 +48,19 @@ class Session {
 
     /* Since we set a session cookie on our session handler, disable the built-in cookies. */
     ini_set('session.use_cookies', 0);
+  }
+
+  /**
+   * Start session
+   */
+  public function start($regen = true) {
+    $this->sessIdRegen = $regen;
 
     /* Start a new session. */
     session_start();
 
-    $psl->getUid();
+    /* Set UID. */
+    $this->psl->getUid();
   }
 
   /**
