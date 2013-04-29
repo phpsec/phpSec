@@ -85,7 +85,7 @@ class Yubikey {
     $rand = $this->psl['crypt/rand'];
 
     if($this->clientId === null || $this->clientSecret === null) {
-      $this->$lastError = 'YUBIKEY_CLIENT_DATA_NEEDED';
+      $this->lastError = 'YUBIKEY_CLIENT_DATA_NEEDED';
       return false;
     }
 
