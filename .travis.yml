@@ -9,5 +9,5 @@ matrix:
   allow_failures:
     - php: 5.5
 
-
+install: composer update
 script: phpunit --coverage-text
