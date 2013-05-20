@@ -1,4 +1,4 @@
-<?php
+<?php namespace phpSec;
 /**
  phpSec - A PHP security library
 
@@ -8,7 +8,6 @@
  @license   http://opensource.org/licenses/mit-license.php The MIT License
  @package   phpSec
  */
-namespace phpSec;
 
 /**
  * phpSec core class.
@@ -17,7 +16,7 @@ namespace phpSec;
  * @author    Audun Larsen <larsen@xqus.com>
  * @package   phpSec
  */
-class Core extends Pimple {
+class Core extends \Pimple {
 
   /**
    * phpSec version consant.
