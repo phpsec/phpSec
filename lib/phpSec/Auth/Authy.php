@@ -122,7 +122,7 @@ class Authy {
     	if(
 		isset($result->errors->message) &&
 		$result->errors->message == 'token is invalid'
-	)   {
+	) {
     		$this->lastError = 'AUTHY_SERVER_BAD_OTP';
     	} elseif(isset($result->errors->api_key)) {
         $this->lastError = 'AUTHY_SERVER_INVALID_API_KEY';
