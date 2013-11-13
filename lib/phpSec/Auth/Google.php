@@ -143,11 +143,11 @@ class Google {
    */
   public function getUrl($account, $key) {
 
-    $url['url'] = Filter::t('otpauth://totp/&account?secret=&key',
+    $url['url'] = $this->psl['text/filter']->t('otpauth://totp/&account?secret=&key',
                     array('&account' => $account, '&key' => $key)
                   );
 
-    $url['qr']  = Filter::t('https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl=otpauth://totp/&account?secret=&key',
+    $url['qr']  = $this->psl['text/filter']->t('https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl=otpauth://totp/&account?secret=&key',
                     array('&account' => $account, '&key' => $key)
                   );
 

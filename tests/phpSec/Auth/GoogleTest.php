@@ -30,4 +30,15 @@ class GoogleTest extends PHPUnit_Framework_TestCase {
     $this->assertTrue($google->verify($token, $key));
     $this->assertFalse($google->verify($token, $key));
   }
+  
+  public function testGetKey() {
+    $psl = new \phpSec\Core();
+
+   
+    $google = $psl['auth/google'];
+
+    $url = $google->getUrl('Account', 'someKey');
+
+    $this->assertTrue(sizeof($url) == 2);
+  }
 }
