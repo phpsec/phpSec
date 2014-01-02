@@ -134,7 +134,7 @@ class Yubikey {
 
     /* If tokens don't match return false. */
     if($response['otp'] != $otp) {
-      $this->$lastError = 'YUBIKEY_NO_MATCH';
+      $this->lastError = 'YUBIKEY_NO_MATCH';
       return false;
     }
 
