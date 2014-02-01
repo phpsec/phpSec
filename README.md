@@ -4,7 +4,10 @@
   of the common security tasks a web developer faces.
 
 [![Build Status](https://travis-ci.org/phpsec/phpSec.png)](https://travis-ci.org/phpsec/phpSec)
-[![Latest Stable Version](https://poser.pugx.org/phpsec/phpsec/v/stable.png)](https://packagist.org/packages/phpsec/phpsec) [![Total Downloads](https://poser.pugx.org/phpsec/phpsec/downloads.png)](https://packagist.org/packages/phpsec/phpsec) [![Latest Unstable Version](https://poser.pugx.org/phpsec/phpsec/v/unstable.png)](https://packagist.org/packages/phpsec/phpsec) [![License](https://poser.pugx.org/phpsec/phpsec/license.png)](https://packagist.org/packages/phpsec/phpsec)
+[![Latest Stable Version](https://poser.pugx.org/phpsec/phpsec/v/stable.png)](https://packagist.org/packages/phpsec/phpsec)
+[![Total Downloads](https://poser.pugx.org/phpsec/phpsec/downloads.png)](https://packagist.org/packages/phpsec/phpsec)
+[![Latest Unstable Version](https://poser.pugx.org/phpsec/phpsec/v/unstable.png)](https://packagist.org/packages/phpsec/phpsec)
+[![License](https://poser.pugx.org/phpsec/phpsec/license.png)](https://packagist.org/packages/phpsec/phpsec)
 
 [Official Website](https://phpseclib.com/) and [Documentation](http://phpseclib.com/docs)
 
