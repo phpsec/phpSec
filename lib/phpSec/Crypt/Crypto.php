@@ -155,6 +155,7 @@ class Crypto {
 
     /* Using PBKDF with constant salts dedicated to each purpose 
      * can securely derivce two keys from one */
+    $keySize = strlen($key);
     $key1 = $this->pbkdf2($key, "encrypt", 1, $keySize);
     $key2 = $this->pbkdf2($key, "HMAC", 1, $keySize);
 
