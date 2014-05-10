@@ -15,7 +15,11 @@ class CryptoTest extends PHPUnit_Framework_TestCase {
     $decrypted = $crypto->decrypt($encrypted, $key);
 
     $this->assertEquals($decrypted, $str);
-    $this->assert(!($crypto->decrypt($encrypted, $badkey)));
+    try {
+        $ret = $crypto->decrypt($encrypted, $badkey);
+    }catch(Exception $e){
+       $this->assertEquals("Message authentication code invalid",$e->getMessage());
+    }
 
   }
 }
