@@ -111,7 +111,7 @@ class Crypto {
     $encrypted['iv']    = base64_encode($iv);                                  /* Initialization vector, just a bunch of randomness. */
     $encrypted['cdata'] = base64_encode(mcrypt_generic($td, $serializedData)); /* The encrypted data. */
     $encrypted['mac']   = base64_encode(                                       /* The message authentication code. Used to make sure the */
-                            $this->pbkdf2($encrypted['cdata'], $key, 1000, 32)  /* message is valid when decrypted. */
+                            $this->pbkdf2($encrypted['cdata'], $key, 1, 32)  /* message is valid when decrypted. */
                           );
     return json_encode($encrypted);
   }
@@ -149,7 +149,7 @@ class Crypto {
     $block = mcrypt_enc_get_block_size($td);
 
     /* Check MAC. */
-    if(base64_decode($data['mac']) != $this->pbkdf2($data['cdata'], $key, 1000, 32)) {
+    if(base64_decode($data['mac']) != $this->pbkdf2($data['cdata'], $key, 1, 32)) {
       throw new \phpSec\Exception\GeneralSecurityException('Message authentication code invalid');
       return false;
     }
