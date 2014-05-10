@@ -84,12 +84,17 @@ class Crypto {
       }
     }
 
+    /* Using PBKDF with constant salts dedicated to each purpose 
+     * can securely derivce two keys from one */
+    $key1 = $this->pbkdf2($key, "encrypt", 1, $keySize);
+    $key2 = $this->pbkdf2($key, "HMAC", 1, $keySize);
+
     /* Create IV. */
     $rnd = $this->psl['crypt/rand'];
     $iv = $rnd->bytes(mcrypt_enc_get_iv_size($td));
 
     /* Init mcrypt. */
-    mcrypt_generic_init($td, $key, $iv);
+    mcrypt_generic_init($td, $key1, $iv);
 
     /* Prepeare the array with data. */
     $serializedData = serialize($data);
@@ -111,7 +116,7 @@ class Crypto {
     $encrypted['iv']    = base64_encode($iv);                                  /* Initialization vector, just a bunch of randomness. */
     $encrypted['cdata'] = base64_encode(mcrypt_generic($td, $serializedData)); /* The encrypted data. */
     $encrypted['mac']   = base64_encode(                                       /* The message authentication code. Used to make sure the */
-                            $this->pbkdf2($encrypted['cdata'], $key, 1, 32)  /* message is valid when decrypted. */
+                            $this->pbkdf2($encrypted['cdata'], $key2, 1, 32)  /* message is valid when decrypted. */
                           );
     return json_encode($encrypted);
   }
@@ -148,14 +153,19 @@ class Crypto {
     $td = mcrypt_module_open($data['algo'], '', $data['mode'], '');
     $block = mcrypt_enc_get_block_size($td);
 
+    /* Using PBKDF with constant salts dedicated to each purpose 
+     * can securely derivce two keys from one */
+    $key1 = $this->pbkdf2($key, "encrypt", 1, $keySize);
+    $key2 = $this->pbkdf2($key, "HMAC", 1, $keySize);
+
     /* Check MAC. */
-    if(base64_decode($data['mac']) != $this->pbkdf2($data['cdata'], $key, 1, 32)) {
+    if(base64_decode($data['mac']) != $this->pbkdf2($data['cdata'], $key2, 1, 32)) {
       throw new \phpSec\Exception\GeneralSecurityException('Message authentication code invalid');
       return false;
     }
 
     /* Init mcrypt. */
-    mcrypt_generic_init($td, $key, base64_decode($data['iv']));
+    mcrypt_generic_init($td, $key1, base64_decode($data['iv']));
 
     $decrypted = rtrim(mdecrypt_generic($td, base64_decode($this->stripPadding($block, $data['cdata']))));
 
