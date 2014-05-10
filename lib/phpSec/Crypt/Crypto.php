@@ -77,7 +77,7 @@ class Crypto {
         return false;
       }
     } else {
-      /* No spsecific size is needed. */
+      /* No specific size is needed. */
       if($keySize == 0 || $keySize > mcrypt_enc_get_key_size($td)) {
         throw new \phpSec\Exception\InvalidKeySpecException('Key is out of range. Should be between  1 and ' . mcrypt_enc_get_key_size($td).' bytes.');
         return false;
