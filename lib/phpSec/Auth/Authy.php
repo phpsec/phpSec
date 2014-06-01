@@ -18,7 +18,7 @@ class Authy {
   /**
    * Authy API key.
    */
-  public$_apiKey  = null;
+  public $_apiKey  = null;
 
   /**
    * Connect to sandbox?
