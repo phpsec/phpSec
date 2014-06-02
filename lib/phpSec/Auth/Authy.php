@@ -178,7 +178,7 @@ class Authy {
 
     	  break;
     	case 'verify':
-        $url = $url.'/protected/json/verify/'.$data['token'].'/'.$data['authy_id'].'?api_key='.$this->_apiKey;
+        $url = $url.'/protected/json/verify/'.$data['token'].'/'.$data['authy_id'].'?api_key='.$this->_apiKey.'&force=true';
 
         $opts = array(
           'http' => array(
