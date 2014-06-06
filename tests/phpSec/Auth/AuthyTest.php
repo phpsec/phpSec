@@ -18,7 +18,7 @@ class AuthyTest extends PHPUnit_Framework_TestCase {
 
     $this->assertFalse($authy->verify($authyID, '1234567'));
 
-    $this->assertEquals('AUTHY_SERVER_BAD_OTP', $authy->lastError);
+    $this->assertEquals('AUTHY_SERVER_INVALID_DATA', $authy->lastError);
 
 
   }
