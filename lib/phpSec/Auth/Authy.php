@@ -141,6 +141,9 @@ class Authy {
    * @param int $authyId
    *   Authy ID to request SMS token for.
    *
+   * @param bool $force
+   *   Force sending of SMS even for users with App.
+   *
    * @return boolean
    *   Returns true if SMS request was OK. false if not.
    */
