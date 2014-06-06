@@ -144,9 +144,10 @@ class Authy {
    * @return boolean
    *   Returns true if SMS request was OK. false if not.
    */
-  public function requestSms($authyId) {
+  public function requestSms($authyId, $force = false) {
     $data = array(
       'authy_id' => $authyId,
+      'force'    => $force,
     );
 
     $result = $this->apiCall('sms', $data);
@@ -218,7 +219,11 @@ class Authy {
       break;
 
       case 'sms':
-        $url = $url.'/protected/json/sms/'.$data['authy_id'].'?api_key='.$this->_apiKey.'&force=true';
+        $url = $url.'/protected/json/sms/'.$data['authy_id'].'?api_key='.$this->_apiKey;
+
+        if($data['force'] === true) {
+          $url = $url.'&force=true';
+        }
 
         $opts = array(
           'http' => array(
