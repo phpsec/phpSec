@@ -21,7 +21,7 @@ class Core extends \Pimple {
   /**
    * phpSec version consant.
    */
-  const VERSION = '0.6.3-dev';
+  const VERSION = '0.6.5';
 
   /**
    * Constructor.
