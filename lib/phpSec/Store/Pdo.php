@@ -25,7 +25,7 @@ class Pdo extends Store {
    */
   private $psl = null;
 
-  public function __construct($loc, \phpSec\Core $psl) {
+  public function __construct($loc, \phpSec\Core $psl, $options = Array()) {
     $this->psl = $psl;
 
     /* Separate username and password from DSN */
@@ -34,7 +34,7 @@ class Pdo extends Store {
 
     /* We try to connect to the database. If this fails throw an error. */
     try {
-      $this->dbh = new \PDO($loc, $parts['username'], $parts['password']);
+      $this->dbh = new \PDO($loc, $parts['username'], $parts['password'], $options);
     } catch(\PDOException $e) {
       throw new \phpSec\Exception\IOException('Database connection failed: ' . $e->getMessage());
       return false;
