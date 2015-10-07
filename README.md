@@ -1,3 +1,5 @@
+* phpSec is no longer actively maintained. *
+
 [phpSec](https://phpseclib.com/) - PHP security library
 =======================================================
 * phpSec is a open-source [PHP](http://php.net) security library that takes care
@@ -8,8 +10,6 @@
 [![Total Downloads](https://poser.pugx.org/phpsec/phpsec/downloads.png)](https://packagist.org/packages/phpsec/phpsec)
 [![Latest Unstable Version](https://poser.pugx.org/phpsec/phpsec/v/unstable.png)](https://packagist.org/packages/phpsec/phpsec)
 [![License](https://poser.pugx.org/phpsec/phpsec/license.png)](https://packagist.org/packages/phpsec/phpsec)
-
-[Official Website](https://phpseclib.com/) and [Documentation](http://phpseclib.com/docs)
 
 Features
 --------
