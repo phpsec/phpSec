@@ -1,4 +1,9 @@
-* phpSec is no longer actively maintained. *
+**phpSec is no longer actively maintained**
+
+This project is [now live on
+Subspace](https://app.dev.subspace.net/gitlab/subspace-open-development/phpsec)!
+Subspace is the open-development platform where projects are
+maintained collectively through voting.
 
 [phpSec](https://phpseclib.com/) - PHP security library
 =======================================================
